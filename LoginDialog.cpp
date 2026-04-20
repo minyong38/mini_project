@@ -4,185 +4,160 @@
 #include <QFrame>
 #include <QMessageBox>
 #include <QPixmap>
-#include <QGraphicsDropShadowEffect>
 
 LoginDialog::LoginDialog(QWidget* parent) : QDialog(parent)
 {
     setWindowTitle("로그인");
-    setFixedWidth(400);
+    setFixedWidth(380);
     setWindowFlags(windowFlags() & ~Qt::WindowContextHelpButtonHint);
-    setStyleSheet("QDialog { background-color: #F5F6FA; }");
+    setStyleSheet("QDialog { background:#FFFFFF; }");
 
     auto* root = new QVBoxLayout(this);
     root->setSpacing(0);
-    root->setContentsMargins(0, 0, 0, 0);
+    root->setContentsMargins(40, 36, 40, 32);
 
-    // ── 상단 헤더 패널 (짙은 배경) ──────────────────────
-    auto* header = new QFrame(this);
-    header->setStyleSheet("QFrame { background: qlineargradient(x1:0,y1:0,x2:1,y2:1,"
-                          "stop:0 #1A237E, stop:1 #283593); border:none; }");
-    header->setFixedHeight(200);
-    auto* headerLayout = new QVBoxLayout(header);
-    headerLayout->setAlignment(Qt::AlignHCenter | Qt::AlignVCenter);
-    headerLayout->setSpacing(10);
+    // ── 로고 + 타이틀 ────────────────────────────────────
+    auto* topRow = new QHBoxLayout();
+    topRow->setSpacing(14);
+    topRow->setAlignment(Qt::AlignLeft | Qt::AlignVCenter);
 
-    auto* logoLabel = new QLabel(header);
+    auto* logoLabel = new QLabel(this);
     QPixmap logoPixmap(":/logo.png");
     if (!logoPixmap.isNull())
-        logoLabel->setPixmap(logoPixmap.scaled(120, 120, Qt::KeepAspectRatio, Qt::SmoothTransformation));
-    logoLabel->setAlignment(Qt::AlignHCenter);
-    headerLayout->addWidget(logoLabel);
+        logoLabel->setPixmap(logoPixmap.scaled(48, 48, Qt::KeepAspectRatio, Qt::SmoothTransformation));
+    topRow->addWidget(logoLabel);
 
-    auto* titleLabel = new QLabel("공유 캘린더", header);
-    titleLabel->setStyleSheet("font-size:20px; font-weight:700; color:#FFFFFF; background:transparent;");
-    titleLabel->setAlignment(Qt::AlignHCenter);
-    headerLayout->addWidget(titleLabel);
+    auto* titleCol = new QVBoxLayout();
+    titleCol->setSpacing(2);
+    auto* titleLabel = new QLabel("공유 캘린더", this);
+    titleLabel->setStyleSheet("font-size:18px; font-weight:700; color:#1A237E;");
+    auto* subLabel = new QLabel("계정으로 로그인하세요", this);
+    subLabel->setStyleSheet("font-size:12px; color:#9E9E9E;");
+    titleCol->addWidget(titleLabel);
+    titleCol->addWidget(subLabel);
+    topRow->addLayout(titleCol);
+    root->addLayout(topRow);
+    root->addSpacing(24);
 
-    root->addWidget(header);
+    // ── 구분선 ────────────────────────────────────────────
+    auto* div0 = new QFrame(this);
+    div0->setFrameShape(QFrame::HLine);
+    div0->setStyleSheet("color:#EEEEEE;");
+    root->addWidget(div0);
+    root->addSpacing(20);
 
-    // ── 본문 카드 ────────────────────────────────────────
-    auto* card = new QFrame(this);
-    card->setStyleSheet(
-        "QFrame { background:#FFFFFF; border:none;"
-        " border-radius:0px; }"
-    );
-    auto* cardLayout = new QVBoxLayout(card);
-    cardLayout->setSpacing(0);
-    cardLayout->setContentsMargins(36, 32, 36, 32);
+    // ── 서버 IP ───────────────────────────────────────────
+    auto* ipLabel = new QLabel("서버 IP", this);
+    ipLabel->setStyleSheet("font-size:11px; font-weight:700; color:#757575; letter-spacing:0.8px;");
+    root->addWidget(ipLabel);
+    root->addSpacing(5);
 
-    // 서버 IP
-    auto* ipLabel = new QLabel("서버 IP 주소", card);
-    ipLabel->setStyleSheet("font-size:11px; font-weight:700; color:#5C6BC0; letter-spacing:1px; background:transparent;");
-    cardLayout->addWidget(ipLabel);
-    cardLayout->addSpacing(6);
-
-    m_ipEdit = new QLineEdit("172.20.35.212", card);
-    m_ipEdit->setFixedHeight(44);
+    m_ipEdit = new QLineEdit("172.20.35.212", this);
+    m_ipEdit->setFixedHeight(40);
     m_ipEdit->setStyleSheet(
-        "QLineEdit { padding:0 14px; border:2px solid #E8EAF6; border-radius:8px;"
-        " font-size:14px; color:#1A237E; background:#F8F9FF; }"
-        "QLineEdit:focus { border-color:#3F51B5; background:#FFFFFF; }"
+        "QLineEdit { padding:0 12px; border:1.5px solid #E0E0E0; border-radius:8px;"
+        " font-size:13px; color:#212121; background:#FAFAFA; }"
+        "QLineEdit:focus { border-color:#1A237E; background:#FFFFFF; }"
     );
-    cardLayout->addWidget(m_ipEdit);
-    cardLayout->addSpacing(20);
+    root->addWidget(m_ipEdit);
+    root->addSpacing(18);
 
-    // 구분선
-    auto* sep1 = new QFrame(card);
-    sep1->setFrameShape(QFrame::HLine);
-    sep1->setStyleSheet("color:#E8EAF6;");
-    cardLayout->addWidget(sep1);
-    cardLayout->addSpacing(20);
-
-    // Google 로그인 버튼
-    m_googleBtn = new QPushButton(card);
+    // ── Google 로그인 ─────────────────────────────────────
+    m_googleBtn = new QPushButton(this);
     m_googleBtn->setText("  Google 계정으로 로그인");
-    m_googleBtn->setFixedHeight(48);
+    m_googleBtn->setFixedHeight(42);
     m_googleBtn->setStyleSheet(R"(
         QPushButton {
-            background: #FFFFFF;
-            border: 2px solid #DADCE0;
-            border-radius: 8px;
-            font-size: 14px;
-            font-weight: 600;
-            color: #3C4043;
-            padding-left: 8px;
+            background:#FFFFFF; border:1.5px solid #DADCE0; border-radius:8px;
+            font-size:13px; font-weight:600; color:#3C4043; padding-left:8px;
         }
-        QPushButton:hover   { background: #F8F9FA; border-color: #3F51B5; }
-        QPushButton:pressed { background: #E8EAF6; }
-        QPushButton:disabled{ color: #AAAAAA; border-color: #E5E5EA; }
+        QPushButton:hover   { background:#F8F9FA; border-color:#BBBFC4; }
+        QPushButton:pressed { background:#F1F3F4; }
+        QPushButton:disabled{ color:#AAAAAA; border-color:#EEEEEE; }
     )");
     auto* gLogo = new QLabel(m_googleBtn);
-    gLogo->setText("<b style='font-size:18px; color:#4285F4;'>G</b>");
+    gLogo->setText("<b style='font-size:16px; color:#4285F4;'>G</b>");
     gLogo->setStyleSheet("background:transparent;");
-    auto* gBtnLayout = new QHBoxLayout(m_googleBtn);
-    gBtnLayout->setContentsMargins(14, 0, 14, 0);
-    gBtnLayout->addWidget(gLogo);
-    gBtnLayout->addStretch();
-    cardLayout->addWidget(m_googleBtn);
-    cardLayout->addSpacing(8);
+    auto* gLayout = new QHBoxLayout(m_googleBtn);
+    gLayout->setContentsMargins(12, 0, 12, 0);
+    gLayout->addWidget(gLogo);
+    gLayout->addStretch();
+    root->addWidget(m_googleBtn);
+    root->addSpacing(6);
 
     // 상태 레이블
-    m_statusLabel = new QLabel(card);
-    m_statusLabel->setStyleSheet("font-size:12px; color:#34C759; font-weight:600; background:transparent;");
+    m_statusLabel = new QLabel(this);
+    m_statusLabel->setStyleSheet("font-size:11px; color:#43A047; font-weight:600;");
     m_statusLabel->setAlignment(Qt::AlignHCenter);
     m_statusLabel->setWordWrap(true);
     m_statusLabel->hide();
-    cardLayout->addWidget(m_statusLabel);
-    cardLayout->addSpacing(16);
+    root->addWidget(m_statusLabel);
+    root->addSpacing(14);
 
-    // 또는 구분선
+    // ── 또는 ─────────────────────────────────────────────
     auto* sepLayout = new QHBoxLayout();
-    auto makeLine = [card]() {
-        auto* f = new QFrame(card);
+    auto makeLine = [this]() {
+        auto* f = new QFrame(this);
         f->setFrameShape(QFrame::HLine);
-        f->setStyleSheet("color:#E8EAF6;");
+        f->setStyleSheet("color:#EEEEEE;");
         return f;
     };
-    auto* orLabel = new QLabel("또는 직접 입력", card);
-    orLabel->setStyleSheet("font-size:11px; color:#9E9E9E; padding:0 10px; background:transparent;");
-    orLabel->setAlignment(Qt::AlignHCenter);
+    auto* orLabel = new QLabel("또는", this);
+    orLabel->setStyleSheet("font-size:11px; color:#BDBDBD; padding:0 8px;");
     sepLayout->addWidget(makeLine());
     sepLayout->addWidget(orLabel);
     sepLayout->addWidget(makeLine());
-    cardLayout->addLayout(sepLayout);
-    cardLayout->addSpacing(16);
+    root->addLayout(sepLayout);
+    root->addSpacing(14);
 
-    // ID 입력
-    auto* idLabel = new QLabel("사용자 ID", card);
-    idLabel->setStyleSheet("font-size:11px; font-weight:700; color:#5C6BC0; letter-spacing:1px; background:transparent;");
-    cardLayout->addWidget(idLabel);
-    cardLayout->addSpacing(6);
+    // ── ID 직접 입력 ──────────────────────────────────────
+    auto* idLabel = new QLabel("사용자 ID", this);
+    idLabel->setStyleSheet("font-size:11px; font-weight:700; color:#757575; letter-spacing:0.8px;");
+    root->addWidget(idLabel);
+    root->addSpacing(5);
 
-    m_idEdit = new QLineEdit(card);
+    m_idEdit = new QLineEdit(this);
     m_idEdit->setPlaceholderText("사용할 ID를 입력하세요");
-    m_idEdit->setFixedHeight(44);
+    m_idEdit->setFixedHeight(40);
     m_idEdit->setStyleSheet(
-        "QLineEdit { padding:0 14px; border:2px solid #E8EAF6; border-radius:8px;"
-        " font-size:14px; color:#1A237E; background:#F8F9FF; }"
-        "QLineEdit:focus { border-color:#3F51B5; background:#FFFFFF; }"
+        "QLineEdit { padding:0 12px; border:1.5px solid #E0E0E0; border-radius:8px;"
+        " font-size:13px; color:#212121; background:#FAFAFA; }"
+        "QLineEdit:focus { border-color:#1A237E; background:#FFFFFF; }"
     );
-    cardLayout->addWidget(m_idEdit);
-    cardLayout->addSpacing(28);
+    root->addWidget(m_idEdit);
+    root->addSpacing(22);
 
-    // 버튼 행
+    // ── 버튼 행 ───────────────────────────────────────────
     auto* btnRow = new QHBoxLayout();
-    btnRow->setSpacing(12);
+    btnRow->setSpacing(10);
 
-    auto* cancelBtn = new QPushButton("취소", card);
-    cancelBtn->setFixedHeight(46);
+    auto* cancelBtn = new QPushButton("취소", this);
+    cancelBtn->setFixedHeight(42);
     cancelBtn->setStyleSheet(
-        "QPushButton { background:#ECEFF1; border:none; border-radius:8px;"
-        " font-size:14px; color:#546E7A; font-weight:600; }"
-        "QPushButton:hover { background:#CFD8DC; }"
+        "QPushButton { background:#F5F5F5; border:none; border-radius:8px;"
+        " font-size:13px; color:#616161; font-weight:600; }"
+        "QPushButton:hover { background:#EEEEEE; }"
     );
 
-    m_okBtn = new QPushButton("로그인", card);
-    m_okBtn->setFixedHeight(46);
+    m_okBtn = new QPushButton("로그인", this);
+    m_okBtn->setFixedHeight(42);
     m_okBtn->setDefault(true);
     m_okBtn->setStyleSheet(
-        "QPushButton { background: qlineargradient(x1:0,y1:0,x2:1,y2:0,"
-        "stop:0 #3F51B5, stop:1 #5C6BC0);"
-        " border:none; border-radius:8px;"
-        " font-size:14px; color:#FFFFFF; font-weight:700; }"
-        "QPushButton:hover   { background: qlineargradient(x1:0,y1:0,x2:1,y2:0,"
-        "stop:0 #303F9F, stop:1 #3F51B5); }"
-        "QPushButton:pressed { background:#283593; }"
+        "QPushButton { background:#1A237E; border:none; border-radius:8px;"
+        " font-size:13px; color:#FFFFFF; font-weight:700; }"
+        "QPushButton:hover   { background:#283593; }"
+        "QPushButton:pressed { background:#0D47A1; }"
     );
 
     btnRow->addWidget(cancelBtn, 1);
     btnRow->addWidget(m_okBtn,   2);
-    cardLayout->addLayout(btnRow);
+    root->addLayout(btnRow);
 
-    root->addWidget(card);
-
-    // ── 시그널 연결 ───────────────────────────────────
     connect(m_googleBtn, &QPushButton::clicked, this, &LoginDialog::onGoogleLogin);
     connect(m_okBtn,     &QPushButton::clicked, this, &LoginDialog::accept);
     connect(cancelBtn,   &QPushButton::clicked, this, &LoginDialog::reject);
     connect(m_idEdit,    &QLineEdit::returnPressed, this, &LoginDialog::accept);
 }
-
-// ── Google 로그인 시작 ──────────────────────────────────
 
 void LoginDialog::onGoogleLogin()
 {
@@ -192,7 +167,7 @@ void LoginDialog::onGoogleLogin()
         connect(m_auth, &GoogleAuthManager::loginFailed,  this, &LoginDialog::onLoginFailed);
     }
     setGoogleButtonState(true);
-    m_statusLabel->setStyleSheet("font-size:12px; color:#8E8E93;");
+    m_statusLabel->setStyleSheet("font-size:11px; color:#9E9E9E;");
     m_statusLabel->setText("브라우저에서 로그인을 완료해주세요...");
     m_statusLabel->show();
     m_auth->startLogin();
@@ -206,11 +181,10 @@ void LoginDialog::onLoginSuccess(const GoogleUserInfo& user)
     setGoogleButtonState(false);
     m_googleBtn->setText("  ✓  " + user.name);
     m_googleBtn->setStyleSheet(
-        "QPushButton { background:#E8F5E9; border:2px solid #43A047; border-radius:8px;"
-        " font-size:14px; font-weight:600; color:#2E7D32; padding-left:8px; }"
+        "QPushButton { background:#E8F5E9; border:1.5px solid #43A047; border-radius:8px;"
+        " font-size:13px; font-weight:600; color:#2E7D32; padding-left:8px; }"
     );
-
-    m_statusLabel->setStyleSheet("font-size:12px; color:#2E7D32; font-weight:600;");
+    m_statusLabel->setStyleSheet("font-size:11px; color:#43A047; font-weight:600;");
     m_statusLabel->setText("✓  " + user.email);
     m_statusLabel->show();
 
@@ -221,7 +195,7 @@ void LoginDialog::onLoginSuccess(const GoogleUserInfo& user)
 void LoginDialog::onLoginFailed(const QString& error)
 {
     setGoogleButtonState(false);
-    m_statusLabel->setStyleSheet("font-size:12px; color:#D32F2F; font-weight:500;");
+    m_statusLabel->setStyleSheet("font-size:11px; color:#E53935; font-weight:500;");
     m_statusLabel->setText("⚠ " + error);
     m_statusLabel->show();
 }
@@ -235,21 +209,12 @@ void LoginDialog::setGoogleButtonState(bool loading)
         m_googleBtn->setText("  Google 계정으로 로그인");
 }
 
-// ── Getter ─────────────────────────────────────────────
-
-QString LoginDialog::getIp() const
-{
-    return m_ipEdit->text().trimmed();
-}
+QString LoginDialog::getIp()    const { return m_ipEdit->text().trimmed(); }
+QString LoginDialog::getEmail() const { return m_userInfo.email; }
 
 QString LoginDialog::getId() const
 {
     if (m_googleLoggedIn && !m_userInfo.name.isEmpty())
         return m_userInfo.name;
     return m_idEdit->text().trimmed();
-}
-
-QString LoginDialog::getEmail() const
-{
-    return m_userInfo.email;
 }
