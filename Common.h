@@ -25,7 +25,7 @@ namespace Protocol {
     inline const QString LOGIN_REJECT = "LOGIN_REJECT";
     inline const QString ONLINE       = "ONLINE";
 
-    // 채팅
+    // 단체 채팅
     // CHAT    : CHAT:USER_ID:MESSAGE
     // CHATRES : CHATRES:ROWID:UNREAD:USER_ID:HHmm:MESSAGE
     // REQCHAT : REQCHAT:USER_ID
@@ -36,6 +36,16 @@ namespace Protocol {
     inline const QString REQCHAT = "REQCHAT";
     inline const QString RESCHAT = "RESCHAT";
     inline const QString READRES = "READRES";
+
+    // 1대1 DM
+    // DM     : DM:sender:receiver:message
+    // DMRES  : DMRES:sender:receiver:HHmm:message  (sender, receiver 모두에게 전송)
+    // REQDM  : REQDM:myId:peerId
+    // RESDM  : RESDM:sender:HHmm:msg|sender:HHmm:msg|...
+    inline const QString DM    = "DM";
+    inline const QString DMRES = "DMRES";
+    inline const QString REQDM = "REQDM";
+    inline const QString RESDM = "RESDM";
 }
 
 #endif

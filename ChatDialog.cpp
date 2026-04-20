@@ -21,9 +21,9 @@ ChatDialog::ChatDialog(const QString& myId, QWidget* parent)
     titleBar->setStyleSheet("background: #3C1E1E;");
     auto* titleLayout = new QHBoxLayout(titleBar);
     titleLayout->setContentsMargins(16, 0, 16, 0);
-    auto* titleLabel = new QLabel("단체 채팅방");
-    titleLabel->setStyleSheet("color: white; font-size: 16px; font-weight: bold;");
-    titleLayout->addWidget(titleLabel);
+    m_titleLabel = new QLabel("단체 채팅방");
+    m_titleLabel->setStyleSheet("color: white; font-size: 16px; font-weight: bold;");
+    titleLayout->addWidget(m_titleLabel);
     mainLayout->addWidget(titleBar);
 
     // ── 메시지 스크롤 영역 ─────────────────────────────
@@ -283,6 +283,11 @@ void ChatDialog::setDarkMode(bool dark)
                     w->setStyleSheet("background:#3C1E1E;");
         }
     }
+}
+
+void ChatDialog::setTitle(const QString& title) {
+    if (m_titleLabel) m_titleLabel->setText(title);
+    setWindowTitle(title);
 }
 
 void ChatDialog::clearMessages() {

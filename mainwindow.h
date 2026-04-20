@@ -71,6 +71,7 @@ private:
 
     void showJoinNotification(const QString& userId);
     void updateFriendsList();
+    void openDmChat(const QString& peerId);
     void setupTray();
     void updateTrayIcon();
     void applyTheme(bool dark);
@@ -84,6 +85,10 @@ private:
     bool             m_darkMode   = false;
 
     WeatherManager*  m_weather    = nullptr;
+
+    QMap<QString, ChatDialog*> m_dmDialogs;
+    QMap<QString, int>         m_dmUnreadCounts;
+    QString                    m_pendingDmPeer;
 };
 
 #endif

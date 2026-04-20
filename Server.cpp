@@ -17,6 +17,8 @@ void ScheduleServer::initDatabase() {
     q.exec("CREATE TABLE IF NOT EXISTS schedules (USER_ID TEXT, DATE TEXT, CONTENT TEXT)");
     q.exec("CREATE TABLE IF NOT EXISTS chats (USER_ID TEXT, MESSAGE TEXT, SEND_TIME TEXT)");
     q.exec("ALTER TABLE chats ADD COLUMN SEND_TIME TEXT DEFAULT ''"); // 기존 테이블 마이그레이션
+    q.exec("CREATE TABLE IF NOT EXISTS dm_chats "
+           "(SENDER TEXT, RECEIVER TEXT, MESSAGE TEXT, SEND_TIME TEXT)");
     qDebug() << "Database initialized.";
 }
 
@@ -157,7 +159,60 @@ void ScheduleServer::handleRequest(QTcpSocket* socket, const QString& data) {
         broadcastChat(rowid, unread, userId, timeStr, message);
     }
 
-    // ── 채팅 기록 요청 ───────────────────────────────────────────
+    // ── 1대1 DM 전송 ─────────────────────────────────────────────
+    else if (cmd == Protocol::DM && parts.size() >= 4) {
+        QString sender   = parts[1];
+        QString receiver = parts[2];
+        QString message  = parts.mid(3).join(Protocol::SEP);
+        QString timeStr  = QTime::currentTime().toString("HHmm");
+
+        QSqlQuery q;
+        q.prepare("INSERT INTO dm_chats (SENDER,RECEIVER,MESSAGE,SEND_TIME) VALUES(?,?,?,?)");
+        q.addBindValue(sender); q.addBindValue(receiver);
+        q.addBindValue(message); q.addBindValue(timeStr);
+        if (!q.exec()) return;
+
+        // sender 와 receiver 에게만 전달
+        QString msg = Protocol::DMRES + Protocol::SEP
+                    + sender   + Protocol::SEP
+                    + receiver + Protocol::SEP
+                    + timeStr  + Protocol::SEP
+                    + message  + "\n";
+        for (QTcpSocket* s : m_clients) {
+            QString uid = m_clientIds.value(s);
+            if (uid == sender || uid == receiver)
+                s->write(msg.toUtf8());
+        }
+    }
+
+    // ── 1대1 DM 기록 요청 ────────────────────────────────────────
+    else if (cmd == Protocol::REQDM && parts.size() >= 3) {
+        QString u1 = parts[1], u2 = parts[2];
+        QSqlQuery q;
+        q.prepare(
+            "SELECT SENDER,SEND_TIME,MESSAGE FROM "
+            "  (SELECT SENDER,SEND_TIME,MESSAGE FROM dm_chats "
+            "   WHERE (SENDER=? AND RECEIVER=?) OR (SENDER=? AND RECEIVER=?) "
+            "   ORDER BY rowid DESC LIMIT 50) "
+            "ORDER BY rowid ASC"
+        );
+        q.addBindValue(u1); q.addBindValue(u2);
+        q.addBindValue(u2); q.addBindValue(u1);
+
+        QStringList entries;
+        if (q.exec()) {
+            while (q.next()) {
+                entries << q.value(0).toString()   // SENDER
+                         + Protocol::SEP
+                         + q.value(1).toString()   // SEND_TIME
+                         + Protocol::SEP
+                         + q.value(2).toString();  // MESSAGE
+            }
+        }
+        socket->write((Protocol::RESDM + Protocol::SEP + entries.join("|") + "\n").toUtf8());
+    }
+
+    // ── 단체 채팅 기록 요청 ──────────────────────────────────────
     else if (cmd == Protocol::REQCHAT && parts.size() >= 2) {
         QString userId = parts[1];
 

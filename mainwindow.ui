@@ -18,130 +18,201 @@
   </property>
   <widget class="QWidget" name="centralwidget">
    <layout class="QVBoxLayout" name="mainLayout">
-    <property name="spacing"><number>0</number></property>
-    <property name="leftMargin"><number>0</number></property>
-    <property name="topMargin"><number>0</number></property>
-    <property name="rightMargin"><number>0</number></property>
-    <property name="bottomMargin"><number>0</number></property>
-
-    <!-- 상단 내비게이션 바 -->
+    <property name="spacing">
+     <number>0</number>
+    </property>
+    <property name="leftMargin">
+     <number>0</number>
+    </property>
+    <property name="topMargin">
+     <number>0</number>
+    </property>
+    <property name="rightMargin">
+     <number>0</number>
+    </property>
+    <property name="bottomMargin">
+     <number>0</number>
+    </property>
     <item>
      <widget class="QFrame" name="navBar">
-      <property name="minimumSize"><size><width>0</width><height>60</height></size></property>
-      <property name="maximumSize"><size><width>16777215</width><height>60</height></size></property>
+      <property name="minimumSize">
+       <size>
+        <width>0</width>
+        <height>60</height>
+       </size>
+      </property>
+      <property name="maximumSize">
+       <size>
+        <width>16777215</width>
+        <height>60</height>
+       </size>
+      </property>
       <property name="styleSheet">
        <string>QFrame#navBar { background-color: #FFFFFF; border-bottom: 1px solid #E5E5EA; }</string>
       </property>
       <layout class="QHBoxLayout" name="navLayout">
-       <property name="leftMargin"><number>24</number></property>
-       <property name="rightMargin"><number>24</number></property>
-       <property name="topMargin"><number>0</number></property>
-       <property name="bottomMargin"><number>0</number></property>
-       <property name="spacing"><number>14</number></property>
-
-       <!-- 타이틀 -->
+       <property name="spacing">
+        <number>14</number>
+       </property>
+       <property name="leftMargin">
+        <number>24</number>
+       </property>
+       <property name="topMargin">
+        <number>0</number>
+       </property>
+       <property name="rightMargin">
+        <number>24</number>
+       </property>
+       <property name="bottomMargin">
+        <number>0</number>
+       </property>
        <item>
         <widget class="QLabel" name="titleLabel">
-         <property name="text"><string>📅 공유 캘린더</string></property>
          <property name="styleSheet">
           <string>QLabel { font-size: 20px; font-weight: bold; color: #1C1C1E; background: transparent; border: none; }</string>
          </property>
+         <property name="text">
+          <string>📅 공유 캘린더</string>
+         </property>
         </widget>
        </item>
-
        <item>
         <spacer name="navSpacer">
-         <property name="orientation"><enum>Qt::Horizontal</enum></property>
-         <property name="sizeHint" stdset="0"><size><width>40</width><height>20</height></size></property>
+         <property name="orientation">
+          <enum>Qt::Orientation::Horizontal</enum>
+         </property>
+         <property name="sizeHint" stdset="0">
+          <size>
+           <width>40</width>
+           <height>20</height>
+          </size>
+         </property>
         </spacer>
        </item>
-
-       <!-- 채팅 버튼 -->
        <item>
         <widget class="QPushButton" name="chatBtn">
-         <property name="text"><string>💬 채팅</string></property>
-         <property name="minimumSize"><size><width>86</width><height>36</height></size></property>
+         <property name="minimumSize">
+          <size>
+           <width>86</width>
+           <height>36</height>
+          </size>
+         </property>
          <property name="styleSheet">
           <string>QPushButton { background: #FFCD00; color: #3C1E1E; border: none; border-radius: 18px; padding: 0 16px; font-size: 13px; font-weight: bold; } QPushButton:hover { background: #FFBA00; } QPushButton:pressed { background: #F0A800; }</string>
          </property>
-        </widget>
-       </item>
-
-       <!-- 보기 레이블 -->
-       <item>
-        <widget class="QLabel" name="userPrefixLabel">
-         <property name="text"><string>보기:</string></property>
-         <property name="styleSheet">
-          <string>QLabel { font-size: 13px; color: #8E8E93; background: transparent; border: none; }</string>
+         <property name="text">
+          <string>💬 채팅</string>
          </property>
         </widget>
        </item>
-
-       <!-- 유저 콤보 -->
+       <item>
+        <widget class="QLabel" name="userPrefixLabel">
+         <property name="styleSheet">
+          <string>QLabel { font-size: 13px; color: #8E8E93; background: transparent; border: none; }</string>
+         </property>
+         <property name="text">
+          <string>친구목록:</string>
+         </property>
+        </widget>
+       </item>
        <item>
         <widget class="QComboBox" name="userCombo">
-         <property name="minimumSize"><size><width>130</width><height>36</height></size></property>
+         <property name="minimumSize">
+          <size>
+           <width>130</width>
+           <height>36</height>
+          </size>
+         </property>
          <property name="styleSheet">
           <string>QComboBox { padding: 4px 12px; border: 1.5px solid #E5E5EA; border-radius: 18px; font-size: 13px; background: #F2F2F7; color: #1C1C1E; } QComboBox:hover { border-color: #007AFF; background: #FFFFFF; } QComboBox::drop-down { border: none; width: 20px; } QComboBox QAbstractItemView { border: 1px solid #E5E5EA; border-radius: 10px; background: #FFFFFF; selection-background-color: #E5F0FF; selection-color: #007AFF; font-size: 13px; }</string>
          </property>
         </widget>
        </item>
-
       </layout>
      </widget>
     </item>
-
-    <!-- 접속자 바 -->
     <item>
      <widget class="QFrame" name="onlineBar">
-      <property name="minimumSize"><size><width>0</width><height>30</height></size></property>
-      <property name="maximumSize"><size><width>16777215</width><height>30</height></size></property>
+      <property name="minimumSize">
+       <size>
+        <width>0</width>
+        <height>30</height>
+       </size>
+      </property>
+      <property name="maximumSize">
+       <size>
+        <width>16777215</width>
+        <height>30</height>
+       </size>
+      </property>
       <property name="styleSheet">
        <string>QFrame#onlineBar { background-color: #F0FFF4; border-bottom: 1px solid #C3E6CB; }</string>
       </property>
       <layout class="QHBoxLayout" name="onlineLayout">
-       <property name="leftMargin"><number>24</number></property>
-       <property name="rightMargin"><number>24</number></property>
-       <property name="topMargin"><number>0</number></property>
-       <property name="bottomMargin"><number>0</number></property>
+       <property name="leftMargin">
+        <number>24</number>
+       </property>
+       <property name="topMargin">
+        <number>0</number>
+       </property>
+       <property name="rightMargin">
+        <number>24</number>
+       </property>
+       <property name="bottomMargin">
+        <number>0</number>
+       </property>
        <item>
         <widget class="QLabel" name="onlineLabel">
-         <property name="text"><string>👥 친구 목록:  연결 중...</string></property>
          <property name="styleSheet">
           <string>QLabel { font-size: 12px; color: #2D6A4F; background: transparent; border: none; }</string>
+         </property>
+         <property name="text">
+          <string>👥 친구 목록:  연결 중...</string>
          </property>
         </widget>
        </item>
       </layout>
      </widget>
     </item>
-
-    <!-- 캘린더 영역 (패딩 포함) -->
     <item>
-     <widget class="QWidget" name="calendarWrapper">
-      <property name="styleSheet">
-       <string>QWidget#calendarWrapper { background: #F2F2F7; }</string>
+     <layout class="QVBoxLayout" name="wrapperLayout">
+      <property name="leftMargin">
+       <number>16</number>
       </property>
-      <layout class="QVBoxLayout" name="wrapperLayout">
-       <property name="leftMargin"><number>16</number></property>
-       <property name="rightMargin"><number>16</number></property>
-       <property name="topMargin"><number>16</number></property>
-       <property name="bottomMargin"><number>16</number></property>
-       <item>
-        <widget class="QFrame" name="calendarCard">
-         <property name="styleSheet">
-          <string>QFrame#calendarCard { background: #FFFFFF; border-radius: 16px; border: none; }</string>
+      <property name="topMargin">
+       <number>16</number>
+      </property>
+      <property name="rightMargin">
+       <number>16</number>
+      </property>
+      <property name="bottomMargin">
+       <number>16</number>
+      </property>
+      <item>
+       <widget class="QFrame" name="calendarCard">
+        <property name="styleSheet">
+         <string>QFrame#calendarCard { background: #FFFFFF; border-radius: 16px; border: none; }</string>
+        </property>
+        <layout class="QVBoxLayout" name="cardLayout">
+         <property name="spacing">
+          <number>0</number>
          </property>
-         <layout class="QVBoxLayout" name="cardLayout">
-          <property name="spacing"><number>0</number></property>
-          <property name="leftMargin"><number>0</number></property>
-          <property name="topMargin"><number>0</number></property>
-          <property name="rightMargin"><number>0</number></property>
-          <property name="bottomMargin"><number>0</number></property>
-          <item>
-           <widget class="CustomCalendarWidget" name="calendarWidget">
-            <property name="styleSheet">
-             <string>
+         <property name="leftMargin">
+          <number>0</number>
+         </property>
+         <property name="topMargin">
+          <number>0</number>
+         </property>
+         <property name="rightMargin">
+          <number>0</number>
+         </property>
+         <property name="bottomMargin">
+          <number>0</number>
+         </property>
+         <item>
+          <widget class="CustomCalendarWidget" name="calendarWidget">
+           <property name="styleSheet">
+            <string>
 CustomCalendarWidget {
     background-color: #FFFFFF;
     border: none;
@@ -188,26 +259,31 @@ QCalendarWidget QWidget {
     alternate-background-color: #FFFFFF;
 }
              </string>
-            </property>
-            <property name="verticalHeaderFormat">
-             <enum>QCalendarWidget::NoVerticalHeader</enum>
-            </property>
-            <property name="gridVisible">
-             <bool>true</bool>
-            </property>
-           </widget>
-          </item>
-         </layout>
-        </widget>
-       </item>
-      </layout>
-     </widget>
+           </property>
+           <property name="gridVisible">
+            <bool>true</bool>
+           </property>
+           <property name="verticalHeaderFormat">
+            <enum>QCalendarWidget::VerticalHeaderFormat::NoVerticalHeader</enum>
+           </property>
+          </widget>
+         </item>
+        </layout>
+       </widget>
+      </item>
+     </layout>
     </item>
-
    </layout>
   </widget>
   <widget class="QMenuBar" name="menubar">
-   <property name="geometry"><rect><x>0</x><y>0</y><width>980</width><height>22</height></rect></property>
+   <property name="geometry">
+    <rect>
+     <x>0</x>
+     <y>0</y>
+     <width>980</width>
+     <height>22</height>
+    </rect>
+   </property>
   </widget>
   <widget class="QStatusBar" name="statusbar"/>
  </widget>

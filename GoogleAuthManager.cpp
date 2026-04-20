@@ -1,3 +1,4 @@
+
 #include "GoogleAuthManager.h"
 #include "secrets.h"
 #include <QDesktopServices>

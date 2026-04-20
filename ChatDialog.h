@@ -23,6 +23,7 @@ public:
     void updateUnread(qint64 rowid, int count);
     void clearMessages();
     void setDarkMode(bool dark);
+    void setTitle(const QString& title);
 
 signals:
     void messageSent(const QString& message);
@@ -43,6 +44,7 @@ private:
     QString      m_myId;
 
     QMap<qint64, QLabel*> m_unreadLabels; // rowid → 미읽음 숫자 라벨
+    QLabel* m_titleLabel = nullptr;
 
 };
 

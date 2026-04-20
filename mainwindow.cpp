@@ -262,6 +262,73 @@ void MainWindow::processMessage(const QString& data) {
             m_chatDialog->updateUnread(p[1].toLongLong(), p[2].toInt());
     }
 
+    // ── 1:1 DM 기록 수신 ─────────────────────────────────────
+    else if (data.startsWith(Protocol::RESDM + Protocol::SEP)) {
+        // RESDM:sender:HHmm:msg|sender:HHmm:msg|...
+        if (m_pendingDmPeer.isEmpty()) return;
+        QString peer = m_pendingDmPeer;
+        m_pendingDmPeer.clear();
+
+        if (!m_dmDialogs.contains(peer)) return;
+        auto* dlg = m_dmDialogs[peer];
+
+        QString payload = data.mid(Protocol::RESDM.length() + Protocol::SEP.length());
+        if (!payload.isEmpty()) {
+            for (const QString& entry : payload.split("|")) {
+                QStringList p = entry.split(Protocol::SEP);
+                if (p.size() < 3) continue;
+                QString sender = p[0];
+                QString rawT   = p[1];
+                QString msg    = p.mid(2).join(Protocol::SEP);
+                QString time   = rawT.length() == 4 ? rawT.left(2) + ":" + rawT.right(2) : "";
+                dlg->appendMessage(0, 0, sender, msg, time);
+            }
+        }
+    }
+
+    // ── 1:1 DM 실시간 수신 ───────────────────────────────────
+    else if (data.startsWith(Protocol::DMRES + Protocol::SEP)) {
+        // DMRES:sender:receiver:HHmm:message
+        QStringList p = data.split(Protocol::SEP);
+        if (p.size() < 5) return;
+        QString sender   = p[1];
+        QString receiver = p[2];
+        QString rawT     = p[3];
+        QString msg      = p.mid(4).join(Protocol::SEP);
+        QString time     = rawT.length() == 4 ? rawT.left(2) + ":" + rawT.right(2) : "";
+
+        QString peer = (sender == m_myId) ? receiver : sender;
+
+        // 다이얼로그가 없으면 생성 (상대방이 먼저 보낸 경우)
+        if (!m_dmDialogs.contains(peer)) {
+            auto* dlg = new ChatDialog(m_myId, this);
+            dlg->setTitle("💬 " + peer);
+            connect(dlg, &ChatDialog::messageSent, this, [this, peer](const QString& m) {
+                if (m_socket->state() != QAbstractSocket::ConnectedState) return;
+                m_socket->write((Protocol::DM + Protocol::SEP
+                                 + m_myId + Protocol::SEP
+                                 + peer   + Protocol::SEP
+                                 + m + "\n").toUtf8());
+            });
+            m_dmDialogs[peer] = dlg;
+        }
+
+        auto* dlg = m_dmDialogs[peer];
+        dlg->appendMessage(0, 0, sender, msg, time);
+
+        if (!dlg->isVisible()) {
+            m_dmUnreadCounts[peer] = m_dmUnreadCounts.value(peer, 0) + 1;
+            if (m_selectedId == peer) updateChatBtnText();
+            if (m_trayIcon && !isActiveWindow()) {
+                m_trayIcon->showMessage(
+                    sender + "님의 메시지",
+                    msg.startsWith("IMG:") ? "[이미지]" : msg,
+                    QSystemTrayIcon::NoIcon, 3000
+                );
+            }
+        }
+    }
+
     // ── ACK ──────────────────────────────────────────────────
     else if (data.startsWith(Protocol::ACK)) {
         if (!data.contains("OK"))
@@ -274,16 +341,54 @@ void MainWindow::processMessage(const QString& data) {
 // ──────────────────────────────────────────────
 
 void MainWindow::onChatBtnClicked() {
-    if (m_chatDialog->isVisible()) {
-        m_chatDialog->hide();
+    if (m_selectedId != m_myId) {
+        openDmChat(m_selectedId);
     } else {
-        if (m_socket->state() == QAbstractSocket::ConnectedState)
-            m_socket->write((Protocol::REQCHAT + Protocol::SEP + m_myId + "\n").toUtf8());
-        m_unreadCount = 0;
+        if (m_chatDialog->isVisible()) {
+            m_chatDialog->hide();
+        } else {
+            if (m_socket->state() == QAbstractSocket::ConnectedState)
+                m_socket->write((Protocol::REQCHAT + Protocol::SEP + m_myId + "\n").toUtf8());
+            m_unreadCount = 0;
+            updateChatBtnText();
+            updateTrayIcon();
+            m_chatDialog->show();
+            m_chatDialog->raise();
+        }
+    }
+}
+
+void MainWindow::openDmChat(const QString& peerId) {
+    // 다이얼로그가 없으면 새로 생성
+    if (!m_dmDialogs.contains(peerId)) {
+        auto* dlg = new ChatDialog(m_myId, this);
+        dlg->setTitle("💬 " + peerId);
+        connect(dlg, &ChatDialog::messageSent, this, [this, peerId](const QString& msg) {
+            if (m_socket->state() != QAbstractSocket::ConnectedState) return;
+            m_socket->write((Protocol::DM + Protocol::SEP
+                             + m_myId + Protocol::SEP
+                             + peerId + Protocol::SEP
+                             + msg + "\n").toUtf8());
+        });
+        m_dmDialogs[peerId] = dlg;
+    }
+
+    auto* dlg = m_dmDialogs[peerId];
+    if (dlg->isVisible()) {
+        dlg->hide();
+    } else {
+        // 대화 기록 요청
+        if (m_socket->state() == QAbstractSocket::ConnectedState) {
+            m_pendingDmPeer = peerId;
+            dlg->clearMessages();
+            m_socket->write((Protocol::REQDM + Protocol::SEP
+                             + m_myId + Protocol::SEP
+                             + peerId + "\n").toUtf8());
+        }
+        m_dmUnreadCounts[peerId] = 0;
         updateChatBtnText();
-        updateTrayIcon();
-        m_chatDialog->show();
-        m_chatDialog->raise();
+        dlg->show();
+        dlg->raise();
     }
 }
 
@@ -293,10 +398,20 @@ void MainWindow::onChatMessageSent(const QString& message) {
 }
 
 void MainWindow::updateChatBtnText() {
-    if (m_unreadCount > 0)
-        ui->chatBtn->setText(QString("💬 채팅 (%1)").arg(m_unreadCount));
-    else
-        ui->chatBtn->setText("💬 채팅");
+    if (m_selectedId != m_myId) {
+        // 친구 캘린더 보는 중 → 1:1 채팅 버튼
+        int dmUnread = m_dmUnreadCounts.value(m_selectedId, 0);
+        if (dmUnread > 0)
+            ui->chatBtn->setText(QString("💬 1:1 채팅 (%1)").arg(dmUnread));
+        else
+            ui->chatBtn->setText("💬 1:1 채팅");
+    } else {
+        // 내 캘린더 → 단체 채팅 버튼
+        if (m_unreadCount > 0)
+            ui->chatBtn->setText(QString("💬 채팅 (%1)").arg(m_unreadCount));
+        else
+            ui->chatBtn->setText("💬 채팅");
+    }
 }
 
 void MainWindow::updateFriendsList() {
@@ -339,6 +454,7 @@ void MainWindow::onUserChanged(int) {
     ui->calendarWidget->clearSchedules();
     requestMonthSchedules(ui->calendarWidget->yearShown(),
                           ui->calendarWidget->monthShown());
+    updateChatBtnText();
 }
 
 void MainWindow::showDateDialog() {
@@ -552,8 +668,6 @@ void MainWindow::applyTheme(bool dark)
             "QFrame#onlineBar { background:#0D2318; border-bottom:1px solid #1A4230; }");
         ui->onlineLabel->setStyleSheet(
             "QLabel { font-size:12px; color:#4CAF7D; background:transparent; border:none; }");
-        ui->calendarWrapper->setStyleSheet(
-            "QWidget#calendarWrapper { background:#1C1C1E; }");
         ui->calendarCard->setStyleSheet(
             "QFrame#calendarCard { background:#2C2C2E; border-radius:16px; border:none; }");
         ui->calendarWidget->setStyleSheet(R"(
@@ -596,8 +710,6 @@ void MainWindow::applyTheme(bool dark)
             "QFrame#onlineBar { background:#F0FFF4; border-bottom:1px solid #C3E6CB; }");
         ui->onlineLabel->setStyleSheet(
             "QLabel { font-size:12px; color:#2D6A4F; background:transparent; border:none; }");
-        ui->calendarWrapper->setStyleSheet(
-            "QWidget#calendarWrapper { background:#F2F2F7; }");
         ui->calendarCard->setStyleSheet(
             "QFrame#calendarCard { background:#FFFFFF; border-radius:16px; border:none; }");
         ui->calendarWidget->setStyleSheet(R"(
@@ -623,6 +735,8 @@ void MainWindow::applyTheme(bool dark)
 
     ui->calendarWidget->setDarkMode(dark);
     m_chatDialog->setDarkMode(dark);
+    for (auto* dlg : m_dmDialogs)
+        dlg->setDarkMode(dark);
 }
 
 void MainWindow::setupTray() {
