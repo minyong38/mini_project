@@ -31,6 +31,8 @@ add_executable(Client
     mainwindow.ui
     CustomCalendarWidget.cpp
     CustomCalendarWidget.h
+    WeatherManager.cpp
+    WeatherManager.h
     ScheduleDialog.cpp
     ScheduleDialog.h
     scheduledialog.ui
