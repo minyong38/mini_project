@@ -129,6 +129,10 @@ void ScheduleServer::handleRequest(QTcpSocket* socket, const QString& data) {
         q.exec("SELECT DISTINCT USER_ID FROM schedules ORDER BY USER_ID");
         QStringList users;
         while (q.next()) users << q.value(0).toString();
+        // 현재 접속 중인 유저도 포함 (일정이 없어도 보기 목록에 표시)
+        for (const QString& u : m_clientIds.values())
+            if (!users.contains(u)) users << u;
+        users.sort();
         socket->write((Protocol::RESUSERS + Protocol::SEP + users.join("|") + "\n").toUtf8());
     }
 
