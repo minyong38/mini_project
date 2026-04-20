@@ -3,40 +3,34 @@
 
 #include <QDialog>
 #include <QLineEdit>
-#include <QDialogButtonBox>
-#include <QVBoxLayout>
+#include <QPushButton>
 #include <QLabel>
+#include "GoogleAuthManager.h"
 
 class LoginDialog : public QDialog {
     Q_OBJECT
 public:
-    explicit LoginDialog(QWidget *parent = nullptr) : QDialog(parent) {
-        setWindowTitle("로그인");
+    explicit LoginDialog(QWidget* parent = nullptr);
 
-        auto* layout = new QVBoxLayout(this);
-
-        layout->addWidget(new QLabel("서버 IP:", this));
-        m_ipEdit = new QLineEdit("172.20.35.212", this);
-        layout->addWidget(m_ipEdit);
-
-        layout->addWidget(new QLabel("사용자 ID:", this));
-        m_idEdit = new QLineEdit(this);
-        m_idEdit->setPlaceholderText("ID를 입력하세요");
-        layout->addWidget(m_idEdit);
-
-        auto* buttonBox = new QDialogButtonBox(QDialogButtonBox::Ok | QDialogButtonBox::Cancel, this);
-        layout->addWidget(buttonBox);
-
-        connect(buttonBox, &QDialogButtonBox::accepted, this, &LoginDialog::accept);
-        connect(buttonBox, &QDialogButtonBox::rejected, this, &LoginDialog::reject);
-    }
-
-    QString getIp() const { return m_ipEdit->text(); }
-    QString getId() const { return m_idEdit->text(); }
+    QString getIp()   const;
+    QString getId()   const;  // Google 로그인 시 표시 이름, 수동 입력 시 ID
+    QString getEmail()const;
 
 private:
-    QLineEdit* m_ipEdit;
-    QLineEdit* m_idEdit;
+    void onGoogleLogin();
+    void onLoginSuccess(const GoogleUserInfo& user);
+    void onLoginFailed(const QString& error);
+    void setGoogleButtonState(bool loading);
+
+    QLineEdit*    m_ipEdit;
+    QLineEdit*    m_idEdit;       // 수동 ID (fallback)
+    QPushButton*  m_googleBtn;
+    QPushButton*  m_okBtn;
+    QLabel*       m_statusLabel;
+
+    GoogleAuthManager* m_auth = nullptr;
+    GoogleUserInfo     m_userInfo;
+    bool               m_googleLoggedIn = false;
 };
 
 #endif
