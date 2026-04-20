@@ -52,10 +52,10 @@ RM = C:\Qt\Tools\CMake_64\bin\cmake.exe -E rm -f
 EQUALS = =
 
 # The top-level source directory on which CMake was run.
-CMAKE_SOURCE_DIR = C:\Users\5-20\mini_project
+CMAKE_SOURCE_DIR = C:\workspace\project2
 
 # The top-level build directory on which CMake was run.
-CMAKE_BINARY_DIR = C:\Users\5-20\mini_project\build\Desktop_Qt_6_11_0_MinGW_64_bit-Debug
+CMAKE_BINARY_DIR = C:\workspace\project2\build\Desktop_Qt_6_11_0_MinGW_64_bit-Debug
 
 # Include any dependencies generated for this target.
 include CMakeFiles/Client.dir/depend.make
@@ -71,114 +71,114 @@ include CMakeFiles/Client.dir/flags.make
 Client_autogen/timestamp: C:/Qt/6.11.0/mingw_64/bin/moc.exe
 Client_autogen/timestamp: C:/Qt/6.11.0/mingw_64/bin/uic.exe
 Client_autogen/timestamp: CMakeFiles/Client.dir/compiler_depend.ts
-	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --blue --bold --progress-dir=C:\Users\5-20\mini_project\build\Desktop_Qt_6_11_0_MinGW_64_bit-Debug\CMakeFiles --progress-num=$(CMAKE_PROGRESS_1) "Automatic MOC and UIC for target Client"
-	C:\Qt\Tools\CMake_64\bin\cmake.exe -E cmake_autogen C:/Users/5-20/mini_project/build/Desktop_Qt_6_11_0_MinGW_64_bit-Debug/CMakeFiles/Client_autogen.dir/AutogenInfo.json Debug
-	C:\Qt\Tools\CMake_64\bin\cmake.exe -E touch C:/Users/5-20/mini_project/build/Desktop_Qt_6_11_0_MinGW_64_bit-Debug/Client_autogen/timestamp
+	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --blue --bold --progress-dir=C:\workspace\project2\build\Desktop_Qt_6_11_0_MinGW_64_bit-Debug\CMakeFiles --progress-num=$(CMAKE_PROGRESS_1) "Automatic MOC and UIC for target Client"
+	C:\Qt\Tools\CMake_64\bin\cmake.exe -E cmake_autogen C:/workspace/project2/build/Desktop_Qt_6_11_0_MinGW_64_bit-Debug/CMakeFiles/Client_autogen.dir/AutogenInfo.json Debug
+	C:\Qt\Tools\CMake_64\bin\cmake.exe -E touch C:/workspace/project2/build/Desktop_Qt_6_11_0_MinGW_64_bit-Debug/Client_autogen/timestamp
 
 CMakeFiles/Client.dir/Client_autogen/mocs_compilation.cpp.obj: CMakeFiles/Client.dir/flags.make
 CMakeFiles/Client.dir/Client_autogen/mocs_compilation.cpp.obj: CMakeFiles/Client.dir/includes_CXX.rsp
 CMakeFiles/Client.dir/Client_autogen/mocs_compilation.cpp.obj: Client_autogen/mocs_compilation.cpp
 CMakeFiles/Client.dir/Client_autogen/mocs_compilation.cpp.obj: CMakeFiles/Client.dir/compiler_depend.ts
-	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green --progress-dir=C:\Users\5-20\mini_project\build\Desktop_Qt_6_11_0_MinGW_64_bit-Debug\CMakeFiles --progress-num=$(CMAKE_PROGRESS_2) "Building CXX object CMakeFiles/Client.dir/Client_autogen/mocs_compilation.cpp.obj"
-	C:\Qt\Tools\mingw1310_64\bin\g++.exe $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -MD -MT CMakeFiles/Client.dir/Client_autogen/mocs_compilation.cpp.obj -MF CMakeFiles\Client.dir\Client_autogen\mocs_compilation.cpp.obj.d -o CMakeFiles\Client.dir\Client_autogen\mocs_compilation.cpp.obj -c C:\Users\5-20\mini_project\build\Desktop_Qt_6_11_0_MinGW_64_bit-Debug\Client_autogen\mocs_compilation.cpp
+	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green --progress-dir=C:\workspace\project2\build\Desktop_Qt_6_11_0_MinGW_64_bit-Debug\CMakeFiles --progress-num=$(CMAKE_PROGRESS_2) "Building CXX object CMakeFiles/Client.dir/Client_autogen/mocs_compilation.cpp.obj"
+	C:\Qt\Tools\mingw1310_64\bin\g++.exe $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -MD -MT CMakeFiles/Client.dir/Client_autogen/mocs_compilation.cpp.obj -MF CMakeFiles\Client.dir\Client_autogen\mocs_compilation.cpp.obj.d -o CMakeFiles\Client.dir\Client_autogen\mocs_compilation.cpp.obj -c C:\workspace\project2\build\Desktop_Qt_6_11_0_MinGW_64_bit-Debug\Client_autogen\mocs_compilation.cpp
 
 CMakeFiles/Client.dir/Client_autogen/mocs_compilation.cpp.i: cmake_force
 	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green "Preprocessing CXX source to CMakeFiles/Client.dir/Client_autogen/mocs_compilation.cpp.i"
-	C:\Qt\Tools\mingw1310_64\bin\g++.exe $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -E C:\Users\5-20\mini_project\build\Desktop_Qt_6_11_0_MinGW_64_bit-Debug\Client_autogen\mocs_compilation.cpp > CMakeFiles\Client.dir\Client_autogen\mocs_compilation.cpp.i
+	C:\Qt\Tools\mingw1310_64\bin\g++.exe $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -E C:\workspace\project2\build\Desktop_Qt_6_11_0_MinGW_64_bit-Debug\Client_autogen\mocs_compilation.cpp > CMakeFiles\Client.dir\Client_autogen\mocs_compilation.cpp.i
 
 CMakeFiles/Client.dir/Client_autogen/mocs_compilation.cpp.s: cmake_force
 	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green "Compiling CXX source to assembly CMakeFiles/Client.dir/Client_autogen/mocs_compilation.cpp.s"
-	C:\Qt\Tools\mingw1310_64\bin\g++.exe $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -S C:\Users\5-20\mini_project\build\Desktop_Qt_6_11_0_MinGW_64_bit-Debug\Client_autogen\mocs_compilation.cpp -o CMakeFiles\Client.dir\Client_autogen\mocs_compilation.cpp.s
+	C:\Qt\Tools\mingw1310_64\bin\g++.exe $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -S C:\workspace\project2\build\Desktop_Qt_6_11_0_MinGW_64_bit-Debug\Client_autogen\mocs_compilation.cpp -o CMakeFiles\Client.dir\Client_autogen\mocs_compilation.cpp.s
 
 CMakeFiles/Client.dir/client_main.cpp.obj: CMakeFiles/Client.dir/flags.make
 CMakeFiles/Client.dir/client_main.cpp.obj: CMakeFiles/Client.dir/includes_CXX.rsp
-CMakeFiles/Client.dir/client_main.cpp.obj: C:/Users/5-20/mini_project/client_main.cpp
+CMakeFiles/Client.dir/client_main.cpp.obj: C:/workspace/project2/client_main.cpp
 CMakeFiles/Client.dir/client_main.cpp.obj: CMakeFiles/Client.dir/compiler_depend.ts
-	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green --progress-dir=C:\Users\5-20\mini_project\build\Desktop_Qt_6_11_0_MinGW_64_bit-Debug\CMakeFiles --progress-num=$(CMAKE_PROGRESS_3) "Building CXX object CMakeFiles/Client.dir/client_main.cpp.obj"
-	C:\Qt\Tools\mingw1310_64\bin\g++.exe $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -MD -MT CMakeFiles/Client.dir/client_main.cpp.obj -MF CMakeFiles\Client.dir\client_main.cpp.obj.d -o CMakeFiles\Client.dir\client_main.cpp.obj -c C:\Users\5-20\mini_project\client_main.cpp
+	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green --progress-dir=C:\workspace\project2\build\Desktop_Qt_6_11_0_MinGW_64_bit-Debug\CMakeFiles --progress-num=$(CMAKE_PROGRESS_3) "Building CXX object CMakeFiles/Client.dir/client_main.cpp.obj"
+	C:\Qt\Tools\mingw1310_64\bin\g++.exe $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -MD -MT CMakeFiles/Client.dir/client_main.cpp.obj -MF CMakeFiles\Client.dir\client_main.cpp.obj.d -o CMakeFiles\Client.dir\client_main.cpp.obj -c C:\workspace\project2\client_main.cpp
 
 CMakeFiles/Client.dir/client_main.cpp.i: cmake_force
 	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green "Preprocessing CXX source to CMakeFiles/Client.dir/client_main.cpp.i"
-	C:\Qt\Tools\mingw1310_64\bin\g++.exe $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -E C:\Users\5-20\mini_project\client_main.cpp > CMakeFiles\Client.dir\client_main.cpp.i
+	C:\Qt\Tools\mingw1310_64\bin\g++.exe $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -E C:\workspace\project2\client_main.cpp > CMakeFiles\Client.dir\client_main.cpp.i
 
 CMakeFiles/Client.dir/client_main.cpp.s: cmake_force
 	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green "Compiling CXX source to assembly CMakeFiles/Client.dir/client_main.cpp.s"
-	C:\Qt\Tools\mingw1310_64\bin\g++.exe $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -S C:\Users\5-20\mini_project\client_main.cpp -o CMakeFiles\Client.dir\client_main.cpp.s
+	C:\Qt\Tools\mingw1310_64\bin\g++.exe $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -S C:\workspace\project2\client_main.cpp -o CMakeFiles\Client.dir\client_main.cpp.s
 
 CMakeFiles/Client.dir/mainwindow.cpp.obj: CMakeFiles/Client.dir/flags.make
 CMakeFiles/Client.dir/mainwindow.cpp.obj: CMakeFiles/Client.dir/includes_CXX.rsp
-CMakeFiles/Client.dir/mainwindow.cpp.obj: C:/Users/5-20/mini_project/mainwindow.cpp
+CMakeFiles/Client.dir/mainwindow.cpp.obj: C:/workspace/project2/mainwindow.cpp
 CMakeFiles/Client.dir/mainwindow.cpp.obj: CMakeFiles/Client.dir/compiler_depend.ts
-	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green --progress-dir=C:\Users\5-20\mini_project\build\Desktop_Qt_6_11_0_MinGW_64_bit-Debug\CMakeFiles --progress-num=$(CMAKE_PROGRESS_4) "Building CXX object CMakeFiles/Client.dir/mainwindow.cpp.obj"
-	C:\Qt\Tools\mingw1310_64\bin\g++.exe $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -MD -MT CMakeFiles/Client.dir/mainwindow.cpp.obj -MF CMakeFiles\Client.dir\mainwindow.cpp.obj.d -o CMakeFiles\Client.dir\mainwindow.cpp.obj -c C:\Users\5-20\mini_project\mainwindow.cpp
+	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green --progress-dir=C:\workspace\project2\build\Desktop_Qt_6_11_0_MinGW_64_bit-Debug\CMakeFiles --progress-num=$(CMAKE_PROGRESS_4) "Building CXX object CMakeFiles/Client.dir/mainwindow.cpp.obj"
+	C:\Qt\Tools\mingw1310_64\bin\g++.exe $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -MD -MT CMakeFiles/Client.dir/mainwindow.cpp.obj -MF CMakeFiles\Client.dir\mainwindow.cpp.obj.d -o CMakeFiles\Client.dir\mainwindow.cpp.obj -c C:\workspace\project2\mainwindow.cpp
 
 CMakeFiles/Client.dir/mainwindow.cpp.i: cmake_force
 	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green "Preprocessing CXX source to CMakeFiles/Client.dir/mainwindow.cpp.i"
-	C:\Qt\Tools\mingw1310_64\bin\g++.exe $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -E C:\Users\5-20\mini_project\mainwindow.cpp > CMakeFiles\Client.dir\mainwindow.cpp.i
+	C:\Qt\Tools\mingw1310_64\bin\g++.exe $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -E C:\workspace\project2\mainwindow.cpp > CMakeFiles\Client.dir\mainwindow.cpp.i
 
 CMakeFiles/Client.dir/mainwindow.cpp.s: cmake_force
 	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green "Compiling CXX source to assembly CMakeFiles/Client.dir/mainwindow.cpp.s"
-	C:\Qt\Tools\mingw1310_64\bin\g++.exe $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -S C:\Users\5-20\mini_project\mainwindow.cpp -o CMakeFiles\Client.dir\mainwindow.cpp.s
+	C:\Qt\Tools\mingw1310_64\bin\g++.exe $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -S C:\workspace\project2\mainwindow.cpp -o CMakeFiles\Client.dir\mainwindow.cpp.s
 
 CMakeFiles/Client.dir/CustomCalendarWidget.cpp.obj: CMakeFiles/Client.dir/flags.make
 CMakeFiles/Client.dir/CustomCalendarWidget.cpp.obj: CMakeFiles/Client.dir/includes_CXX.rsp
-CMakeFiles/Client.dir/CustomCalendarWidget.cpp.obj: C:/Users/5-20/mini_project/CustomCalendarWidget.cpp
+CMakeFiles/Client.dir/CustomCalendarWidget.cpp.obj: C:/workspace/project2/CustomCalendarWidget.cpp
 CMakeFiles/Client.dir/CustomCalendarWidget.cpp.obj: CMakeFiles/Client.dir/compiler_depend.ts
-	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green --progress-dir=C:\Users\5-20\mini_project\build\Desktop_Qt_6_11_0_MinGW_64_bit-Debug\CMakeFiles --progress-num=$(CMAKE_PROGRESS_5) "Building CXX object CMakeFiles/Client.dir/CustomCalendarWidget.cpp.obj"
-	C:\Qt\Tools\mingw1310_64\bin\g++.exe $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -MD -MT CMakeFiles/Client.dir/CustomCalendarWidget.cpp.obj -MF CMakeFiles\Client.dir\CustomCalendarWidget.cpp.obj.d -o CMakeFiles\Client.dir\CustomCalendarWidget.cpp.obj -c C:\Users\5-20\mini_project\CustomCalendarWidget.cpp
+	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green --progress-dir=C:\workspace\project2\build\Desktop_Qt_6_11_0_MinGW_64_bit-Debug\CMakeFiles --progress-num=$(CMAKE_PROGRESS_5) "Building CXX object CMakeFiles/Client.dir/CustomCalendarWidget.cpp.obj"
+	C:\Qt\Tools\mingw1310_64\bin\g++.exe $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -MD -MT CMakeFiles/Client.dir/CustomCalendarWidget.cpp.obj -MF CMakeFiles\Client.dir\CustomCalendarWidget.cpp.obj.d -o CMakeFiles\Client.dir\CustomCalendarWidget.cpp.obj -c C:\workspace\project2\CustomCalendarWidget.cpp
 
 CMakeFiles/Client.dir/CustomCalendarWidget.cpp.i: cmake_force
 	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green "Preprocessing CXX source to CMakeFiles/Client.dir/CustomCalendarWidget.cpp.i"
-	C:\Qt\Tools\mingw1310_64\bin\g++.exe $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -E C:\Users\5-20\mini_project\CustomCalendarWidget.cpp > CMakeFiles\Client.dir\CustomCalendarWidget.cpp.i
+	C:\Qt\Tools\mingw1310_64\bin\g++.exe $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -E C:\workspace\project2\CustomCalendarWidget.cpp > CMakeFiles\Client.dir\CustomCalendarWidget.cpp.i
 
 CMakeFiles/Client.dir/CustomCalendarWidget.cpp.s: cmake_force
 	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green "Compiling CXX source to assembly CMakeFiles/Client.dir/CustomCalendarWidget.cpp.s"
-	C:\Qt\Tools\mingw1310_64\bin\g++.exe $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -S C:\Users\5-20\mini_project\CustomCalendarWidget.cpp -o CMakeFiles\Client.dir\CustomCalendarWidget.cpp.s
+	C:\Qt\Tools\mingw1310_64\bin\g++.exe $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -S C:\workspace\project2\CustomCalendarWidget.cpp -o CMakeFiles\Client.dir\CustomCalendarWidget.cpp.s
 
 CMakeFiles/Client.dir/WeatherManager.cpp.obj: CMakeFiles/Client.dir/flags.make
 CMakeFiles/Client.dir/WeatherManager.cpp.obj: CMakeFiles/Client.dir/includes_CXX.rsp
-CMakeFiles/Client.dir/WeatherManager.cpp.obj: C:/Users/5-20/mini_project/WeatherManager.cpp
+CMakeFiles/Client.dir/WeatherManager.cpp.obj: C:/workspace/project2/WeatherManager.cpp
 CMakeFiles/Client.dir/WeatherManager.cpp.obj: CMakeFiles/Client.dir/compiler_depend.ts
-	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green --progress-dir=C:\Users\5-20\mini_project\build\Desktop_Qt_6_11_0_MinGW_64_bit-Debug\CMakeFiles --progress-num=$(CMAKE_PROGRESS_6) "Building CXX object CMakeFiles/Client.dir/WeatherManager.cpp.obj"
-	C:\Qt\Tools\mingw1310_64\bin\g++.exe $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -MD -MT CMakeFiles/Client.dir/WeatherManager.cpp.obj -MF CMakeFiles\Client.dir\WeatherManager.cpp.obj.d -o CMakeFiles\Client.dir\WeatherManager.cpp.obj -c C:\Users\5-20\mini_project\WeatherManager.cpp
+	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green --progress-dir=C:\workspace\project2\build\Desktop_Qt_6_11_0_MinGW_64_bit-Debug\CMakeFiles --progress-num=$(CMAKE_PROGRESS_6) "Building CXX object CMakeFiles/Client.dir/WeatherManager.cpp.obj"
+	C:\Qt\Tools\mingw1310_64\bin\g++.exe $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -MD -MT CMakeFiles/Client.dir/WeatherManager.cpp.obj -MF CMakeFiles\Client.dir\WeatherManager.cpp.obj.d -o CMakeFiles\Client.dir\WeatherManager.cpp.obj -c C:\workspace\project2\WeatherManager.cpp
 
 CMakeFiles/Client.dir/WeatherManager.cpp.i: cmake_force
 	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green "Preprocessing CXX source to CMakeFiles/Client.dir/WeatherManager.cpp.i"
-	C:\Qt\Tools\mingw1310_64\bin\g++.exe $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -E C:\Users\5-20\mini_project\WeatherManager.cpp > CMakeFiles\Client.dir\WeatherManager.cpp.i
+	C:\Qt\Tools\mingw1310_64\bin\g++.exe $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -E C:\workspace\project2\WeatherManager.cpp > CMakeFiles\Client.dir\WeatherManager.cpp.i
 
 CMakeFiles/Client.dir/WeatherManager.cpp.s: cmake_force
 	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green "Compiling CXX source to assembly CMakeFiles/Client.dir/WeatherManager.cpp.s"
-	C:\Qt\Tools\mingw1310_64\bin\g++.exe $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -S C:\Users\5-20\mini_project\WeatherManager.cpp -o CMakeFiles\Client.dir\WeatherManager.cpp.s
+	C:\Qt\Tools\mingw1310_64\bin\g++.exe $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -S C:\workspace\project2\WeatherManager.cpp -o CMakeFiles\Client.dir\WeatherManager.cpp.s
 
 CMakeFiles/Client.dir/ScheduleDialog.cpp.obj: CMakeFiles/Client.dir/flags.make
 CMakeFiles/Client.dir/ScheduleDialog.cpp.obj: CMakeFiles/Client.dir/includes_CXX.rsp
-CMakeFiles/Client.dir/ScheduleDialog.cpp.obj: C:/Users/5-20/mini_project/ScheduleDialog.cpp
+CMakeFiles/Client.dir/ScheduleDialog.cpp.obj: C:/workspace/project2/ScheduleDialog.cpp
 CMakeFiles/Client.dir/ScheduleDialog.cpp.obj: CMakeFiles/Client.dir/compiler_depend.ts
-	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green --progress-dir=C:\Users\5-20\mini_project\build\Desktop_Qt_6_11_0_MinGW_64_bit-Debug\CMakeFiles --progress-num=$(CMAKE_PROGRESS_7) "Building CXX object CMakeFiles/Client.dir/ScheduleDialog.cpp.obj"
-	C:\Qt\Tools\mingw1310_64\bin\g++.exe $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -MD -MT CMakeFiles/Client.dir/ScheduleDialog.cpp.obj -MF CMakeFiles\Client.dir\ScheduleDialog.cpp.obj.d -o CMakeFiles\Client.dir\ScheduleDialog.cpp.obj -c C:\Users\5-20\mini_project\ScheduleDialog.cpp
+	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green --progress-dir=C:\workspace\project2\build\Desktop_Qt_6_11_0_MinGW_64_bit-Debug\CMakeFiles --progress-num=$(CMAKE_PROGRESS_7) "Building CXX object CMakeFiles/Client.dir/ScheduleDialog.cpp.obj"
+	C:\Qt\Tools\mingw1310_64\bin\g++.exe $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -MD -MT CMakeFiles/Client.dir/ScheduleDialog.cpp.obj -MF CMakeFiles\Client.dir\ScheduleDialog.cpp.obj.d -o CMakeFiles\Client.dir\ScheduleDialog.cpp.obj -c C:\workspace\project2\ScheduleDialog.cpp
 
 CMakeFiles/Client.dir/ScheduleDialog.cpp.i: cmake_force
 	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green "Preprocessing CXX source to CMakeFiles/Client.dir/ScheduleDialog.cpp.i"
-	C:\Qt\Tools\mingw1310_64\bin\g++.exe $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -E C:\Users\5-20\mini_project\ScheduleDialog.cpp > CMakeFiles\Client.dir\ScheduleDialog.cpp.i
+	C:\Qt\Tools\mingw1310_64\bin\g++.exe $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -E C:\workspace\project2\ScheduleDialog.cpp > CMakeFiles\Client.dir\ScheduleDialog.cpp.i
 
 CMakeFiles/Client.dir/ScheduleDialog.cpp.s: cmake_force
 	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green "Compiling CXX source to assembly CMakeFiles/Client.dir/ScheduleDialog.cpp.s"
-	C:\Qt\Tools\mingw1310_64\bin\g++.exe $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -S C:\Users\5-20\mini_project\ScheduleDialog.cpp -o CMakeFiles\Client.dir\ScheduleDialog.cpp.s
+	C:\Qt\Tools\mingw1310_64\bin\g++.exe $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -S C:\workspace\project2\ScheduleDialog.cpp -o CMakeFiles\Client.dir\ScheduleDialog.cpp.s
 
 CMakeFiles/Client.dir/ChatDialog.cpp.obj: CMakeFiles/Client.dir/flags.make
 CMakeFiles/Client.dir/ChatDialog.cpp.obj: CMakeFiles/Client.dir/includes_CXX.rsp
-CMakeFiles/Client.dir/ChatDialog.cpp.obj: C:/Users/5-20/mini_project/ChatDialog.cpp
+CMakeFiles/Client.dir/ChatDialog.cpp.obj: C:/workspace/project2/ChatDialog.cpp
 CMakeFiles/Client.dir/ChatDialog.cpp.obj: CMakeFiles/Client.dir/compiler_depend.ts
-	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green --progress-dir=C:\Users\5-20\mini_project\build\Desktop_Qt_6_11_0_MinGW_64_bit-Debug\CMakeFiles --progress-num=$(CMAKE_PROGRESS_8) "Building CXX object CMakeFiles/Client.dir/ChatDialog.cpp.obj"
-	C:\Qt\Tools\mingw1310_64\bin\g++.exe $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -MD -MT CMakeFiles/Client.dir/ChatDialog.cpp.obj -MF CMakeFiles\Client.dir\ChatDialog.cpp.obj.d -o CMakeFiles\Client.dir\ChatDialog.cpp.obj -c C:\Users\5-20\mini_project\ChatDialog.cpp
+	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green --progress-dir=C:\workspace\project2\build\Desktop_Qt_6_11_0_MinGW_64_bit-Debug\CMakeFiles --progress-num=$(CMAKE_PROGRESS_8) "Building CXX object CMakeFiles/Client.dir/ChatDialog.cpp.obj"
+	C:\Qt\Tools\mingw1310_64\bin\g++.exe $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -MD -MT CMakeFiles/Client.dir/ChatDialog.cpp.obj -MF CMakeFiles\Client.dir\ChatDialog.cpp.obj.d -o CMakeFiles\Client.dir\ChatDialog.cpp.obj -c C:\workspace\project2\ChatDialog.cpp
 
 CMakeFiles/Client.dir/ChatDialog.cpp.i: cmake_force
 	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green "Preprocessing CXX source to CMakeFiles/Client.dir/ChatDialog.cpp.i"
-	C:\Qt\Tools\mingw1310_64\bin\g++.exe $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -E C:\Users\5-20\mini_project\ChatDialog.cpp > CMakeFiles\Client.dir\ChatDialog.cpp.i
+	C:\Qt\Tools\mingw1310_64\bin\g++.exe $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -E C:\workspace\project2\ChatDialog.cpp > CMakeFiles\Client.dir\ChatDialog.cpp.i
 
 CMakeFiles/Client.dir/ChatDialog.cpp.s: cmake_force
 	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green "Compiling CXX source to assembly CMakeFiles/Client.dir/ChatDialog.cpp.s"
-	C:\Qt\Tools\mingw1310_64\bin\g++.exe $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -S C:\Users\5-20\mini_project\ChatDialog.cpp -o CMakeFiles\Client.dir\ChatDialog.cpp.s
+	C:\Qt\Tools\mingw1310_64\bin\g++.exe $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -S C:\workspace\project2\ChatDialog.cpp -o CMakeFiles\Client.dir\ChatDialog.cpp.s
 
 # Object files for target Client
 Client_OBJECTS = \
@@ -208,7 +208,7 @@ Client.exe: C:/Qt/6.11.0/mingw_64/lib/libQt6Core.a
 Client.exe: CMakeFiles/Client.dir/linkLibs.rsp
 Client.exe: CMakeFiles/Client.dir/objects1.rsp
 Client.exe: CMakeFiles/Client.dir/link.txt
-	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green --bold --progress-dir=C:\Users\5-20\mini_project\build\Desktop_Qt_6_11_0_MinGW_64_bit-Debug\CMakeFiles --progress-num=$(CMAKE_PROGRESS_9) "Linking CXX executable Client.exe"
+	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green --bold --progress-dir=C:\workspace\project2\build\Desktop_Qt_6_11_0_MinGW_64_bit-Debug\CMakeFiles --progress-num=$(CMAKE_PROGRESS_9) "Linking CXX executable Client.exe"
 	$(CMAKE_COMMAND) -E cmake_link_script CMakeFiles\Client.dir\link.txt --verbose=$(VERBOSE)
 
 # Rule to build all files generated by this target.
@@ -220,6 +220,6 @@ CMakeFiles/Client.dir/clean:
 .PHONY : CMakeFiles/Client.dir/clean
 
 CMakeFiles/Client.dir/depend: Client_autogen/timestamp
-	$(CMAKE_COMMAND) -E cmake_depends "MinGW Makefiles" C:\Users\5-20\mini_project C:\Users\5-20\mini_project C:\Users\5-20\mini_project\build\Desktop_Qt_6_11_0_MinGW_64_bit-Debug C:\Users\5-20\mini_project\build\Desktop_Qt_6_11_0_MinGW_64_bit-Debug C:\Users\5-20\mini_project\build\Desktop_Qt_6_11_0_MinGW_64_bit-Debug\CMakeFiles\Client.dir\DependInfo.cmake "--color=$(COLOR)"
+	$(CMAKE_COMMAND) -E cmake_depends "MinGW Makefiles" C:\workspace\project2 C:\workspace\project2 C:\workspace\project2\build\Desktop_Qt_6_11_0_MinGW_64_bit-Debug C:\workspace\project2\build\Desktop_Qt_6_11_0_MinGW_64_bit-Debug C:\workspace\project2\build\Desktop_Qt_6_11_0_MinGW_64_bit-Debug\CMakeFiles\Client.dir\DependInfo.cmake "--color=$(COLOR)"
 .PHONY : CMakeFiles/Client.dir/depend
 

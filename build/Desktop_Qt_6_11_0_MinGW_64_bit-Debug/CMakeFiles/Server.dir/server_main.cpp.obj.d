@@ -1,5 +1,5 @@
 CMakeFiles/Server.dir/server_main.cpp.obj: \
- C:\Users\5-20\mini_project\server_main.cpp \
+ C:\workspace\project2\server_main.cpp \
  C:/Qt/6.11.0/mingw_64/include/QtCore/QCoreApplication \
  C:/Qt/6.11.0/mingw_64/include/QtCore/qcoreapplication.h \
  C:/Qt/6.11.0/mingw_64/include/QtCore/qglobal.h \
@@ -329,7 +329,7 @@ CMakeFiles/Server.dir/server_main.cpp.obj: \
  C:/Qt/6.11.0/mingw_64/include/QtCore/qdeadlinetimer.h \
  C:/Qt/6.11.0/mingw_64/include/QtCore/qnativeinterface.h \
  C:/Qt/6.11.0/mingw_64/include/QtCore/qcoreapplication_platform.h \
- C:\Users\5-20\mini_project\Server.h \
+ C:\workspace\project2\Server.h \
  C:/Qt/6.11.0/mingw_64/include/QtNetwork/QTcpServer \
  C:/Qt/6.11.0/mingw_64/include/QtNetwork/qtcpserver.h \
  C:/Qt/6.11.0/mingw_64/include/QtNetwork/qtnetworkglobal.h \

@@ -1,6 +1,6 @@
 CMakeFiles/Client.dir/ScheduleDialog.cpp.obj: \
- C:\Users\5-20\mini_project\ScheduleDialog.cpp \
- C:\Users\5-20\mini_project\ScheduleDialog.h \
+ C:\workspace\project2\ScheduleDialog.cpp \
+ C:\workspace\project2\ScheduleDialog.h \
  C:/Qt/6.11.0/mingw_64/include/QtWidgets/QDialog \
  C:/Qt/6.11.0/mingw_64/include/QtWidgets/qdialog.h \
  C:/Qt/6.11.0/mingw_64/include/QtWidgets/qtwidgetsglobal.h \
@@ -447,7 +447,7 @@ CMakeFiles/Client.dir/ScheduleDialog.cpp.obj: \
  C:/Qt/6.11.0/mingw_64/include/QtGui/qfontdatabase.h \
  C:/Qt/6.11.0/mingw_64/include/QtWidgets/QButtonGroup \
  C:/Qt/6.11.0/mingw_64/include/QtWidgets/qbuttongroup.h \
- C:/Users/5-20/mini_project/build/Desktop_Qt_6_11_0_MinGW_64_bit-Debug/Client_autogen/include/ui_scheduledialog.h \
+ C:/workspace/project2/build/Desktop_Qt_6_11_0_MinGW_64_bit-Debug/Client_autogen/include/ui_scheduledialog.h \
  C:/Qt/6.11.0/mingw_64/include/QtCore/QVariant \
  C:/Qt/6.11.0/mingw_64/include/QtWidgets/QApplication \
  C:/Qt/6.11.0/mingw_64/include/QtWidgets/qapplication.h \

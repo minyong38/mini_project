@@ -1,7 +1,7 @@
 CMakeFiles/Server.dir/Server_autogen/mocs_compilation.cpp.obj: \
- C:\Users\5-20\mini_project\build\Desktop_Qt_6_11_0_MinGW_64_bit-Debug\Server_autogen\mocs_compilation.cpp \
- C:\Users\5-20\mini_project\build\Desktop_Qt_6_11_0_MinGW_64_bit-Debug\Server_autogen\EWIEGA46WW/moc_Server.cpp \
- C:/Users/5-20/mini_project/Server.h \
+ C:\workspace\project2\build\Desktop_Qt_6_11_0_MinGW_64_bit-Debug\Server_autogen\mocs_compilation.cpp \
+ C:\workspace\project2\build\Desktop_Qt_6_11_0_MinGW_64_bit-Debug\Server_autogen\EWIEGA46WW/moc_Server.cpp \
+ C:/workspace/project2/Server.h \
  C:/Qt/6.11.0/mingw_64/include/QtNetwork/QTcpServer \
  C:/Qt/6.11.0/mingw_64/include/QtNetwork/qtcpserver.h \
  C:/Qt/6.11.0/mingw_64/include/QtNetwork/qtnetworkglobal.h \

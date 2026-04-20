@@ -203,34 +203,45 @@ void CustomCalendarWidget::paintCell(QPainter *painter, const QRect &rect, QDate
             QColor textCol = isToday ? Qt::white
                            : (m_darkMode ? QColor("#E0E0E0") : QColor("#333333"));
 
+            const int wW    = 36;
+            const int wLeft = rect.right() - wW - 1;
+
+            // 배경 (반투명)
+            if (!isToday) {
+                QColor bgW = m_darkMode ? QColor(0, 0, 0, 40) : QColor(255, 255, 255, 80);
+                painter->setBrush(bgW);
+                painter->setPen(Qt::NoPen);
+                painter->drawRoundedRect(QRect(wLeft, rect.top() + 2, wW, 42), 4, 4);
+            }
+
             // 이모지
             QFont ef = painter->font();
-            ef.setPixelSize(13);
+            ef.setPixelSize(16);
             ef.setBold(false);
             painter->setFont(ef);
             painter->setPen(textCol);
-            QRect emojiR(rect.right() - 20, rect.top() + 2, 18, 17);
+            QRect emojiR(wLeft, rect.top() + 3, wW, 20);
             painter->drawText(emojiR, Qt::AlignCenter, wi.emoji);
 
             // 최고/최저 기온
             QFont tf = painter->font();
-            tf.setPixelSize(8);
+            tf.setPixelSize(9);
             painter->setFont(tf);
             painter->setPen(textCol);
             QString tempStr = QString("%1°/%2°")
                                 .arg(qRound(wi.tempMax))
                                 .arg(qRound(wi.tempMin));
-            QRect tempR(rect.right() - 30, rect.top() + 19, 30, 10);
+            QRect tempR(wLeft, rect.top() + 23, wW, 11);
             painter->drawText(tempR, Qt::AlignCenter, tempStr);
 
             // 강수 확률 (20% 이상일 때만 표시)
             if (wi.pop >= 0.2) {
                 QFont pf = painter->font();
-                pf.setPixelSize(7);
+                pf.setPixelSize(8);
                 painter->setFont(pf);
                 painter->setPen(isToday ? Qt::white : QColor("#007AFF"));
                 QString popStr = QString("💧%1%").arg(qRound(wi.pop * 100));
-                QRect popR(rect.right() - 30, rect.top() + 29, 30, 9);
+                QRect popR(wLeft, rect.top() + 34, wW, 10);
                 painter->drawText(popR, Qt::AlignCenter, popStr);
             }
         }

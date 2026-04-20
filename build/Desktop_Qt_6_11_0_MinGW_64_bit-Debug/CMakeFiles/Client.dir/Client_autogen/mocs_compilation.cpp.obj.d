@@ -1,7 +1,7 @@
 CMakeFiles/Client.dir/Client_autogen/mocs_compilation.cpp.obj: \
- C:\Users\5-20\mini_project\build\Desktop_Qt_6_11_0_MinGW_64_bit-Debug\Client_autogen\mocs_compilation.cpp \
- C:\Users\5-20\mini_project\build\Desktop_Qt_6_11_0_MinGW_64_bit-Debug\Client_autogen\EWIEGA46WW/moc_ChatDialog.cpp \
- C:/Users/5-20/mini_project/ChatDialog.h \
+ C:\workspace\project2\build\Desktop_Qt_6_11_0_MinGW_64_bit-Debug\Client_autogen\mocs_compilation.cpp \
+ C:\workspace\project2\build\Desktop_Qt_6_11_0_MinGW_64_bit-Debug\Client_autogen\EWIEGA46WW/moc_ChatDialog.cpp \
+ C:/workspace/project2/ChatDialog.h \
  C:/Qt/6.11.0/mingw_64/include/QtWidgets/QDialog \
  C:/Qt/6.11.0/mingw_64/include/QtWidgets/qdialog.h \
  C:/Qt/6.11.0/mingw_64/include/QtWidgets/qtwidgetsglobal.h \
@@ -420,8 +420,8 @@ CMakeFiles/Client.dir/Client_autogen/mocs_compilation.cpp.obj: \
  C:/Qt/6.11.0/mingw_64/include/QtCore/qtmochelpers.h \
  C:/Qt/6.11.0/mingw_64/include/QtCore/qtmocconstants.h \
  C:/Qt/6.11.0/mingw_64/include/QtCore/q20algorithm.h \
- C:\Users\5-20\mini_project\build\Desktop_Qt_6_11_0_MinGW_64_bit-Debug\Client_autogen\EWIEGA46WW/moc_CustomCalendarWidget.cpp \
- C:/Users/5-20/mini_project/CustomCalendarWidget.h \
+ C:\workspace\project2\build\Desktop_Qt_6_11_0_MinGW_64_bit-Debug\Client_autogen\EWIEGA46WW/moc_CustomCalendarWidget.cpp \
+ C:/workspace/project2/CustomCalendarWidget.h \
  C:/Qt/6.11.0/mingw_64/include/QtWidgets/QCalendarWidget \
  C:/Qt/6.11.0/mingw_64/include/QtWidgets/qcalendarwidget.h \
  C:/Qt/6.11.0/mingw_64/include/QtCore/qdatetime.h \
@@ -429,7 +429,7 @@ CMakeFiles/Client.dir/Client_autogen/mocs_compilation.cpp.obj: \
  C:/Qt/6.11.0/mingw_64/include/QtCore/qlocale.h \
  C:/Qt/6.11.0/mingw_64/include/QtCore/QDate \
  C:/Qt/6.11.0/mingw_64/include/QtCore/QStringList \
- C:/Users/5-20/mini_project/WeatherManager.h \
+ C:/workspace/project2/WeatherManager.h \
  C:/Qt/6.11.0/mingw_64/include/QtCore/QObject \
  C:/Qt/6.11.0/mingw_64/include/QtNetwork/QNetworkAccessManager \
  C:/Qt/6.11.0/mingw_64/include/QtNetwork/qnetworkaccessmanager.h \
@@ -461,12 +461,12 @@ CMakeFiles/Client.dir/Client_autogen/mocs_compilation.cpp.obj: \
  C:/Qt/6.11.0/mingw_64/include/QtNetwork/qsslpresharedkeyauthenticator.h \
  C:/Qt/6.11.0/mingw_64/include/QtCore/QMetaType \
  C:/Qt/6.11.0/mingw_64/include/QtNetwork/QSslError \
- C:\Users\5-20\mini_project\build\Desktop_Qt_6_11_0_MinGW_64_bit-Debug\Client_autogen\EWIEGA46WW/moc_LoginDialog.cpp \
- C:/Users/5-20/mini_project/LoginDialog.h \
+ C:\workspace\project2\build\Desktop_Qt_6_11_0_MinGW_64_bit-Debug\Client_autogen\EWIEGA46WW/moc_LoginDialog.cpp \
+ C:/workspace/project2/LoginDialog.h \
  C:/Qt/6.11.0/mingw_64/include/QtWidgets/QDialogButtonBox \
  C:/Qt/6.11.0/mingw_64/include/QtWidgets/qdialogbuttonbox.h \
- C:\Users\5-20\mini_project\build\Desktop_Qt_6_11_0_MinGW_64_bit-Debug\Client_autogen\EWIEGA46WW/moc_ScheduleDialog.cpp \
- C:/Users/5-20/mini_project/ScheduleDialog.h \
+ C:\workspace\project2\build\Desktop_Qt_6_11_0_MinGW_64_bit-Debug\Client_autogen\EWIEGA46WW/moc_ScheduleDialog.cpp \
+ C:/workspace/project2/ScheduleDialog.h \
  C:/Qt/6.11.0/mingw_64/include/QtWidgets/QCheckBox \
  C:/Qt/6.11.0/mingw_64/include/QtWidgets/qcheckbox.h \
  C:/Qt/6.11.0/mingw_64/include/QtWidgets/QTimeEdit \
@@ -508,10 +508,10 @@ CMakeFiles/Client.dir/Client_autogen/mocs_compilation.cpp.obj: \
  C:/Qt/6.11.0/mingw_64/include/QtGui/qfontdatabase.h \
  C:/Qt/6.11.0/mingw_64/include/QtWidgets/QButtonGroup \
  C:/Qt/6.11.0/mingw_64/include/QtWidgets/qbuttongroup.h \
- C:\Users\5-20\mini_project\build\Desktop_Qt_6_11_0_MinGW_64_bit-Debug\Client_autogen\EWIEGA46WW/moc_WeatherManager.cpp \
- C:/Users/5-20/mini_project/WeatherManager.h \
- C:\Users\5-20\mini_project\build\Desktop_Qt_6_11_0_MinGW_64_bit-Debug\Client_autogen\EWIEGA46WW/moc_mainwindow.cpp \
- C:/Users/5-20/mini_project/mainwindow.h \
+ C:\workspace\project2\build\Desktop_Qt_6_11_0_MinGW_64_bit-Debug\Client_autogen\EWIEGA46WW/moc_WeatherManager.cpp \
+ C:/workspace/project2/WeatherManager.h \
+ C:\workspace\project2\build\Desktop_Qt_6_11_0_MinGW_64_bit-Debug\Client_autogen\EWIEGA46WW/moc_mainwindow.cpp \
+ C:/workspace/project2/mainwindow.h \
  C:/Qt/6.11.0/mingw_64/include/QtWidgets/QMainWindow \
  C:/Qt/6.11.0/mingw_64/include/QtWidgets/qmainwindow.h \
  C:/Qt/6.11.0/mingw_64/include/QtWidgets/qtabwidget.h \
@@ -521,5 +521,5 @@ CMakeFiles/Client.dir/Client_autogen/mocs_compilation.cpp.obj: \
  C:/Qt/6.11.0/mingw_64/include/QtWidgets/QMenu \
  C:/Qt/6.11.0/mingw_64/include/QtWidgets/qmenu.h \
  C:/Qt/6.11.0/mingw_64/include/QtGui/QCloseEvent \
- C:/Users/5-20/mini_project/ScheduleDialog.h \
- C:/Users/5-20/mini_project/ChatDialog.h
+ C:/workspace/project2/ScheduleDialog.h \
+ C:/workspace/project2/ChatDialog.h

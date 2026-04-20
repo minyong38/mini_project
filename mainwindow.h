@@ -66,9 +66,11 @@ private:
     int              m_unreadCount  = 0;
 
     QStringList      m_onlineUsers;
+    QStringList      m_allKnownUsers;
     bool             m_initialOnlineReceived = false;
 
     void showJoinNotification(const QString& userId);
+    void updateFriendsList();
     void setupTray();
     void updateTrayIcon();
     void applyTheme(bool dark);

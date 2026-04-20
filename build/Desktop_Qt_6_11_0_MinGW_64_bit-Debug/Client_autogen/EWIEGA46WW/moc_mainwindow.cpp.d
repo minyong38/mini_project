@@ -1,5 +1,5 @@
-C:/Users/5-20/mini_project/build/Desktop_Qt_6_11_0_MinGW_64_bit-Debug/Client_autogen/EWIEGA46WW/moc_mainwindow.cpp: C:/Users/5-20/mini_project/mainwindow.h \
-  C:/Users/5-20/mini_project/build/Desktop_Qt_6_11_0_MinGW_64_bit-Debug/Client_autogen/moc_predefs.h \
+C:/workspace/project2/build/Desktop_Qt_6_11_0_MinGW_64_bit-Debug/Client_autogen/EWIEGA46WW/moc_mainwindow.cpp: C:/workspace/project2/mainwindow.h \
+  C:/workspace/project2/build/Desktop_Qt_6_11_0_MinGW_64_bit-Debug/Client_autogen/moc_predefs.h \
   C:/Qt/6.11.0/mingw_64/include/QtCore/QDate \
   C:/Qt/6.11.0/mingw_64/include/QtCore/QFlags \
   C:/Qt/6.11.0/mingw_64/include/QtCore/QList \
@@ -488,6 +488,6 @@ C:/Users/5-20/mini_project/build/Desktop_Qt_6_11_0_MinGW_64_bit-Debug/Client_aut
   C:/Qt/Tools/mingw1310_64/x86_64-w64-mingw32/include/time.h \
   C:/Qt/Tools/mingw1310_64/x86_64-w64-mingw32/include/vadefs.h \
   C:/Qt/Tools/mingw1310_64/x86_64-w64-mingw32/include/wchar.h \
-  C:/Users/5-20/mini_project/ChatDialog.h \
-  C:/Users/5-20/mini_project/ScheduleDialog.h \
-  C:/Users/5-20/mini_project/WeatherManager.h
+  C:/workspace/project2/ChatDialog.h \
+  C:/workspace/project2/ScheduleDialog.h \
+  C:/workspace/project2/WeatherManager.h

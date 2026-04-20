@@ -143,13 +143,7 @@ void MainWindow::processMessage(const QString& data) {
         }
         m_onlineUsers = users;
         m_initialOnlineReceived = true;
-
-        QString text = QString("접속 중 (%1명):  ").arg(users.size());
-        QStringList dots;
-        for (const QString& u : users)
-            dots << "● " + u;
-        text += dots.join("   ");
-        ui->onlineLabel->setText(text);
+        updateFriendsList();
     }
 
     // ── 유저 목록 ────────────────────────────────────────────
@@ -166,6 +160,9 @@ void MainWindow::processMessage(const QString& data) {
         int idx = users.indexOf(m_selectedId);
         ui->userCombo->setCurrentIndex(idx >= 0 ? idx : 0);
         ui->userCombo->blockSignals(false);
+
+        m_allKnownUsers = users;
+        updateFriendsList();
     }
 
     // ── 월별 일정 ────────────────────────────────────────────
@@ -300,6 +297,30 @@ void MainWindow::updateChatBtnText() {
         ui->chatBtn->setText(QString("💬 채팅 (%1)").arg(m_unreadCount));
     else
         ui->chatBtn->setText("💬 채팅");
+}
+
+void MainWindow::updateFriendsList() {
+    QStringList known = m_allKnownUsers;
+    for (const QString& u : m_onlineUsers)
+        if (!known.contains(u)) known << u;
+
+    if (known.isEmpty()) {
+        ui->onlineLabel->setText("👥 친구 목록:  연결 중...");
+        return;
+    }
+
+    // 온라인 먼저, 오프라인 나중
+    QStringList onlineItems, offlineItems;
+    for (const QString& u : known) {
+        if (m_onlineUsers.contains(u))
+            onlineItems << "🟢 " + u;
+        else
+            offlineItems << "⚫ " + u;
+    }
+
+    QString text = QString("👥 친구 목록  (%1명 접속 중)    ").arg(m_onlineUsers.size());
+    text += (onlineItems + offlineItems).join("    ");
+    ui->onlineLabel->setText(text);
 }
 
 // ──────────────────────────────────────────────

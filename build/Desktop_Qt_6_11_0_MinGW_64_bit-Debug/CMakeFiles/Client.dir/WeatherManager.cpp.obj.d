@@ -1,6 +1,6 @@
 CMakeFiles/Client.dir/WeatherManager.cpp.obj: \
- C:\Users\5-20\mini_project\WeatherManager.cpp \
- C:\Users\5-20\mini_project\WeatherManager.h \
+ C:\workspace\project2\WeatherManager.cpp \
+ C:\workspace\project2\WeatherManager.h \
  C:/Qt/6.11.0/mingw_64/include/QtCore/QObject \
  C:/Qt/6.11.0/mingw_64/include/QtCore/qobject.h \
  C:/Qt/6.11.0/mingw_64/include/QtCore/qobjectdefs.h \

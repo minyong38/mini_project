@@ -1,6 +1,5 @@
-CMakeFiles/Server.dir/Server.cpp.obj: \
- C:\Users\5-20\mini_project\Server.cpp \
- C:\Users\5-20\mini_project\Server.h \
+CMakeFiles/Server.dir/Server.cpp.obj: C:\workspace\project2\Server.cpp \
+ C:\workspace\project2\Server.h \
  C:/Qt/6.11.0/mingw_64/include/QtNetwork/QTcpServer \
  C:/Qt/6.11.0/mingw_64/include/QtNetwork/qtcpserver.h \
  C:/Qt/6.11.0/mingw_64/include/QtNetwork/qtnetworkglobal.h \
@@ -366,7 +365,7 @@ CMakeFiles/Server.dir/Server.cpp.obj: \
  C:/Qt/6.11.0/mingw_64/include/QtCore/QObject \
  C:/Qt/6.11.0/mingw_64/include/QtCore/QMap \
  C:/Qt/6.11.0/mingw_64/include/QtCore/QList \
- C:\Users\5-20\mini_project\Common.h \
+ C:\workspace\project2\Common.h \
  C:/Qt/6.11.0/mingw_64/include/QtCore/QString \
  C:/Qt/6.11.0/mingw_64/include/QtSql/QSqlError \
  C:/Qt/6.11.0/mingw_64/include/QtSql/qsqlerror.h \

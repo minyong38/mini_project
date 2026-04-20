@@ -1,5 +1,5 @@
-C:/Users/5-20/mini_project/build/Desktop_Qt_6_11_0_MinGW_64_bit-Debug/Client_autogen/EWIEGA46WW/moc_ScheduleDialog.cpp: C:/Users/5-20/mini_project/ScheduleDialog.h \
-  C:/Users/5-20/mini_project/build/Desktop_Qt_6_11_0_MinGW_64_bit-Debug/Client_autogen/moc_predefs.h \
+C:/workspace/project2/build/Desktop_Qt_6_11_0_MinGW_64_bit-Debug/Client_autogen/EWIEGA46WW/moc_ScheduleDialog.cpp: C:/workspace/project2/ScheduleDialog.h \
+  C:/workspace/project2/build/Desktop_Qt_6_11_0_MinGW_64_bit-Debug/Client_autogen/moc_predefs.h \
   C:/Qt/6.11.0/mingw_64/include/QtCore/QDate \
   C:/Qt/6.11.0/mingw_64/include/QtCore/QList \
   C:/Qt/6.11.0/mingw_64/include/QtCore/QObject \

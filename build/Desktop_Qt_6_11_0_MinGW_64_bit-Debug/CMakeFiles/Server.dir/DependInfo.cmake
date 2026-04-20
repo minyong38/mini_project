@@ -9,9 +9,9 @@ set(CMAKE_DEPENDS_LANGUAGES
 # The set of dependency files which are needed:
 set(CMAKE_DEPENDS_DEPENDENCY_FILES
   "" "Server_autogen/timestamp" "custom" "Server_autogen/deps"
-  "C:/Users/5-20/mini_project/Server.cpp" "CMakeFiles/Server.dir/Server.cpp.obj" "gcc" "CMakeFiles/Server.dir/Server.cpp.obj.d"
-  "C:/Users/5-20/mini_project/build/Desktop_Qt_6_11_0_MinGW_64_bit-Debug/Server_autogen/mocs_compilation.cpp" "CMakeFiles/Server.dir/Server_autogen/mocs_compilation.cpp.obj" "gcc" "CMakeFiles/Server.dir/Server_autogen/mocs_compilation.cpp.obj.d"
-  "C:/Users/5-20/mini_project/server_main.cpp" "CMakeFiles/Server.dir/server_main.cpp.obj" "gcc" "CMakeFiles/Server.dir/server_main.cpp.obj.d"
+  "C:/workspace/project2/Server.cpp" "CMakeFiles/Server.dir/Server.cpp.obj" "gcc" "CMakeFiles/Server.dir/Server.cpp.obj.d"
+  "C:/workspace/project2/build/Desktop_Qt_6_11_0_MinGW_64_bit-Debug/Server_autogen/mocs_compilation.cpp" "CMakeFiles/Server.dir/Server_autogen/mocs_compilation.cpp.obj" "gcc" "CMakeFiles/Server.dir/Server_autogen/mocs_compilation.cpp.obj.d"
+  "C:/workspace/project2/server_main.cpp" "CMakeFiles/Server.dir/server_main.cpp.obj" "gcc" "CMakeFiles/Server.dir/server_main.cpp.obj.d"
   )
 
 # Targets to which this target links which contain Fortran sources.

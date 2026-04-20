@@ -1,6 +1,6 @@
 CMakeFiles/Client.dir/CustomCalendarWidget.cpp.obj: \
- C:\Users\5-20\mini_project\CustomCalendarWidget.cpp \
- C:\Users\5-20\mini_project\CustomCalendarWidget.h \
+ C:\workspace\project2\CustomCalendarWidget.cpp \
+ C:\workspace\project2\CustomCalendarWidget.h \
  C:/Qt/6.11.0/mingw_64/include/QtWidgets/QCalendarWidget \
  C:/Qt/6.11.0/mingw_64/include/QtWidgets/qcalendarwidget.h \
  C:/Qt/6.11.0/mingw_64/include/QtWidgets/qtwidgetsglobal.h \
@@ -391,7 +391,7 @@ CMakeFiles/Client.dir/CustomCalendarWidget.cpp.obj: \
  C:/Qt/6.11.0/mingw_64/include/QtCore/QMap \
  C:/Qt/6.11.0/mingw_64/include/QtCore/QDate \
  C:/Qt/6.11.0/mingw_64/include/QtCore/QStringList \
- C:\Users\5-20\mini_project\WeatherManager.h \
+ C:\workspace\project2\WeatherManager.h \
  C:/Qt/6.11.0/mingw_64/include/QtCore/QObject \
  C:/Qt/6.11.0/mingw_64/include/QtNetwork/QNetworkAccessManager \
  C:/Qt/6.11.0/mingw_64/include/QtNetwork/qnetworkaccessmanager.h \

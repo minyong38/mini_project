@@ -1,5 +1,5 @@
 CMakeFiles/Client.dir/client_main.cpp.obj: \
- C:\Users\5-20\mini_project\client_main.cpp \
+ C:\workspace\project2\client_main.cpp \
  C:/Qt/6.11.0/mingw_64/include/QtWidgets/QApplication \
  C:/Qt/6.11.0/mingw_64/include/QtWidgets/qapplication.h \
  C:/Qt/6.11.0/mingw_64/include/QtWidgets/qtwidgetsglobal.h \
@@ -384,7 +384,7 @@ CMakeFiles/Client.dir/client_main.cpp.obj: \
  C:/Qt/6.11.0/mingw_64/include/QtCore/qvarlengtharray.h \
  C:/Qt/6.11.0/mingw_64/include/QtCore/qalloc.h \
  C:/Qt/6.11.0/mingw_64/include/QtGui/qguiapplication_platform.h \
- C:\Users\5-20\mini_project\MainWindow.h \
+ C:\workspace\project2\MainWindow.h \
  C:/Qt/6.11.0/mingw_64/include/QtWidgets/QMainWindow \
  C:/Qt/6.11.0/mingw_64/include/QtWidgets/qmainwindow.h \
  C:/Qt/6.11.0/mingw_64/include/QtWidgets/qwidget.h \
@@ -432,7 +432,7 @@ CMakeFiles/Client.dir/client_main.cpp.obj: \
  C:/Qt/6.11.0/mingw_64/include/QtCore/QSizeF \
  C:/Qt/6.11.0/mingw_64/include/QtGui/QTransform \
  C:/Qt/6.11.0/mingw_64/include/QtGui/qscreen_platform.h \
- C:\Users\5-20\mini_project\ScheduleDialog.h \
+ C:\workspace\project2\ScheduleDialog.h \
  C:/Qt/6.11.0/mingw_64/include/QtWidgets/QDialog \
  C:/Qt/6.11.0/mingw_64/include/QtWidgets/qdialog.h \
  C:/Qt/6.11.0/mingw_64/include/QtWidgets/QLabel \
@@ -466,7 +466,7 @@ CMakeFiles/Client.dir/client_main.cpp.obj: \
  C:/Qt/6.11.0/mingw_64/include/QtGui/qfontdatabase.h \
  C:/Qt/6.11.0/mingw_64/include/QtWidgets/QButtonGroup \
  C:/Qt/6.11.0/mingw_64/include/QtWidgets/qbuttongroup.h \
- C:\Users\5-20\mini_project\ChatDialog.h \
+ C:\workspace\project2\ChatDialog.h \
  C:/Qt/6.11.0/mingw_64/include/QtWidgets/QScrollArea \
  C:/Qt/6.11.0/mingw_64/include/QtWidgets/qscrollarea.h \
  C:/Qt/6.11.0/mingw_64/include/QtWidgets/QVBoxLayout \
@@ -482,7 +482,7 @@ CMakeFiles/Client.dir/client_main.cpp.obj: \
  C:/Qt/6.11.0/mingw_64/include/QtWidgets/qscrollbar.h \
  C:/Qt/6.11.0/mingw_64/include/QtWidgets/qabstractslider.h \
  C:/Qt/6.11.0/mingw_64/include/QtGui/QPixmap \
- C:\Users\5-20\mini_project\WeatherManager.h \
+ C:\workspace\project2\WeatherManager.h \
  C:/Qt/6.11.0/mingw_64/include/QtCore/QObject \
  C:/Qt/6.11.0/mingw_64/include/QtNetwork/QNetworkAccessManager \
  C:/Qt/6.11.0/mingw_64/include/QtNetwork/qnetworkaccessmanager.h \
@@ -505,6 +505,6 @@ CMakeFiles/Client.dir/client_main.cpp.obj: \
  C:/Qt/6.11.0/mingw_64/include/QtNetwork/QSslPreSharedKeyAuthenticator \
  C:/Qt/6.11.0/mingw_64/include/QtNetwork/qsslpresharedkeyauthenticator.h \
  C:/Qt/6.11.0/mingw_64/include/QtCore/QMetaType \
- C:\Users\5-20\mini_project\LoginDialog.h \
+ C:\workspace\project2\LoginDialog.h \
  C:/Qt/6.11.0/mingw_64/include/QtWidgets/QDialogButtonBox \
  C:/Qt/6.11.0/mingw_64/include/QtWidgets/qdialogbuttonbox.h

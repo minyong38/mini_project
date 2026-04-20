@@ -52,10 +52,10 @@ RM = C:\Qt\Tools\CMake_64\bin\cmake.exe -E rm -f
 EQUALS = =
 
 # The top-level source directory on which CMake was run.
-CMAKE_SOURCE_DIR = C:\Users\5-20\mini_project
+CMAKE_SOURCE_DIR = C:\workspace\project2
 
 # The top-level build directory on which CMake was run.
-CMAKE_BINARY_DIR = C:\Users\5-20\mini_project\build\Desktop_Qt_6_11_0_MinGW_64_bit-Debug
+CMAKE_BINARY_DIR = C:\workspace\project2\build\Desktop_Qt_6_11_0_MinGW_64_bit-Debug
 
 # Utility rule file for Server_autogen_timestamp_deps.
 
@@ -77,6 +77,6 @@ CMakeFiles/Server_autogen_timestamp_deps.dir/clean:
 .PHONY : CMakeFiles/Server_autogen_timestamp_deps.dir/clean
 
 CMakeFiles/Server_autogen_timestamp_deps.dir/depend:
-	$(CMAKE_COMMAND) -E cmake_depends "MinGW Makefiles" C:\Users\5-20\mini_project C:\Users\5-20\mini_project C:\Users\5-20\mini_project\build\Desktop_Qt_6_11_0_MinGW_64_bit-Debug C:\Users\5-20\mini_project\build\Desktop_Qt_6_11_0_MinGW_64_bit-Debug C:\Users\5-20\mini_project\build\Desktop_Qt_6_11_0_MinGW_64_bit-Debug\CMakeFiles\Server_autogen_timestamp_deps.dir\DependInfo.cmake "--color=$(COLOR)"
+	$(CMAKE_COMMAND) -E cmake_depends "MinGW Makefiles" C:\workspace\project2 C:\workspace\project2 C:\workspace\project2\build\Desktop_Qt_6_11_0_MinGW_64_bit-Debug C:\workspace\project2\build\Desktop_Qt_6_11_0_MinGW_64_bit-Debug C:\workspace\project2\build\Desktop_Qt_6_11_0_MinGW_64_bit-Debug\CMakeFiles\Server_autogen_timestamp_deps.dir\DependInfo.cmake "--color=$(COLOR)"
 .PHONY : CMakeFiles/Server_autogen_timestamp_deps.dir/depend
 

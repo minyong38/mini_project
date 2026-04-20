@@ -52,10 +52,10 @@ RM = C:\Qt\Tools\CMake_64\bin\cmake.exe -E rm -f
 EQUALS = =
 
 # The top-level source directory on which CMake was run.
-CMAKE_SOURCE_DIR = C:\Users\5-20\mini_project
+CMAKE_SOURCE_DIR = C:\workspace\project2
 
 # The top-level build directory on which CMake was run.
-CMAKE_BINARY_DIR = C:\Users\5-20\mini_project\build\Desktop_Qt_6_11_0_MinGW_64_bit-Debug
+CMAKE_BINARY_DIR = C:\workspace\project2\build\Desktop_Qt_6_11_0_MinGW_64_bit-Debug
 
 # Include any dependencies generated for this target.
 include CMakeFiles/Server.dir/depend.make
@@ -71,54 +71,54 @@ include CMakeFiles/Server.dir/flags.make
 Server_autogen/timestamp: C:/Qt/6.11.0/mingw_64/bin/moc.exe
 Server_autogen/timestamp: C:/Qt/6.11.0/mingw_64/bin/uic.exe
 Server_autogen/timestamp: CMakeFiles/Server.dir/compiler_depend.ts
-	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --blue --bold --progress-dir=C:\Users\5-20\mini_project\build\Desktop_Qt_6_11_0_MinGW_64_bit-Debug\CMakeFiles --progress-num=$(CMAKE_PROGRESS_1) "Automatic MOC and UIC for target Server"
-	C:\Qt\Tools\CMake_64\bin\cmake.exe -E cmake_autogen C:/Users/5-20/mini_project/build/Desktop_Qt_6_11_0_MinGW_64_bit-Debug/CMakeFiles/Server_autogen.dir/AutogenInfo.json Debug
-	C:\Qt\Tools\CMake_64\bin\cmake.exe -E touch C:/Users/5-20/mini_project/build/Desktop_Qt_6_11_0_MinGW_64_bit-Debug/Server_autogen/timestamp
+	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --blue --bold --progress-dir=C:\workspace\project2\build\Desktop_Qt_6_11_0_MinGW_64_bit-Debug\CMakeFiles --progress-num=$(CMAKE_PROGRESS_1) "Automatic MOC and UIC for target Server"
+	C:\Qt\Tools\CMake_64\bin\cmake.exe -E cmake_autogen C:/workspace/project2/build/Desktop_Qt_6_11_0_MinGW_64_bit-Debug/CMakeFiles/Server_autogen.dir/AutogenInfo.json Debug
+	C:\Qt\Tools\CMake_64\bin\cmake.exe -E touch C:/workspace/project2/build/Desktop_Qt_6_11_0_MinGW_64_bit-Debug/Server_autogen/timestamp
 
 CMakeFiles/Server.dir/Server_autogen/mocs_compilation.cpp.obj: CMakeFiles/Server.dir/flags.make
 CMakeFiles/Server.dir/Server_autogen/mocs_compilation.cpp.obj: CMakeFiles/Server.dir/includes_CXX.rsp
 CMakeFiles/Server.dir/Server_autogen/mocs_compilation.cpp.obj: Server_autogen/mocs_compilation.cpp
 CMakeFiles/Server.dir/Server_autogen/mocs_compilation.cpp.obj: CMakeFiles/Server.dir/compiler_depend.ts
-	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green --progress-dir=C:\Users\5-20\mini_project\build\Desktop_Qt_6_11_0_MinGW_64_bit-Debug\CMakeFiles --progress-num=$(CMAKE_PROGRESS_2) "Building CXX object CMakeFiles/Server.dir/Server_autogen/mocs_compilation.cpp.obj"
-	C:\Qt\Tools\mingw1310_64\bin\g++.exe $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -MD -MT CMakeFiles/Server.dir/Server_autogen/mocs_compilation.cpp.obj -MF CMakeFiles\Server.dir\Server_autogen\mocs_compilation.cpp.obj.d -o CMakeFiles\Server.dir\Server_autogen\mocs_compilation.cpp.obj -c C:\Users\5-20\mini_project\build\Desktop_Qt_6_11_0_MinGW_64_bit-Debug\Server_autogen\mocs_compilation.cpp
+	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green --progress-dir=C:\workspace\project2\build\Desktop_Qt_6_11_0_MinGW_64_bit-Debug\CMakeFiles --progress-num=$(CMAKE_PROGRESS_2) "Building CXX object CMakeFiles/Server.dir/Server_autogen/mocs_compilation.cpp.obj"
+	C:\Qt\Tools\mingw1310_64\bin\g++.exe $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -MD -MT CMakeFiles/Server.dir/Server_autogen/mocs_compilation.cpp.obj -MF CMakeFiles\Server.dir\Server_autogen\mocs_compilation.cpp.obj.d -o CMakeFiles\Server.dir\Server_autogen\mocs_compilation.cpp.obj -c C:\workspace\project2\build\Desktop_Qt_6_11_0_MinGW_64_bit-Debug\Server_autogen\mocs_compilation.cpp
 
 CMakeFiles/Server.dir/Server_autogen/mocs_compilation.cpp.i: cmake_force
 	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green "Preprocessing CXX source to CMakeFiles/Server.dir/Server_autogen/mocs_compilation.cpp.i"
-	C:\Qt\Tools\mingw1310_64\bin\g++.exe $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -E C:\Users\5-20\mini_project\build\Desktop_Qt_6_11_0_MinGW_64_bit-Debug\Server_autogen\mocs_compilation.cpp > CMakeFiles\Server.dir\Server_autogen\mocs_compilation.cpp.i
+	C:\Qt\Tools\mingw1310_64\bin\g++.exe $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -E C:\workspace\project2\build\Desktop_Qt_6_11_0_MinGW_64_bit-Debug\Server_autogen\mocs_compilation.cpp > CMakeFiles\Server.dir\Server_autogen\mocs_compilation.cpp.i
 
 CMakeFiles/Server.dir/Server_autogen/mocs_compilation.cpp.s: cmake_force
 	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green "Compiling CXX source to assembly CMakeFiles/Server.dir/Server_autogen/mocs_compilation.cpp.s"
-	C:\Qt\Tools\mingw1310_64\bin\g++.exe $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -S C:\Users\5-20\mini_project\build\Desktop_Qt_6_11_0_MinGW_64_bit-Debug\Server_autogen\mocs_compilation.cpp -o CMakeFiles\Server.dir\Server_autogen\mocs_compilation.cpp.s
+	C:\Qt\Tools\mingw1310_64\bin\g++.exe $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -S C:\workspace\project2\build\Desktop_Qt_6_11_0_MinGW_64_bit-Debug\Server_autogen\mocs_compilation.cpp -o CMakeFiles\Server.dir\Server_autogen\mocs_compilation.cpp.s
 
 CMakeFiles/Server.dir/server_main.cpp.obj: CMakeFiles/Server.dir/flags.make
 CMakeFiles/Server.dir/server_main.cpp.obj: CMakeFiles/Server.dir/includes_CXX.rsp
-CMakeFiles/Server.dir/server_main.cpp.obj: C:/Users/5-20/mini_project/server_main.cpp
+CMakeFiles/Server.dir/server_main.cpp.obj: C:/workspace/project2/server_main.cpp
 CMakeFiles/Server.dir/server_main.cpp.obj: CMakeFiles/Server.dir/compiler_depend.ts
-	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green --progress-dir=C:\Users\5-20\mini_project\build\Desktop_Qt_6_11_0_MinGW_64_bit-Debug\CMakeFiles --progress-num=$(CMAKE_PROGRESS_3) "Building CXX object CMakeFiles/Server.dir/server_main.cpp.obj"
-	C:\Qt\Tools\mingw1310_64\bin\g++.exe $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -MD -MT CMakeFiles/Server.dir/server_main.cpp.obj -MF CMakeFiles\Server.dir\server_main.cpp.obj.d -o CMakeFiles\Server.dir\server_main.cpp.obj -c C:\Users\5-20\mini_project\server_main.cpp
+	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green --progress-dir=C:\workspace\project2\build\Desktop_Qt_6_11_0_MinGW_64_bit-Debug\CMakeFiles --progress-num=$(CMAKE_PROGRESS_3) "Building CXX object CMakeFiles/Server.dir/server_main.cpp.obj"
+	C:\Qt\Tools\mingw1310_64\bin\g++.exe $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -MD -MT CMakeFiles/Server.dir/server_main.cpp.obj -MF CMakeFiles\Server.dir\server_main.cpp.obj.d -o CMakeFiles\Server.dir\server_main.cpp.obj -c C:\workspace\project2\server_main.cpp
 
 CMakeFiles/Server.dir/server_main.cpp.i: cmake_force
 	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green "Preprocessing CXX source to CMakeFiles/Server.dir/server_main.cpp.i"
-	C:\Qt\Tools\mingw1310_64\bin\g++.exe $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -E C:\Users\5-20\mini_project\server_main.cpp > CMakeFiles\Server.dir\server_main.cpp.i
+	C:\Qt\Tools\mingw1310_64\bin\g++.exe $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -E C:\workspace\project2\server_main.cpp > CMakeFiles\Server.dir\server_main.cpp.i
 
 CMakeFiles/Server.dir/server_main.cpp.s: cmake_force
 	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green "Compiling CXX source to assembly CMakeFiles/Server.dir/server_main.cpp.s"
-	C:\Qt\Tools\mingw1310_64\bin\g++.exe $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -S C:\Users\5-20\mini_project\server_main.cpp -o CMakeFiles\Server.dir\server_main.cpp.s
+	C:\Qt\Tools\mingw1310_64\bin\g++.exe $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -S C:\workspace\project2\server_main.cpp -o CMakeFiles\Server.dir\server_main.cpp.s
 
 CMakeFiles/Server.dir/Server.cpp.obj: CMakeFiles/Server.dir/flags.make
 CMakeFiles/Server.dir/Server.cpp.obj: CMakeFiles/Server.dir/includes_CXX.rsp
-CMakeFiles/Server.dir/Server.cpp.obj: C:/Users/5-20/mini_project/Server.cpp
+CMakeFiles/Server.dir/Server.cpp.obj: C:/workspace/project2/Server.cpp
 CMakeFiles/Server.dir/Server.cpp.obj: CMakeFiles/Server.dir/compiler_depend.ts
-	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green --progress-dir=C:\Users\5-20\mini_project\build\Desktop_Qt_6_11_0_MinGW_64_bit-Debug\CMakeFiles --progress-num=$(CMAKE_PROGRESS_4) "Building CXX object CMakeFiles/Server.dir/Server.cpp.obj"
-	C:\Qt\Tools\mingw1310_64\bin\g++.exe $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -MD -MT CMakeFiles/Server.dir/Server.cpp.obj -MF CMakeFiles\Server.dir\Server.cpp.obj.d -o CMakeFiles\Server.dir\Server.cpp.obj -c C:\Users\5-20\mini_project\Server.cpp
+	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green --progress-dir=C:\workspace\project2\build\Desktop_Qt_6_11_0_MinGW_64_bit-Debug\CMakeFiles --progress-num=$(CMAKE_PROGRESS_4) "Building CXX object CMakeFiles/Server.dir/Server.cpp.obj"
+	C:\Qt\Tools\mingw1310_64\bin\g++.exe $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -MD -MT CMakeFiles/Server.dir/Server.cpp.obj -MF CMakeFiles\Server.dir\Server.cpp.obj.d -o CMakeFiles\Server.dir\Server.cpp.obj -c C:\workspace\project2\Server.cpp
 
 CMakeFiles/Server.dir/Server.cpp.i: cmake_force
 	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green "Preprocessing CXX source to CMakeFiles/Server.dir/Server.cpp.i"
-	C:\Qt\Tools\mingw1310_64\bin\g++.exe $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -E C:\Users\5-20\mini_project\Server.cpp > CMakeFiles\Server.dir\Server.cpp.i
+	C:\Qt\Tools\mingw1310_64\bin\g++.exe $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -E C:\workspace\project2\Server.cpp > CMakeFiles\Server.dir\Server.cpp.i
 
 CMakeFiles/Server.dir/Server.cpp.s: cmake_force
 	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green "Compiling CXX source to assembly CMakeFiles/Server.dir/Server.cpp.s"
-	C:\Qt\Tools\mingw1310_64\bin\g++.exe $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -S C:\Users\5-20\mini_project\Server.cpp -o CMakeFiles\Server.dir\Server.cpp.s
+	C:\Qt\Tools\mingw1310_64\bin\g++.exe $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -S C:\workspace\project2\Server.cpp -o CMakeFiles\Server.dir\Server.cpp.s
 
 # Object files for target Server
 Server_OBJECTS = \
@@ -139,7 +139,7 @@ Server.exe: C:/Qt/6.11.0/mingw_64/lib/libQt6Core.a
 Server.exe: CMakeFiles/Server.dir/linkLibs.rsp
 Server.exe: CMakeFiles/Server.dir/objects1.rsp
 Server.exe: CMakeFiles/Server.dir/link.txt
-	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green --bold --progress-dir=C:\Users\5-20\mini_project\build\Desktop_Qt_6_11_0_MinGW_64_bit-Debug\CMakeFiles --progress-num=$(CMAKE_PROGRESS_5) "Linking CXX executable Server.exe"
+	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green --bold --progress-dir=C:\workspace\project2\build\Desktop_Qt_6_11_0_MinGW_64_bit-Debug\CMakeFiles --progress-num=$(CMAKE_PROGRESS_5) "Linking CXX executable Server.exe"
 	$(CMAKE_COMMAND) -E cmake_link_script CMakeFiles\Server.dir\link.txt --verbose=$(VERBOSE)
 
 # Rule to build all files generated by this target.
@@ -151,6 +151,6 @@ CMakeFiles/Server.dir/clean:
 .PHONY : CMakeFiles/Server.dir/clean
 
 CMakeFiles/Server.dir/depend: Server_autogen/timestamp
-	$(CMAKE_COMMAND) -E cmake_depends "MinGW Makefiles" C:\Users\5-20\mini_project C:\Users\5-20\mini_project C:\Users\5-20\mini_project\build\Desktop_Qt_6_11_0_MinGW_64_bit-Debug C:\Users\5-20\mini_project\build\Desktop_Qt_6_11_0_MinGW_64_bit-Debug C:\Users\5-20\mini_project\build\Desktop_Qt_6_11_0_MinGW_64_bit-Debug\CMakeFiles\Server.dir\DependInfo.cmake "--color=$(COLOR)"
+	$(CMAKE_COMMAND) -E cmake_depends "MinGW Makefiles" C:\workspace\project2 C:\workspace\project2 C:\workspace\project2\build\Desktop_Qt_6_11_0_MinGW_64_bit-Debug C:\workspace\project2\build\Desktop_Qt_6_11_0_MinGW_64_bit-Debug C:\workspace\project2\build\Desktop_Qt_6_11_0_MinGW_64_bit-Debug\CMakeFiles\Server.dir\DependInfo.cmake "--color=$(COLOR)"
 .PHONY : CMakeFiles/Server.dir/depend
 

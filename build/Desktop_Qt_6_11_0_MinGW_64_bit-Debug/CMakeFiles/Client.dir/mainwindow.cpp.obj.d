@@ -1,6 +1,5 @@
 CMakeFiles/Client.dir/mainwindow.cpp.obj: \
- C:\Users\5-20\mini_project\mainwindow.cpp \
- C:\Users\5-20\mini_project\MainWindow.h \
+ C:\workspace\project2\mainwindow.cpp C:\workspace\project2\MainWindow.h \
  C:/Qt/6.11.0/mingw_64/include/QtWidgets/QMainWindow \
  C:/Qt/6.11.0/mingw_64/include/QtWidgets/qmainwindow.h \
  C:/Qt/6.11.0/mingw_64/include/QtWidgets/qtwidgetsglobal.h \
@@ -430,7 +429,7 @@ CMakeFiles/Client.dir/mainwindow.cpp.obj: \
  C:/Qt/6.11.0/mingw_64/include/QtCore/qcoreapplication_platform.h \
  C:/Qt/6.11.0/mingw_64/include/QtGui/qinputmethod.h \
  C:/Qt/6.11.0/mingw_64/include/QtGui/qguiapplication_platform.h \
- C:\Users\5-20\mini_project\ScheduleDialog.h \
+ C:\workspace\project2\ScheduleDialog.h \
  C:/Qt/6.11.0/mingw_64/include/QtWidgets/QDialog \
  C:/Qt/6.11.0/mingw_64/include/QtWidgets/qdialog.h \
  C:/Qt/6.11.0/mingw_64/include/QtWidgets/QLabel \
@@ -464,7 +463,7 @@ CMakeFiles/Client.dir/mainwindow.cpp.obj: \
  C:/Qt/6.11.0/mingw_64/include/QtGui/qfontdatabase.h \
  C:/Qt/6.11.0/mingw_64/include/QtWidgets/QButtonGroup \
  C:/Qt/6.11.0/mingw_64/include/QtWidgets/qbuttongroup.h \
- C:\Users\5-20\mini_project\ChatDialog.h \
+ C:\workspace\project2\ChatDialog.h \
  C:/Qt/6.11.0/mingw_64/include/QtWidgets/QScrollArea \
  C:/Qt/6.11.0/mingw_64/include/QtWidgets/qscrollarea.h \
  C:/Qt/6.11.0/mingw_64/include/QtWidgets/QVBoxLayout \
@@ -480,7 +479,7 @@ CMakeFiles/Client.dir/mainwindow.cpp.obj: \
  C:/Qt/6.11.0/mingw_64/include/QtWidgets/qscrollbar.h \
  C:/Qt/6.11.0/mingw_64/include/QtWidgets/qabstractslider.h \
  C:/Qt/6.11.0/mingw_64/include/QtGui/QPixmap \
- C:\Users\5-20\mini_project\WeatherManager.h \
+ C:\workspace\project2\WeatherManager.h \
  C:/Qt/6.11.0/mingw_64/include/QtCore/QObject \
  C:/Qt/6.11.0/mingw_64/include/QtNetwork/QNetworkAccessManager \
  C:/Qt/6.11.0/mingw_64/include/QtNetwork/qnetworkaccessmanager.h \
@@ -503,7 +502,7 @@ CMakeFiles/Client.dir/mainwindow.cpp.obj: \
  C:/Qt/6.11.0/mingw_64/include/QtNetwork/QSslPreSharedKeyAuthenticator \
  C:/Qt/6.11.0/mingw_64/include/QtNetwork/qsslpresharedkeyauthenticator.h \
  C:/Qt/6.11.0/mingw_64/include/QtCore/QMetaType \
- C:/Users/5-20/mini_project/build/Desktop_Qt_6_11_0_MinGW_64_bit-Debug/Client_autogen/include/ui_mainwindow.h \
+ C:/workspace/project2/build/Desktop_Qt_6_11_0_MinGW_64_bit-Debug/Client_autogen/include/ui_mainwindow.h \
  C:/Qt/6.11.0/mingw_64/include/QtWidgets/QApplication \
  C:/Qt/6.11.0/mingw_64/include/QtWidgets/qapplication.h \
  C:/Qt/6.11.0/mingw_64/include/QtWidgets/QComboBox \
@@ -527,12 +526,11 @@ CMakeFiles/Client.dir/mainwindow.cpp.obj: \
  C:/Qt/6.11.0/mingw_64/include/QtWidgets/qstatusbar.h \
  C:/Qt/6.11.0/mingw_64/include/QtWidgets/QVBoxLayout \
  C:/Qt/6.11.0/mingw_64/include/QtWidgets/QWidget \
- C:/Users/5-20/mini_project/CustomCalendarWidget.h \
+ C:/workspace/project2/CustomCalendarWidget.h \
  C:/Qt/6.11.0/mingw_64/include/QtWidgets/QCalendarWidget \
  C:/Qt/6.11.0/mingw_64/include/QtWidgets/qcalendarwidget.h \
  C:/Qt/6.11.0/mingw_64/include/QtCore/QStringList \
- C:/Users/5-20/mini_project/WeatherManager.h \
- C:\Users\5-20\mini_project\Common.h \
+ C:/workspace/project2/WeatherManager.h C:\workspace\project2\Common.h \
  C:/Qt/6.11.0/mingw_64/include/QtCore/QString \
  C:/Qt/6.11.0/mingw_64/include/QtWidgets/QMessageBox \
  C:/Qt/6.11.0/mingw_64/include/QtWidgets/qmessagebox.h \

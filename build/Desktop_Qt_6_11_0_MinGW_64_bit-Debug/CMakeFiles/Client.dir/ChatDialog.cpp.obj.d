@@ -1,6 +1,5 @@
 CMakeFiles/Client.dir/ChatDialog.cpp.obj: \
- C:\Users\5-20\mini_project\ChatDialog.cpp \
- C:\Users\5-20\mini_project\ChatDialog.h \
+ C:\workspace\project2\ChatDialog.cpp C:\workspace\project2\ChatDialog.h \
  C:/Qt/6.11.0/mingw_64/include/QtWidgets/QDialog \
  C:/Qt/6.11.0/mingw_64/include/QtWidgets/qdialog.h \
  C:/Qt/6.11.0/mingw_64/include/QtWidgets/qtwidgetsglobal.h \
