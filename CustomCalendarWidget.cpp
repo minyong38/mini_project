@@ -200,8 +200,7 @@ void CustomCalendarWidget::paintCell(QPainter *painter, const QRect &rect, QDate
         auto wit = m_weatherData.find(date);
         if (wit != m_weatherData.end()) {
             const WeatherInfo& wi = wit.value();
-            QColor textCol = isToday ? Qt::white
-                           : (m_darkMode ? QColor("#E0E0E0") : QColor("#333333"));
+            QColor textCol = m_darkMode ? QColor("#E0E0E0") : QColor("#333333");
 
             const int wW    = 36;
             const int wLeft = rect.right() - wW - 1;
@@ -214,8 +213,8 @@ void CustomCalendarWidget::paintCell(QPainter *painter, const QRect &rect, QDate
                 painter->drawRoundedRect(QRect(wLeft, rect.top() + 2, wW, 42), 4, 4);
             }
 
-            // 이모지
-            QFont ef = painter->font();
+            // 이모지 (컬러 렌더링)
+            QFont ef("Segoe UI Emoji");
             ef.setPixelSize(16);
             ef.setBold(false);
             painter->setFont(ef);
@@ -236,10 +235,10 @@ void CustomCalendarWidget::paintCell(QPainter *painter, const QRect &rect, QDate
 
             // 강수 확률 (20% 이상일 때만 표시)
             if (wi.pop >= 0.2) {
-                QFont pf = painter->font();
+                QFont pf("Segoe UI Emoji");
                 pf.setPixelSize(8);
                 painter->setFont(pf);
-                painter->setPen(isToday ? Qt::white : QColor("#007AFF"));
+                painter->setPen(QColor("#007AFF"));
                 QString popStr = QString("💧%1%").arg(qRound(wi.pop * 100));
                 QRect popR(wLeft, rect.top() + 34, wW, 10);
                 painter->drawText(popR, Qt::AlignCenter, popStr);

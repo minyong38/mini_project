@@ -13,6 +13,7 @@
 #include <QPainterPath>
 #include <QStyle>
 #include <QTabWidget>
+#include <QPixmap>
 
 MainWindow::MainWindow(const QString& ip, const QString& myId, QWidget *parent)
     : QMainWindow(parent), ui(new Ui::MainWindow),
@@ -20,6 +21,14 @@ MainWindow::MainWindow(const QString& ip, const QString& myId, QWidget *parent)
 {
     ui->setupUi(this);
     setWindowTitle("캘린더 — " + m_myId);
+
+    // 로고 (navBar 맨 왼쪽)
+    auto* logoLabel = new QLabel(this);
+    QPixmap logoPixmap(":/logo.png");
+    if (!logoPixmap.isNull())
+        logoLabel->setPixmap(logoPixmap.scaled(56, 56, Qt::KeepAspectRatio, Qt::SmoothTransformation));
+    auto* navLayout0 = qobject_cast<QHBoxLayout*>(ui->navBar->layout());
+    if (navLayout0) navLayout0->insertWidget(0, logoLabel);
 
     m_selectedDate = QDate::currentDate();
 

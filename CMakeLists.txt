@@ -44,5 +44,6 @@ add_executable(Client
     ChatDialog.h
     SharedCalDialog.h
     Common.h
+    resources.qrc
 )
 target_link_libraries(Client PRIVATE Qt6::Widgets Qt6::Network)
