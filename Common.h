@@ -46,6 +46,40 @@ namespace Protocol {
     inline const QString DMRES = "DMRES";
     inline const QString REQDM = "REQDM";
     inline const QString RESDM = "RESDM";
+
+    // 공유 캘린더
+    // CREATECAL  : CREATECAL:owner:calName:member1~member2~...
+    // CALID      : CALID:id  (서버→클라, 새 캘린더 ID 알림)
+    // REQCALS    : REQCALS:userId
+    // RESCALS    : RESCALS:id~name~owner~m1,m2|...
+    // REQSHMONTH : REQSHMONTH:calId:yyyy-MM
+    // RESSHMONTH : RESSHMONTH:calId:date@rowid@content|...
+    // REQSHDAY   : REQSHDAY:calId:date
+    // RESSHDAY   : RESSHDAY:calId:rowid:content|rowid:content|...
+    // ADDSH      : ADDSH:calId:userId:date:content
+    // DELSH      : DELSH:calId:rowid
+    // MODSH      : MODSH:calId:rowid:content
+    // SHUPDATE   : SHUPDATE:calId  (서버→전체 멤버, 일정 변경 알림)
+    // REQSHCHAT  : REQSHCHAT:calId:userId
+    // RESSHCHAT  : RESSHCHAT:calId:sender:HHmm:msg|...
+    // SHCHAT     : SHCHAT:calId:sender:message
+    // SHCHATRES  : SHCHATRES:calId:rowid:sender:HHmm:message
+    inline const QString CREATECAL  = "CREATECAL";
+    inline const QString CALID      = "CALID";
+    inline const QString REQCALS    = "REQCALS";
+    inline const QString RESCALS    = "RESCALS";
+    inline const QString REQSHMONTH = "REQSHMONTH";
+    inline const QString RESSHMONTH = "RESSHMONTH";
+    inline const QString REQSHDAY   = "REQSHDAY";
+    inline const QString RESSHDAY   = "RESSHDAY";
+    inline const QString ADDSH      = "ADDSH";
+    inline const QString DELSH      = "DELSH";
+    inline const QString MODSH      = "MODSH";
+    inline const QString SHUPDATE   = "SHUPDATE";
+    inline const QString REQSHCHAT  = "REQSHCHAT";
+    inline const QString RESSHCHAT  = "RESSHCHAT";
+    inline const QString SHCHAT     = "SHCHAT";
+    inline const QString SHCHATRES  = "SHCHATRES";
 }
 
 #endif

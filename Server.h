@@ -27,6 +27,8 @@ private:
                        const QString& timeStr, const QString& message);
     void broadcastReadRes(qint64 rowid, int count, QTcpSocket* exclude);
     void broadcastOnlineList();
+    QStringList getCalMembers(int calId);
+    void sendToCalMembers(int calId, const QString& msg, QTcpSocket* exclude = nullptr);
 
     QSqlDatabase               m_db;
     QMap<QTcpSocket*, QString> m_buffers;

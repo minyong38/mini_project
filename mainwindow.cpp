@@ -1,15 +1,18 @@
 #include "MainWindow.h"
 #include "ui_mainwindow.h"
 #include "Common.h"
+#include "SharedCalDialog.h"
 #include <QMessageBox>
 #include <QFrame>
 #include <QHBoxLayout>
+#include <QVBoxLayout>
 #include <QTimer>
 #include <QCloseEvent>
 #include <QAction>
 #include <QPainter>
 #include <QPainterPath>
 #include <QStyle>
+#include <QTabWidget>
 
 MainWindow::MainWindow(const QString& ip, const QString& myId, QWidget *parent)
     : QMainWindow(parent), ui(new Ui::MainWindow),
@@ -28,6 +31,51 @@ MainWindow::MainWindow(const QString& ip, const QString& myId, QWidget *parent)
             this, &MainWindow::onDateClicked);
     connect(ui->calendarWidget, &QCalendarWidget::currentPageChanged,
             this, &MainWindow::requestMonthSchedules);
+
+    // ── 탭 위젯으로 캘린더 카드 재구성 ──────────────────────
+    m_calTabWidget = new QTabWidget(ui->calendarCard);
+    m_calTabWidget->setDocumentMode(false);
+    m_calTabWidget->setStyleSheet(R"(
+        QTabWidget::pane { border: none; }
+        QTabBar::tab { padding: 7px 16px; font-size: 13px;
+                       border-radius: 8px 8px 0 0; min-width: 80px; }
+        QTabBar::tab:selected { background: #007AFF; color: white; font-weight: 600; }
+        QTabBar::tab:!selected { background: #F2F2F7; color: #1C1C1E; }
+        QTabBar::tab:!selected:hover { background: #E5E5EA; }
+    )");
+
+    // 개인 캘린더 탭 (calendarWidget 옮기기)
+    auto* personalPage   = new QWidget();
+    auto* personalLayout = new QVBoxLayout(personalPage);
+    personalLayout->setContentsMargins(0, 0, 0, 0);
+    personalLayout->setSpacing(0);
+    personalLayout->addWidget(ui->calendarWidget);   // reparent → cardLayout에서 제거됨
+    m_calTabWidget->addTab(personalPage, "📅 내 캘린더");
+
+    // "＋ 캘린더 추가" 코너 버튼
+    auto* addCalBtn = new QPushButton("＋ 캘린더 추가");
+    addCalBtn->setFixedHeight(28);
+    addCalBtn->setStyleSheet(
+        "QPushButton { background:#34C759; color:white; border:none; border-radius:10px;"
+        " padding:0 12px; font-size:12px; font-weight:600; }"
+        "QPushButton:hover { background:#2DB84F; }"
+    );
+    m_calTabWidget->setCornerWidget(addCalBtn, Qt::TopRightCorner);
+    connect(addCalBtn, &QPushButton::clicked, this, &MainWindow::showAddCalendarDialog);
+
+    // cardLayout 에 탭 위젯 추가 (calendarWidget은 이미 reparent됨)
+    ui->cardLayout->addWidget(m_calTabWidget);
+
+    connect(m_calTabWidget, &QTabWidget::currentChanged, this, [this](int index) {
+        if (index == 0) {
+            m_activeCalId = -1;
+        } else {
+            m_activeCalId = m_calTabWidget->tabBar()->tabData(index).toInt();
+            auto* w = m_sharedCalWidgets.value(m_activeCalId);
+            if (w) requestSharedMonthSchedules(m_activeCalId, w->yearShown(), w->monthShown());
+        }
+        updateChatBtnText();
+    });
 
     // 채팅 다이얼로그 미리 생성
     m_chatDialog = new ChatDialog(m_myId, this);
@@ -55,6 +103,8 @@ MainWindow::MainWindow(const QString& ip, const QString& myId, QWidget *parent)
     m_weather = new WeatherManager("84befa7d5f3b34072813213012110a05", this);
     connect(m_weather, &WeatherManager::weatherUpdated, this, [this]() {
         ui->calendarWidget->setWeatherData(m_weather->data());
+        for (auto* w : m_sharedCalWidgets)
+            w->setWeatherData(m_weather->data());
     });
     m_weather->fetchWeather();
     auto* weatherTimer = new QTimer(this);
@@ -121,6 +171,7 @@ void MainWindow::processMessage(const QString& data) {
         requestUsers();
         requestMonthSchedules(ui->calendarWidget->yearShown(),
                               ui->calendarWidget->monthShown());
+        requestSharedCals();
     }
     else if (data == Protocol::LOGIN_REJECT) {
         QMessageBox::critical(this, "로그인 실패",
@@ -244,9 +295,10 @@ void MainWindow::processMessage(const QString& data) {
                 updateChatBtnText();
                 updateTrayIcon();
                 if (m_trayIcon && !isActiveWindow()) {
+                    m_lastNotifPeer = "";  // 단체 채팅
                     m_trayIcon->showMessage(
                         uid + "님의 메시지",
-                        msg,
+                        msg.startsWith("IMG:") ? "[이미지]" : msg,
                         QSystemTrayIcon::NoIcon, 3000
                     );
                 }
@@ -320,12 +372,172 @@ void MainWindow::processMessage(const QString& data) {
             m_dmUnreadCounts[peer] = m_dmUnreadCounts.value(peer, 0) + 1;
             if (m_selectedId == peer) updateChatBtnText();
             if (m_trayIcon && !isActiveWindow()) {
+                m_lastNotifPeer = peer;  // DM 발신자
                 m_trayIcon->showMessage(
                     sender + "님의 메시지",
                     msg.startsWith("IMG:") ? "[이미지]" : msg,
                     QSystemTrayIcon::NoIcon, 3000
                 );
             }
+        }
+    }
+
+    // ── 공유 캘린더 새 ID 알림 (CALID) ──────────────────────
+    else if (data.startsWith(Protocol::CALID + Protocol::SEP)) {
+        requestSharedCals();
+    }
+
+    // ── 공유 캘린더 목록 수신 ────────────────────────────────
+    else if (data.startsWith(Protocol::RESCALS + Protocol::SEP)) {
+        QString payload = data.mid(Protocol::RESCALS.length() + Protocol::SEP.length());
+        m_sharedCals.clear();
+        if (!payload.isEmpty()) {
+            for (const QString& entry : payload.split("|")) {
+                QStringList f = entry.split("~");
+                if (f.size() < 4) continue;
+                SharedCalInfo info;
+                info.id      = f[0].toInt();
+                info.name    = f[1];
+                info.owner   = f[2];
+                info.members = f[3].split(",", Qt::SkipEmptyParts);
+                m_sharedCals.append(info);
+            }
+        }
+        refreshSharedCalTabs();
+    }
+
+    // ── 공유 캘린더 월별 일정 수신 ───────────────────────────
+    else if (data.startsWith(Protocol::RESSHMONTH + Protocol::SEP)) {
+        QString payload = data.mid(Protocol::RESSHMONTH.length() + Protocol::SEP.length());
+        int sep = payload.indexOf(Protocol::SEP);
+        if (sep < 0) return;
+        int calId = payload.left(sep).toInt();
+        QString rest = payload.mid(sep + 1);
+
+        auto& ms = m_sharedMonthSchedules[calId];
+        ms.clear();
+        if (!rest.isEmpty()) {
+            for (const QString& e : rest.split("|")) {
+                QStringList p = e.split("@");
+                if (p.size() < 3) continue;
+                QDate d = QDate::fromString(p[0], "yyyy-MM-dd");
+                if (d.isValid()) ms[d].append(p[2]);
+            }
+        }
+        if (m_sharedCalWidgets.contains(calId))
+            m_sharedCalWidgets[calId]->setMonthSchedules(ms);
+    }
+
+    // ── 공유 캘린더 일별 일정 수신 ───────────────────────────
+    else if (data.startsWith(Protocol::RESSHDAY + Protocol::SEP)) {
+        QString payload = data.mid(Protocol::RESSHDAY.length() + Protocol::SEP.length());
+        int sep = payload.indexOf(Protocol::SEP);
+        if (sep < 0) return;
+        int calId = payload.left(sep).toInt();
+        QString rest = payload.mid(sep + 1);
+
+        QList<qint64>  rowids;
+        QStringList    contents;
+        if (!rest.isEmpty()) {
+            for (const QString& e : rest.split("|")) {
+                int s = e.indexOf(Protocol::SEP);
+                if (s < 0) continue;
+                rowids   << e.left(s).toLongLong();
+                contents << e.mid(s + 1);
+            }
+        }
+
+        // 월별 캐시 업데이트
+        m_sharedMonthSchedules[calId][m_pendingShDate] = contents;
+        if (m_sharedCalWidgets.contains(calId))
+            m_sharedCalWidgets[calId]->setMonthSchedules(m_sharedMonthSchedules[calId]);
+
+        if (m_pendingShModal) {
+            m_pendingShModal = false;
+            showSharedDateDialog(calId, m_pendingShDate, rowids, contents);
+        } else if (m_activeShDialog) {
+            m_activeShDialog->refreshSchedules(contents, rowids);
+        }
+        m_pendingShCalId = -1;
+    }
+
+    // ── 공유 캘린더 일정 변경 알림 (SHUPDATE) ────────────────
+    else if (data.startsWith(Protocol::SHUPDATE + Protocol::SEP)) {
+        int calId = data.mid(Protocol::SHUPDATE.length() + Protocol::SEP.length()).toInt();
+        if (m_sharedCalWidgets.contains(calId)) {
+            auto* w = m_sharedCalWidgets[calId];
+            requestSharedMonthSchedules(calId, w->yearShown(), w->monthShown());
+        }
+        // 다이얼로그가 열려 있으면 날짜 재조회
+        if (m_activeShDialog && m_activeCalId == calId) {
+            m_socket->write((Protocol::REQSHDAY + Protocol::SEP
+                             + QString::number(calId) + Protocol::SEP
+                             + m_pendingShDate.toString("yyyy-MM-dd") + "\n").toUtf8());
+        }
+    }
+
+    // ── 공유 채팅 기록 수신 ──────────────────────────────────
+    else if (data.startsWith(Protocol::RESSHCHAT + Protocol::SEP)) {
+        QString payload = data.mid(Protocol::RESSHCHAT.length() + Protocol::SEP.length());
+        int sep = payload.indexOf(Protocol::SEP);
+        if (sep < 0) return;
+        int calId = payload.left(sep).toInt();
+        QString rest = payload.mid(sep + 1);
+
+        if (!m_sharedChatDialogs.contains(calId)) return;
+        auto* dlg = m_sharedChatDialogs[calId];
+        dlg->clearMessages();
+        if (!rest.isEmpty()) {
+            for (const QString& e : rest.split("|")) {
+                QStringList p = e.split(Protocol::SEP);
+                if (p.size() < 3) continue;
+                QString sender = p[0];
+                QString rawT   = p[1];
+                QString msg    = p.mid(2).join(Protocol::SEP);
+                QString time   = rawT.length() == 4 ? rawT.left(2) + ":" + rawT.right(2) : "";
+                dlg->appendMessage(0, 0, sender, msg, time);
+            }
+        }
+    }
+
+    // ── 공유 채팅 실시간 수신 ────────────────────────────────
+    else if (data.startsWith(Protocol::SHCHATRES + Protocol::SEP)) {
+        QString payload = data.mid(Protocol::SHCHATRES.length() + Protocol::SEP.length());
+        QStringList p = payload.split(Protocol::SEP);
+        if (p.size() < 5) return;
+        int     calId  = p[0].toInt();
+        // p[1] = rowid (unused on client)
+        QString sender = p[2];
+        QString rawT   = p[3];
+        QString msg    = p.mid(4).join(Protocol::SEP);
+        QString time   = rawT.length() == 4 ? rawT.left(2) + ":" + rawT.right(2) : "";
+
+        if (!m_sharedChatDialogs.contains(calId)) {
+            QString calName;
+            for (const auto& cal : m_sharedCals) if (cal.id == calId) { calName = cal.name; break; }
+            auto* dlg = new ChatDialog(m_myId, this);
+            dlg->setTitle("🗓 " + calName + " 채팅");
+            connect(dlg, &ChatDialog::messageSent, this, [this, calId](const QString& m) {
+                if (m_socket->state() != QAbstractSocket::ConnectedState) return;
+                m_socket->write((Protocol::SHCHAT + Protocol::SEP
+                                 + QString::number(calId) + Protocol::SEP
+                                 + m_myId + Protocol::SEP + m + "\n").toUtf8());
+            });
+            m_sharedChatDialogs[calId] = dlg;
+        }
+
+        auto* dlg = m_sharedChatDialogs[calId];
+        dlg->appendMessage(0, 0, sender, msg, time);
+
+        if (!dlg->isVisible() && m_trayIcon && !isActiveWindow()) {
+            QString calName;
+            for (const auto& cal : m_sharedCals) if (cal.id == calId) { calName = cal.name; break; }
+            m_lastNotifPeer = "";   // 단체 채팅 알림으로 처리
+            m_trayIcon->showMessage(
+                sender + " (" + calName + ")",
+                msg.startsWith("IMG:") ? "[이미지]" : msg,
+                QSystemTrayIcon::NoIcon, 3000
+            );
         }
     }
 
@@ -341,14 +553,21 @@ void MainWindow::processMessage(const QString& data) {
 // ──────────────────────────────────────────────
 
 void MainWindow::onChatBtnClicked() {
-    if (m_selectedId != m_myId) {
+    if (m_activeCalId != -1) {
+        // 공유 캘린더 탭 → 해당 캘린더 단톡방
+        openSharedChat(m_activeCalId);
+    } else if (m_selectedId != m_myId) {
+        // 친구 캘린더 탭 → 1:1 DM
         openDmChat(m_selectedId);
     } else {
+        // 내 캘린더 탭 → 전체 단체 채팅
         if (m_chatDialog->isVisible()) {
             m_chatDialog->hide();
         } else {
-            if (m_socket->state() == QAbstractSocket::ConnectedState)
+            if (!m_groupChatLoaded && m_socket->state() == QAbstractSocket::ConnectedState) {
                 m_socket->write((Protocol::REQCHAT + Protocol::SEP + m_myId + "\n").toUtf8());
+                m_groupChatLoaded = true;
+            }
             m_unreadCount = 0;
             updateChatBtnText();
             updateTrayIcon();
@@ -377,13 +596,13 @@ void MainWindow::openDmChat(const QString& peerId) {
     if (dlg->isVisible()) {
         dlg->hide();
     } else {
-        // 대화 기록 요청
-        if (m_socket->state() == QAbstractSocket::ConnectedState) {
+        // 최초 1회만 기록 요청 (이후엔 실시간 DMRES로 누적)
+        if (!m_dmLoaded.contains(peerId) && m_socket->state() == QAbstractSocket::ConnectedState) {
             m_pendingDmPeer = peerId;
-            dlg->clearMessages();
             m_socket->write((Protocol::REQDM + Protocol::SEP
                              + m_myId + Protocol::SEP
                              + peerId + "\n").toUtf8());
+            m_dmLoaded.insert(peerId);
         }
         m_dmUnreadCounts[peerId] = 0;
         updateChatBtnText();
@@ -398,20 +617,199 @@ void MainWindow::onChatMessageSent(const QString& message) {
 }
 
 void MainWindow::updateChatBtnText() {
-    if (m_selectedId != m_myId) {
-        // 친구 캘린더 보는 중 → 1:1 채팅 버튼
+    if (m_activeCalId != -1) {
+        ui->chatBtn->setText("💬 공유 채팅");
+    } else if (m_selectedId != m_myId) {
         int dmUnread = m_dmUnreadCounts.value(m_selectedId, 0);
         if (dmUnread > 0)
             ui->chatBtn->setText(QString("💬 1:1 채팅 (%1)").arg(dmUnread));
         else
             ui->chatBtn->setText("💬 1:1 채팅");
     } else {
-        // 내 캘린더 → 단체 채팅 버튼
         if (m_unreadCount > 0)
             ui->chatBtn->setText(QString("💬 채팅 (%1)").arg(m_unreadCount));
         else
             ui->chatBtn->setText("💬 채팅");
     }
+}
+
+void MainWindow::requestSharedCals() {
+    if (m_socket->state() != QAbstractSocket::ConnectedState) return;
+    m_socket->write((Protocol::REQCALS + Protocol::SEP + m_myId + "\n").toUtf8());
+}
+
+void MainWindow::requestSharedMonthSchedules(int calId, int year, int month) {
+    if (m_socket->state() != QAbstractSocket::ConnectedState) return;
+    QString ym = QString("%1-%2").arg(year).arg(month, 2, 10, QChar('0'));
+    m_socket->write((Protocol::REQSHMONTH + Protocol::SEP
+                     + QString::number(calId) + Protocol::SEP + ym + "\n").toUtf8());
+}
+
+void MainWindow::refreshSharedCalTabs() {
+    // 기존 공유 탭 제거 (개인 탭 0번 제외)
+    while (m_calTabWidget->count() > 1)
+        m_calTabWidget->removeTab(1);
+
+    for (auto* w : m_sharedCalWidgets) w->deleteLater();
+    m_sharedCalWidgets.clear();
+
+    QString calStyle = ui->calendarWidget->styleSheet();
+
+    for (const SharedCalInfo& cal : m_sharedCals) {
+        auto* page       = new QWidget();
+        auto* pageLayout = new QVBoxLayout(page);
+        pageLayout->setContentsMargins(0, 0, 0, 0);
+        pageLayout->setSpacing(0);
+
+        auto* calWidget = new CustomCalendarWidget(page);
+        calWidget->setGridVisible(true);
+        calWidget->setVerticalHeaderFormat(QCalendarWidget::NoVerticalHeader);
+        calWidget->setStyleSheet(calStyle);
+        calWidget->setDarkMode(m_darkMode);
+        if (m_weather) calWidget->setWeatherData(m_weather->data());
+
+        const int calId = cal.id;
+        connect(calWidget, &QCalendarWidget::clicked,
+                this, [this, calId](const QDate& date) {
+            if (m_socket->state() != QAbstractSocket::ConnectedState) return;
+            m_selectedDate    = date;
+            m_pendingShCalId  = calId;
+            m_pendingShDate   = date;
+            m_pendingShModal  = true;
+            m_socket->write((Protocol::REQSHDAY + Protocol::SEP
+                             + QString::number(calId) + Protocol::SEP
+                             + date.toString("yyyy-MM-dd") + "\n").toUtf8());
+        });
+
+        connect(calWidget, &QCalendarWidget::currentPageChanged,
+                this, [this, calId](int year, int month) {
+            requestSharedMonthSchedules(calId, year, month);
+        });
+
+        pageLayout->addWidget(calWidget);
+        m_sharedCalWidgets[calId] = calWidget;
+
+        int tabIdx = m_calTabWidget->addTab(page, "🗓 " + cal.name);
+        m_calTabWidget->tabBar()->setTabData(tabIdx, calId);
+    }
+}
+
+void MainWindow::openSharedChat(int calId) {
+    if (!m_sharedChatDialogs.contains(calId)) {
+        QString calName;
+        for (const auto& cal : m_sharedCals) if (cal.id == calId) { calName = cal.name; break; }
+        auto* dlg = new ChatDialog(m_myId, this);
+        dlg->setTitle("🗓 " + calName + " 채팅");
+        dlg->setDarkMode(m_darkMode);
+        connect(dlg, &ChatDialog::messageSent, this, [this, calId](const QString& m) {
+            if (m_socket->state() != QAbstractSocket::ConnectedState) return;
+            m_socket->write((Protocol::SHCHAT + Protocol::SEP
+                             + QString::number(calId) + Protocol::SEP
+                             + m_myId + Protocol::SEP + m + "\n").toUtf8());
+        });
+        m_sharedChatDialogs[calId] = dlg;
+    }
+
+    auto* dlg = m_sharedChatDialogs[calId];
+    if (dlg->isVisible()) {
+        dlg->hide();
+    } else {
+        if (!m_sharedChatLoaded.value(calId, false)
+                && m_socket->state() == QAbstractSocket::ConnectedState) {
+            m_socket->write((Protocol::REQSHCHAT + Protocol::SEP
+                             + QString::number(calId) + "\n").toUtf8());
+            m_sharedChatLoaded[calId] = true;
+        }
+        dlg->show();
+        dlg->raise();
+    }
+}
+
+void MainWindow::showAddCalendarDialog() {
+    QStringList friends = m_allKnownUsers;
+    friends.removeAll(m_myId);
+
+    SharedCalDialog dlg(friends, this);
+    if (dlg.exec() != QDialog::Accepted) return;
+
+    QString name = dlg.calendarName();
+    if (name.isEmpty()) {
+        QMessageBox::warning(this, "캘린더 추가", "캘린더 이름을 입력해주세요.");
+        return;
+    }
+
+    QStringList invited = dlg.selectedFriends();
+    QString msg = Protocol::CREATECAL + Protocol::SEP
+                + m_myId + Protocol::SEP
+                + name   + Protocol::SEP
+                + invited.join("~") + "\n";
+    m_socket->write(msg.toUtf8());
+}
+
+void MainWindow::showSharedDateDialog(int calId, const QDate& date,
+                                       const QList<qint64>& rowids,
+                                       const QStringList& contents)
+{
+    if (m_activeShDialog) {
+        m_activeShDialog->close();
+        return;
+    }
+
+    m_activeShDialog = new ScheduleDialog(date, this);
+    m_activeShDialog->refreshSchedules(contents, rowids);
+    m_pendingShDate = date;
+
+    connect(m_activeShDialog, &ScheduleDialog::addRequested,
+            this, [this, calId, date](const QString& content) {
+        if (m_socket->state() != QAbstractSocket::ConnectedState) return;
+        m_socket->write((Protocol::ADDSH + Protocol::SEP
+                         + QString::number(calId) + Protocol::SEP
+                         + m_myId + Protocol::SEP
+                         + date.toString("yyyy-MM-dd") + Protocol::SEP
+                         + content + "\n").toUtf8());
+        m_pendingShCalId = calId;
+        m_pendingShDate  = date;
+        m_pendingShModal = false;
+        m_socket->write((Protocol::REQSHDAY + Protocol::SEP
+                         + QString::number(calId) + Protocol::SEP
+                         + date.toString("yyyy-MM-dd") + "\n").toUtf8());
+    });
+
+    connect(m_activeShDialog, &ScheduleDialog::editRequested,
+            this, [this, calId, date](qint64 rowid, const QString& newContent) {
+        if (m_socket->state() != QAbstractSocket::ConnectedState) return;
+        m_socket->write((Protocol::MODSH + Protocol::SEP
+                         + QString::number(calId) + Protocol::SEP
+                         + QString::number(rowid) + Protocol::SEP
+                         + newContent + "\n").toUtf8());
+        m_pendingShCalId = calId;
+        m_pendingShDate  = date;
+        m_pendingShModal = false;
+        m_socket->write((Protocol::REQSHDAY + Protocol::SEP
+                         + QString::number(calId) + Protocol::SEP
+                         + date.toString("yyyy-MM-dd") + "\n").toUtf8());
+    });
+
+    connect(m_activeShDialog, &ScheduleDialog::deleteRequested,
+            this, [this, calId, date](qint64 rowid) {
+        if (m_socket->state() != QAbstractSocket::ConnectedState) return;
+        m_socket->write((Protocol::DELSH + Protocol::SEP
+                         + QString::number(calId) + Protocol::SEP
+                         + QString::number(rowid) + "\n").toUtf8());
+        m_pendingShCalId = calId;
+        m_pendingShDate  = date;
+        m_pendingShModal = false;
+        m_socket->write((Protocol::REQSHDAY + Protocol::SEP
+                         + QString::number(calId) + Protocol::SEP
+                         + date.toString("yyyy-MM-dd") + "\n").toUtf8());
+    });
+
+    connect(m_activeShDialog, &QDialog::finished, this, [this]() {
+        m_activeShDialog->deleteLater();
+        m_activeShDialog = nullptr;
+    });
+
+    m_activeShDialog->open();
 }
 
 void MainWindow::updateFriendsList() {
@@ -737,6 +1135,38 @@ void MainWindow::applyTheme(bool dark)
     m_chatDialog->setDarkMode(dark);
     for (auto* dlg : m_dmDialogs)
         dlg->setDarkMode(dark);
+    for (auto* dlg : m_sharedChatDialogs)
+        dlg->setDarkMode(dark);
+
+    // 탭 위젯 스타일
+    if (m_calTabWidget) {
+        if (dark) {
+            m_calTabWidget->setStyleSheet(R"(
+                QTabWidget::pane { border: none; }
+                QTabBar::tab { padding: 7px 16px; font-size: 13px;
+                               border-radius: 8px 8px 0 0; min-width: 80px; }
+                QTabBar::tab:selected { background: #0A84FF; color: white; font-weight: 600; }
+                QTabBar::tab:!selected { background: #3A3A3C; color: #EBEBF5; }
+                QTabBar::tab:!selected:hover { background: #48484A; }
+            )");
+        } else {
+            m_calTabWidget->setStyleSheet(R"(
+                QTabWidget::pane { border: none; }
+                QTabBar::tab { padding: 7px 16px; font-size: 13px;
+                               border-radius: 8px 8px 0 0; min-width: 80px; }
+                QTabBar::tab:selected { background: #007AFF; color: white; font-weight: 600; }
+                QTabBar::tab:!selected { background: #F2F2F7; color: #1C1C1E; }
+                QTabBar::tab:!selected:hover { background: #E5E5EA; }
+            )");
+        }
+    }
+
+    // 공유 캘린더 위젯 스타일 적용
+    QString shCalStyle = dark ? ui->calendarWidget->styleSheet() : ui->calendarWidget->styleSheet();
+    for (auto* w : m_sharedCalWidgets) {
+        w->setStyleSheet(ui->calendarWidget->styleSheet());
+        w->setDarkMode(dark);
+    }
 }
 
 void MainWindow::setupTray() {
@@ -784,6 +1214,31 @@ void MainWindow::setupTray() {
             } else {
                 hide();
             }
+        }
+    });
+
+    // 알림 클릭 → 해당 채팅 바로 열기
+    connect(m_trayIcon, &QSystemTrayIcon::messageClicked, this, [this]() {
+        showNormal();
+        raise();
+        activateWindow();
+
+        if (m_lastNotifPeer.isEmpty()) {
+            // 단체 채팅 열기
+            if (!m_chatDialog->isVisible()) {
+                if (!m_groupChatLoaded && m_socket->state() == QAbstractSocket::ConnectedState) {
+                    m_socket->write((Protocol::REQCHAT + Protocol::SEP + m_myId + "\n").toUtf8());
+                    m_groupChatLoaded = true;
+                }
+                m_unreadCount = 0;
+                updateChatBtnText();
+                updateTrayIcon();
+                m_chatDialog->show();
+                m_chatDialog->raise();
+            }
+        } else {
+            // 1:1 DM 열기
+            openDmChat(m_lastNotifPeer);
         }
     });
 

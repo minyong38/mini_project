@@ -42,6 +42,7 @@ add_executable(Client
     scheduledialog.ui
     ChatDialog.cpp
     ChatDialog.h
+    SharedCalDialog.h
     Common.h
 )
 target_link_libraries(Client PRIVATE Qt6::Widgets Qt6::Network)

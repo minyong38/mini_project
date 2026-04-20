@@ -5,16 +5,27 @@
 #include <QTcpSocket>
 #include <QDate>
 #include <QMap>
+#include <QSet>
 #include <QSystemTrayIcon>
 #include <QMenu>
 #include <QCloseEvent>
 #include "ScheduleDialog.h"
 #include "ChatDialog.h"
 #include "WeatherManager.h"
+#include "SharedCalDialog.h"
+#include "CustomCalendarWidget.h"
+#include <QTabWidget>
 
 QT_BEGIN_NAMESPACE
 namespace Ui { class MainWindow; }
 QT_END_NAMESPACE
+
+struct SharedCalInfo {
+    int         id;
+    QString     name;
+    QString     owner;
+    QStringList members;
+};
 
 class MainWindow : public QMainWindow {
     Q_OBJECT
@@ -76,6 +87,16 @@ private:
     void updateTrayIcon();
     void applyTheme(bool dark);
 
+    // 공유 캘린더
+    void requestSharedCals();
+    void refreshSharedCalTabs();
+    void requestSharedMonthSchedules(int calId, int year, int month);
+    void openSharedChat(int calId);
+    void showAddCalendarDialog();
+    void showSharedDateDialog(int calId, const QDate& date,
+                              const QList<qint64>& rowids,
+                              const QStringList& contents);
+
     void closeEvent(QCloseEvent* event) override;
 
     QSystemTrayIcon* m_trayIcon   = nullptr;
@@ -89,6 +110,23 @@ private:
     QMap<QString, ChatDialog*> m_dmDialogs;
     QMap<QString, int>         m_dmUnreadCounts;
     QString                    m_pendingDmPeer;
+
+    bool          m_groupChatLoaded = false;
+    QSet<QString> m_dmLoaded;
+    QString       m_lastNotifPeer;
+
+    // 공유 캘린더 상태
+    int                                     m_activeCalId    = -1;
+    QList<SharedCalInfo>                    m_sharedCals;
+    QTabWidget*                             m_calTabWidget   = nullptr;
+    QMap<int, CustomCalendarWidget*>        m_sharedCalWidgets;
+    QMap<int, QMap<QDate, QStringList>>     m_sharedMonthSchedules;
+    QMap<int, ChatDialog*>                  m_sharedChatDialogs;
+    QMap<int, bool>                         m_sharedChatLoaded;
+    int             m_pendingShCalId  = -1;
+    QDate           m_pendingShDate;
+    bool            m_pendingShModal  = false;
+    ScheduleDialog* m_activeShDialog  = nullptr;
 };
 
 #endif

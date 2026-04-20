@@ -3,7 +3,10 @@
     "allow": [
       "Bash(cmake --build . --target Client)",
       "Bash(/c/Qt/Tools/mingw1310_64/bin/mingw32-make.exe Client)",
-      "Bash(/c/Qt/6.11.0/mingw_64/bin/windeployqt6.exe *)"
+      "Bash(/c/Qt/6.11.0/mingw_64/bin/windeployqt6.exe *)",
+      "Bash(/c/Qt/Tools/mingw1310_64/bin/mingw32-make.exe -j4)",
+      "Bash(taskkill //F //IM Client.exe)",
+      "Bash(taskkill //F //IM Server.exe)"
     ]
   }
 }

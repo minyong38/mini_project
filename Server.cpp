@@ -19,6 +19,14 @@ void ScheduleServer::initDatabase() {
     q.exec("ALTER TABLE chats ADD COLUMN SEND_TIME TEXT DEFAULT ''"); // 기존 테이블 마이그레이션
     q.exec("CREATE TABLE IF NOT EXISTS dm_chats "
            "(SENDER TEXT, RECEIVER TEXT, MESSAGE TEXT, SEND_TIME TEXT)");
+    q.exec("CREATE TABLE IF NOT EXISTS shared_calendars "
+           "(ID INTEGER PRIMARY KEY AUTOINCREMENT, OWNER TEXT, NAME TEXT)");
+    q.exec("CREATE TABLE IF NOT EXISTS shared_members "
+           "(CAL_ID INTEGER, USER_ID TEXT)");
+    q.exec("CREATE TABLE IF NOT EXISTS shared_schedules "
+           "(CAL_ID INTEGER, USER_ID TEXT, DATE TEXT, CONTENT TEXT)");
+    q.exec("CREATE TABLE IF NOT EXISTS shared_chats "
+           "(CAL_ID INTEGER, SENDER TEXT, MESSAGE TEXT, SEND_TIME TEXT)");
     qDebug() << "Database initialized.";
 }
 
@@ -249,6 +257,210 @@ void ScheduleServer::handleRequest(QTcpSocket* socket, const QString& data) {
         if (maxRowid > lastRead)
             m_lastReadRowid[userId] = maxRowid;
     }
+
+    // ── 공유 캘린더 생성 ─────────────────────────────────────
+    else if (cmd == Protocol::CREATECAL && parts.size() >= 3) {
+        QString owner   = parts[1];
+        QString calName = parts[2];
+        QStringList invited = (parts.size() >= 4 && !parts[3].isEmpty())
+                              ? parts[3].split("~", Qt::SkipEmptyParts)
+                              : QStringList();
+
+        QSqlQuery q;
+        q.prepare("INSERT INTO shared_calendars (OWNER, NAME) VALUES(?,?)");
+        q.addBindValue(owner); q.addBindValue(calName);
+        if (!q.exec()) return;
+
+        int calId = q.lastInsertId().toInt();
+
+        q.prepare("INSERT INTO shared_members (CAL_ID, USER_ID) VALUES(?,?)");
+        q.addBindValue(calId); q.addBindValue(owner);
+        q.exec();
+
+        for (const QString& m : invited) {
+            q.prepare("INSERT INTO shared_members (CAL_ID, USER_ID) VALUES(?,?)");
+            q.addBindValue(calId); q.addBindValue(m);
+            q.exec();
+        }
+
+        QString notif = Protocol::CALID + Protocol::SEP + QString::number(calId) + "\n";
+        sendToCalMembers(calId, notif);
+    }
+
+    // ── 공유 캘린더 목록 조회 ────────────────────────────────
+    else if (cmd == Protocol::REQCALS && parts.size() >= 2) {
+        QString userId = parts[1];
+        QSqlQuery q;
+        q.prepare("SELECT sc.ID, sc.NAME, sc.OWNER "
+                  "FROM shared_calendars sc "
+                  "JOIN shared_members sm ON sc.ID = sm.CAL_ID "
+                  "WHERE sm.USER_ID = ?");
+        q.addBindValue(userId);
+
+        QStringList entries;
+        if (q.exec()) {
+            while (q.next()) {
+                int     calId = q.value(0).toInt();
+                QString name  = q.value(1).toString();
+                QString owner = q.value(2).toString();
+
+                QSqlQuery mq;
+                mq.prepare("SELECT USER_ID FROM shared_members WHERE CAL_ID=?");
+                mq.addBindValue(calId);
+                QStringList members;
+                if (mq.exec()) while (mq.next()) members << mq.value(0).toString();
+
+                entries << QString::number(calId) + "~" + name + "~" + owner
+                             + "~" + members.join(",");
+            }
+        }
+        socket->write((Protocol::RESCALS + Protocol::SEP + entries.join("|") + "\n").toUtf8());
+    }
+
+    // ── 공유 캘린더 월별 일정 ────────────────────────────────
+    else if (cmd == Protocol::REQSHMONTH && parts.size() >= 3) {
+        int     calId = parts[1].toInt();
+        QString ym    = parts[2];
+
+        QSqlQuery q;
+        q.prepare("SELECT rowid,DATE,CONTENT FROM shared_schedules WHERE CAL_ID=? AND DATE LIKE ?");
+        q.addBindValue(calId); q.addBindValue(ym + "%");
+
+        QStringList res;
+        if (q.exec()) {
+            while (q.next())
+                res << q.value(1).toString() + "@"
+                     + q.value(0).toString() + "@"
+                     + q.value(2).toString();
+        }
+        socket->write((Protocol::RESSHMONTH + Protocol::SEP
+                       + QString::number(calId) + Protocol::SEP
+                       + res.join("|") + "\n").toUtf8());
+    }
+
+    // ── 공유 캘린더 일별 일정 ────────────────────────────────
+    else if (cmd == Protocol::REQSHDAY && parts.size() >= 3) {
+        int     calId = parts[1].toInt();
+        QString date  = parts[2];
+
+        QSqlQuery q;
+        q.prepare("SELECT rowid, CONTENT FROM shared_schedules WHERE CAL_ID=? AND DATE=?");
+        q.addBindValue(calId); q.addBindValue(date);
+
+        QStringList res;
+        if (q.exec()) {
+            while (q.next())
+                res << q.value(0).toString() + Protocol::SEP + q.value(1).toString();
+        }
+        socket->write((Protocol::RESSHDAY + Protocol::SEP
+                       + QString::number(calId) + Protocol::SEP
+                       + res.join("|") + "\n").toUtf8());
+    }
+
+    // ── 공유 캘린더 일정 추가 ────────────────────────────────
+    else if (cmd == Protocol::ADDSH && parts.size() >= 5) {
+        int     calId   = parts[1].toInt();
+        QString userId  = parts[2];
+        QString date    = parts[3];
+        QString content = parts.mid(4).join(Protocol::SEP);
+
+        QSqlQuery q;
+        q.prepare("INSERT INTO shared_schedules (CAL_ID,USER_ID,DATE,CONTENT) VALUES(?,?,?,?)");
+        q.addBindValue(calId); q.addBindValue(userId);
+        q.addBindValue(date);  q.addBindValue(content);
+
+        if (q.exec()) {
+            socket->write((Protocol::ACK + ":OK\n").toUtf8());
+            QString upd = Protocol::SHUPDATE + Protocol::SEP + QString::number(calId) + "\n";
+            sendToCalMembers(calId, upd, socket);
+        } else {
+            socket->write((Protocol::ACK + ":ERR\n").toUtf8());
+        }
+    }
+
+    // ── 공유 캘린더 일정 삭제 ────────────────────────────────
+    else if (cmd == Protocol::DELSH && parts.size() >= 3) {
+        int    calId = parts[1].toInt();
+        qint64 rowid = parts[2].toLongLong();
+
+        QSqlQuery q;
+        q.prepare("DELETE FROM shared_schedules WHERE rowid=? AND CAL_ID=?");
+        q.addBindValue(rowid); q.addBindValue(calId);
+
+        if (q.exec()) {
+            socket->write((Protocol::ACK + ":OK\n").toUtf8());
+            QString upd = Protocol::SHUPDATE + Protocol::SEP + QString::number(calId) + "\n";
+            sendToCalMembers(calId, upd, socket);
+        } else {
+            socket->write((Protocol::ACK + ":ERR\n").toUtf8());
+        }
+    }
+
+    // ── 공유 캘린더 일정 수정 ────────────────────────────────
+    else if (cmd == Protocol::MODSH && parts.size() >= 4) {
+        int     calId   = parts[1].toInt();
+        qint64  rowid   = parts[2].toLongLong();
+        QString content = parts.mid(3).join(Protocol::SEP);
+
+        QSqlQuery q;
+        q.prepare("UPDATE shared_schedules SET CONTENT=? WHERE rowid=? AND CAL_ID=?");
+        q.addBindValue(content); q.addBindValue(rowid); q.addBindValue(calId);
+
+        if (q.exec()) {
+            socket->write((Protocol::ACK + ":OK\n").toUtf8());
+            QString upd = Protocol::SHUPDATE + Protocol::SEP + QString::number(calId) + "\n";
+            sendToCalMembers(calId, upd, socket);
+        } else {
+            socket->write((Protocol::ACK + ":ERR\n").toUtf8());
+        }
+    }
+
+    // ── 공유 채팅 기록 조회 ──────────────────────────────────
+    else if (cmd == Protocol::REQSHCHAT && parts.size() >= 2) {
+        int calId = parts[1].toInt();
+
+        QSqlQuery q;
+        q.prepare("SELECT SENDER,SEND_TIME,MESSAGE FROM "
+                  "(SELECT rowid,SENDER,SEND_TIME,MESSAGE FROM shared_chats "
+                  " WHERE CAL_ID=? ORDER BY rowid DESC LIMIT 50) "
+                  "ORDER BY rowid ASC");
+        q.addBindValue(calId);
+
+        QStringList entries;
+        if (q.exec()) {
+            while (q.next())
+                entries << q.value(0).toString() + Protocol::SEP
+                         + q.value(1).toString() + Protocol::SEP
+                         + q.value(2).toString();
+        }
+        socket->write((Protocol::RESSHCHAT + Protocol::SEP
+                       + QString::number(calId) + Protocol::SEP
+                       + entries.join("|") + "\n").toUtf8());
+    }
+
+    // ── 공유 채팅 전송 ────────────────────────────────────────
+    else if (cmd == Protocol::SHCHAT && parts.size() >= 4) {
+        int     calId   = parts[1].toInt();
+        QString sender  = parts[2];
+        QString message = parts.mid(3).join(Protocol::SEP);
+        QString timeStr = QTime::currentTime().toString("HHmm");
+
+        QSqlQuery q;
+        q.prepare("INSERT INTO shared_chats (CAL_ID,SENDER,MESSAGE,SEND_TIME) VALUES(?,?,?,?)");
+        q.addBindValue(calId); q.addBindValue(sender);
+        q.addBindValue(message); q.addBindValue(timeStr);
+        if (!q.exec()) return;
+
+        qint64 rowid = q.lastInsertId().toLongLong();
+
+        QString msg = Protocol::SHCHATRES + Protocol::SEP
+                    + QString::number(calId) + Protocol::SEP
+                    + QString::number(rowid) + Protocol::SEP
+                    + sender  + Protocol::SEP
+                    + timeStr + Protocol::SEP
+                    + message + "\n";
+        sendToCalMembers(calId, msg);
+    }
 }
 
 void ScheduleServer::broadcastChat(qint64 rowid, int unread, const QString& userId,
@@ -290,4 +502,23 @@ void ScheduleServer::onDisconnected() {
     m_clientIds.remove(socket);
     broadcastOnlineList();
     socket->deleteLater();
+}
+
+QStringList ScheduleServer::getCalMembers(int calId) {
+    QSqlQuery q;
+    q.prepare("SELECT USER_ID FROM shared_members WHERE CAL_ID=?");
+    q.addBindValue(calId);
+    QStringList members;
+    if (q.exec()) while (q.next()) members << q.value(0).toString();
+    return members;
+}
+
+void ScheduleServer::sendToCalMembers(int calId, const QString& msg, QTcpSocket* exclude) {
+    QStringList members = getCalMembers(calId);
+    for (QTcpSocket* s : m_clients) {
+        if (s == exclude) continue;
+        if (s && s->state() == QAbstractSocket::ConnectedState)
+            if (members.contains(m_clientIds.value(s)))
+                s->write(msg.toUtf8());
+    }
 }
