@@ -1,6 +1,0 @@
-set(__QT_DEPLOY_TARGET_Server_FILE C:/workspace/project2/build/Desktop_Qt_6_11_0_MinGW_64_bit-Debug/Server.exe)
-set(__QT_DEPLOY_TARGET_Server_TYPE EXECUTABLE)
-set(__QT_DEPLOY_TARGET_Server_RUNTIME_DLLS C:/Qt/6.11.0/mingw_64/bin/Qt6Network.dll;C:/Qt/6.11.0/mingw_64/bin/Qt6Sql.dll;C:/Qt/6.11.0/mingw_64/bin/Qt6Core.dll)
-set(__QT_DEPLOY_TARGET_Client_FILE C:/workspace/project2/build/Desktop_Qt_6_11_0_MinGW_64_bit-Debug/Client.exe)
-set(__QT_DEPLOY_TARGET_Client_TYPE EXECUTABLE)
-set(__QT_DEPLOY_TARGET_Client_RUNTIME_DLLS C:/Qt/6.11.0/mingw_64/bin/Qt6Widgets.dll;C:/Qt/6.11.0/mingw_64/bin/Qt6Network.dll;C:/Qt/6.11.0/mingw_64/bin/Qt6Gui.dll;C:/Qt/6.11.0/mingw_64/bin/Qt6Core.dll)

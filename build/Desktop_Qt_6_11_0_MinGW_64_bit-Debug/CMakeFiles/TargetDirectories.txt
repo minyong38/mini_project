@@ -1,8 +1,0 @@
-C:/workspace/project2/build/Desktop_Qt_6_11_0_MinGW_64_bit-Debug/CMakeFiles/Server.dir
-C:/workspace/project2/build/Desktop_Qt_6_11_0_MinGW_64_bit-Debug/CMakeFiles/Client.dir
-C:/workspace/project2/build/Desktop_Qt_6_11_0_MinGW_64_bit-Debug/CMakeFiles/edit_cache.dir
-C:/workspace/project2/build/Desktop_Qt_6_11_0_MinGW_64_bit-Debug/CMakeFiles/rebuild_cache.dir
-C:/workspace/project2/build/Desktop_Qt_6_11_0_MinGW_64_bit-Debug/CMakeFiles/Server_autogen_timestamp_deps.dir
-C:/workspace/project2/build/Desktop_Qt_6_11_0_MinGW_64_bit-Debug/CMakeFiles/Server_autogen.dir
-C:/workspace/project2/build/Desktop_Qt_6_11_0_MinGW_64_bit-Debug/CMakeFiles/Client_autogen_timestamp_deps.dir
-C:/workspace/project2/build/Desktop_Qt_6_11_0_MinGW_64_bit-Debug/CMakeFiles/Client_autogen.dir
