@@ -51,6 +51,18 @@ MainWindow::MainWindow(const QString& ip, const QString& myId, QWidget *parent)
 
     setupTray();
 
+    // 날씨 매니저 (서울 기준, 30분마다 갱신)
+    m_weather = new WeatherManager("84befa7d5f3b34072813213012110a05", this);
+    connect(m_weather, &WeatherManager::weatherUpdated, this, [this]() {
+        ui->calendarWidget->setWeatherData(m_weather->data());
+    });
+    m_weather->fetchWeather();
+    auto* weatherTimer = new QTimer(this);
+    connect(weatherTimer, &QTimer::timeout, this, [this]() {
+        m_weather->fetchWeather();
+    });
+    weatherTimer->start(30 * 60 * 1000);
+
     // 소켓
     m_socket = new QTcpSocket(this);
     connect(m_socket, &QTcpSocket::connected,     this, &MainWindow::onConnectSuccess);

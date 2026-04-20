@@ -195,6 +195,47 @@ void CustomCalendarWidget::paintCell(QPainter *painter, const QRect &rect, QDate
         painter->drawText(hRect, Qt::AlignHCenter | Qt::AlignTop, elided);
     }
 
+    // ── 날씨 (우상단) ─────────────────────────────────
+    {
+        auto wit = m_weatherData.find(date);
+        if (wit != m_weatherData.end()) {
+            const WeatherInfo& wi = wit.value();
+            QColor textCol = isToday ? Qt::white
+                           : (m_darkMode ? QColor("#E0E0E0") : QColor("#333333"));
+
+            // 이모지
+            QFont ef = painter->font();
+            ef.setPixelSize(13);
+            ef.setBold(false);
+            painter->setFont(ef);
+            painter->setPen(textCol);
+            QRect emojiR(rect.right() - 20, rect.top() + 2, 18, 17);
+            painter->drawText(emojiR, Qt::AlignCenter, wi.emoji);
+
+            // 최고/최저 기온
+            QFont tf = painter->font();
+            tf.setPixelSize(8);
+            painter->setFont(tf);
+            painter->setPen(textCol);
+            QString tempStr = QString("%1°/%2°")
+                                .arg(qRound(wi.tempMax))
+                                .arg(qRound(wi.tempMin));
+            QRect tempR(rect.right() - 30, rect.top() + 19, 30, 10);
+            painter->drawText(tempR, Qt::AlignCenter, tempStr);
+
+            // 강수 확률 (20% 이상일 때만 표시)
+            if (wi.pop >= 0.2) {
+                QFont pf = painter->font();
+                pf.setPixelSize(7);
+                painter->setFont(pf);
+                painter->setPen(isToday ? Qt::white : QColor("#007AFF"));
+                QString popStr = QString("💧%1%").arg(qRound(wi.pop * 100));
+                QRect popR(rect.right() - 30, rect.top() + 29, 30, 9);
+                painter->drawText(popR, Qt::AlignCenter, popStr);
+            }
+        }
+    }
+
     // ── 일정 칩 ──────────────────────────────────────
     if (!isCurrentMonth) { painter->restore(); return; }
 

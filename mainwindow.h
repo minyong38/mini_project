@@ -10,6 +10,7 @@
 #include <QCloseEvent>
 #include "ScheduleDialog.h"
 #include "ChatDialog.h"
+#include "WeatherManager.h"
 
 QT_BEGIN_NAMESPACE
 namespace Ui { class MainWindow; }
@@ -79,6 +80,8 @@ private:
 
     QPushButton*     m_themeBtn   = nullptr;
     bool             m_darkMode   = false;
+
+    WeatherManager*  m_weather    = nullptr;
 };
 
 #endif

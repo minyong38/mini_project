@@ -31,10 +31,15 @@ add_executable(Client
     mainwindow.ui
     CustomCalendarWidget.cpp
     CustomCalendarWidget.h
+    WeatherManager.cpp
+    WeatherManager.h
+    GoogleAuthManager.cpp
+    GoogleAuthManager.h
+    LoginDialog.cpp
+    LoginDialog.h
     ScheduleDialog.cpp
     ScheduleDialog.h
     scheduledialog.ui
-    LoginDialog.h
     ChatDialog.cpp
     ChatDialog.h
     Common.h
