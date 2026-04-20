@@ -3,3 +3,7 @@ secrets.h
 
 # 빌드 결과물
 build/
+
+# IDE / 툴 설정 (로컬 전용)
+.qtcreator/
+.claude/
