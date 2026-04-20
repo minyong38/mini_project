@@ -21,7 +21,17 @@ MainWindow::MainWindow(const QString& ip, const QString& myId, QWidget *parent)
     ui->setupUi(this);
     setWindowTitle("캘린더 — " + m_myId);
 
-    m_selectedDate = QDate::currentDate();
+    m_selectedDate       = QDate::currentDate();
+    m_pendingMonthUserId = m_myId;
+
+    // onlineLabel 옆에 클릭 가능한 친구 버튼 컨테이너 추가
+    auto* friendContainer = new QWidget(ui->onlineBar);
+    friendContainer->setStyleSheet("background: transparent;");
+    m_friendsLayout = new QHBoxLayout(friendContainer);
+    m_friendsLayout->setContentsMargins(0, 0, 0, 0);
+    m_friendsLayout->setSpacing(6);
+    auto* onlineBarLayout = qobject_cast<QHBoxLayout*>(ui->onlineBar->layout());
+    if (onlineBarLayout) onlineBarLayout->addWidget(friendContainer, 1);
 
     ui->userCombo->addItems({m_myId});
     connect(ui->userCombo, QOverload<int>::of(&QComboBox::currentIndexChanged),
@@ -66,15 +76,76 @@ MainWindow::MainWindow(const QString& ip, const QString& myId, QWidget *parent)
     // cardLayout 에 탭 위젯 추가 (calendarWidget은 이미 reparent됨)
     ui->cardLayout->addWidget(m_calTabWidget);
 
+    m_calTabWidget->setTabsClosable(true);
+    // 개인 탭은 닫기 버튼 제거 (나중에 공유탭도 동일하게 처리)
+    m_calTabWidget->tabBar()->setTabButton(0, QTabBar::RightSide, nullptr);
+
     connect(m_calTabWidget, &QTabWidget::currentChanged, this, [this](int index) {
+        QString tabKey = m_calTabWidget->tabBar()->tabData(index).toString();
+
         if (index == 0) {
+            // 내 캘린더
             m_activeCalId = -1;
-        } else {
-            m_activeCalId = m_calTabWidget->tabBar()->tabData(index).toInt();
+            m_selectedId  = m_myId;
+            ui->chatBtn->setVisible(false);
+        } else if (tabKey.startsWith("S:")) {
+            // 공유 캘린더
+            m_activeCalId = tabKey.mid(2).toInt();
+            m_selectedId  = m_myId;
+            ui->chatBtn->setVisible(true);
             auto* w = m_sharedCalWidgets.value(m_activeCalId);
             if (w) requestSharedMonthSchedules(m_activeCalId, w->yearShown(), w->monthShown());
+        } else if (tabKey.startsWith("F:")) {
+            // 친구 캘린더
+            QString friendId = tabKey.mid(2);
+            m_activeCalId = -1;
+            m_selectedId  = friendId;
+            ui->chatBtn->setVisible(true);
+            auto* w = m_friendCalWidgets.value(friendId);
+            if (w && m_socket->state() == QAbstractSocket::ConnectedState) {
+                m_pendingMonthUserId = friendId;
+                QString ym = QString("%1-%2")
+                    .arg(w->yearShown()).arg(w->monthShown(), 2, 10, QChar('0'));
+                m_socket->write((Protocol::REQMONTH + Protocol::SEP
+                                 + friendId + Protocol::SEP + ym + "\n").toUtf8());
+            }
         }
         updateChatBtnText();
+    });
+
+    connect(m_calTabWidget, &QTabWidget::tabCloseRequested, this, [this](int index) {
+        QString tabKey = m_calTabWidget->tabBar()->tabData(index).toString();
+
+        if (tabKey.startsWith("F:")) {
+            // 친구 탭 — 그냥 닫기
+            QString friendId = tabKey.mid(2);
+            if (m_friendCalWidgets.contains(friendId)) {
+                m_friendCalWidgets[friendId]->deleteLater();
+                m_friendCalWidgets.remove(friendId);
+            }
+            m_friendMonthSchedules.remove(friendId);
+            if (m_calTabWidget->currentIndex() == index)
+                m_calTabWidget->setCurrentIndex(0);
+            m_calTabWidget->removeTab(index);
+
+        } else if (tabKey.startsWith("S:")) {
+            // 공유 캘린더 탭 — 확인 후 삭제
+            int calId = tabKey.mid(2).toInt();
+            QString calName;
+            for (const auto& cal : m_sharedCals)
+                if (cal.id == calId) { calName = cal.name; break; }
+
+            auto reply = QMessageBox::question(
+                this,
+                "공유 캘린더 삭제",
+                QString("'%1' 공유 캘린더를 삭제 하시겠습니까?\n모든 일정과 채팅이 삭제됩니다.").arg(calName),
+                QMessageBox::Yes | QMessageBox::No,
+                QMessageBox::No
+            );
+            if (reply == QMessageBox::Yes && m_socket->state() == QAbstractSocket::ConnectedState)
+                m_socket->write((Protocol::DELCAL + Protocol::SEP
+                                 + QString::number(calId) + "\n").toUtf8());
+        }
     });
 
     // 채팅 다이얼로그 미리 생성
@@ -104,6 +175,8 @@ MainWindow::MainWindow(const QString& ip, const QString& myId, QWidget *parent)
     connect(m_weather, &WeatherManager::weatherUpdated, this, [this]() {
         ui->calendarWidget->setWeatherData(m_weather->data());
         for (auto* w : m_sharedCalWidgets)
+            w->setWeatherData(m_weather->data());
+        for (auto* w : m_friendCalWidgets)
             w->setWeatherData(m_weather->data());
     });
     m_weather->fetchWeather();
@@ -140,6 +213,7 @@ void MainWindow::requestUsers() {
 
 void MainWindow::requestMonthSchedules(int year, int month) {
     if (m_socket->state() != QAbstractSocket::ConnectedState) return;
+    m_pendingMonthUserId = m_selectedId;
     QString ym  = QString("%1-%2").arg(year).arg(month, 2, 10, QChar('0'));
     QString msg = Protocol::REQMONTH + Protocol::SEP + m_selectedId + Protocol::SEP + ym + "\n";
     m_socket->write(msg.toUtf8());
@@ -202,8 +276,7 @@ void MainWindow::processMessage(const QString& data) {
         QString payload = data.mid(Protocol::RESUSERS.length() + Protocol::SEP.length());
         QStringList users = payload.isEmpty() ? QStringList() : payload.split("|");
 
-        if (!users.contains(m_myId))
-            users.prepend(m_myId);
+        users.removeAll(m_myId);  // 콤보박스에 본인 표시 안 함
 
         ui->userCombo->blockSignals(true);
         ui->userCombo->clear();
@@ -218,17 +291,24 @@ void MainWindow::processMessage(const QString& data) {
 
     // ── 월별 일정 ────────────────────────────────────────────
     else if (data.startsWith(Protocol::RESMONTH + Protocol::SEP)) {
-        m_monthSchedules.clear();
+        QMap<QDate, QStringList> sched;
         QString payload = data.mid(Protocol::RESMONTH.length() + Protocol::SEP.length());
         if (!payload.isEmpty()) {
             for (const QString& entry : payload.split("|")) {
                 QStringList p = entry.split("@");
                 if (p.size() < 3) continue;
                 QDate d = QDate::fromString(p[0], "yyyy-MM-dd");
-                if (d.isValid()) m_monthSchedules[d].append(p[2]);
+                if (d.isValid()) sched[d].append(p[2]);
             }
         }
-        ui->calendarWidget->setMonthSchedules(m_monthSchedules);
+        if (m_pendingMonthUserId.isEmpty() || m_pendingMonthUserId == m_myId) {
+            m_monthSchedules = sched;
+            ui->calendarWidget->setMonthSchedules(m_monthSchedules);
+        } else {
+            m_friendMonthSchedules[m_pendingMonthUserId] = sched;
+            if (m_friendCalWidgets.contains(m_pendingMonthUserId))
+                m_friendCalWidgets[m_pendingMonthUserId]->setMonthSchedules(sched);
+        }
     }
 
     // ── 일별 일정 ────────────────────────────────────────────
@@ -384,6 +464,23 @@ void MainWindow::processMessage(const QString& data) {
 
     // ── 공유 캘린더 새 ID 알림 (CALID) ──────────────────────
     else if (data.startsWith(Protocol::CALID + Protocol::SEP)) {
+        requestSharedCals();
+    }
+
+    // ── 공유 캘린더 삭제 알림 (CALREMOVED) ───────────────────
+    else if (data.startsWith(Protocol::CALREMOVED + Protocol::SEP)) {
+        int calId = data.mid(Protocol::CALREMOVED.length() + Protocol::SEP.length()).toInt();
+        // 관련 채팅 다이얼로그 정리
+        if (m_sharedChatDialogs.contains(calId)) {
+            m_sharedChatDialogs[calId]->deleteLater();
+            m_sharedChatDialogs.remove(calId);
+        }
+        m_sharedChatLoaded.remove(calId);
+        m_sharedMonthSchedules.remove(calId);
+        if (m_activeCalId == calId) {
+            m_activeCalId = -1;
+            m_calTabWidget->setCurrentIndex(0);
+        }
         requestSharedCals();
     }
 
@@ -633,6 +730,45 @@ void MainWindow::updateChatBtnText() {
     }
 }
 
+void MainWindow::openFriendTab(const QString& friendId) {
+    // 이미 탭이 있으면 그 탭으로 전환
+    for (int i = 0; i < m_calTabWidget->count(); i++) {
+        if (m_calTabWidget->tabBar()->tabData(i).toString() == "F:" + friendId) {
+            m_calTabWidget->setCurrentIndex(i);
+            return;
+        }
+    }
+
+    auto* page       = new QWidget();
+    auto* pageLayout = new QVBoxLayout(page);
+    pageLayout->setContentsMargins(0, 0, 0, 0);
+    pageLayout->setSpacing(0);
+
+    auto* calWidget = new CustomCalendarWidget(page);
+    calWidget->setGridVisible(true);
+    calWidget->setVerticalHeaderFormat(QCalendarWidget::NoVerticalHeader);
+    calWidget->setStyleSheet(ui->calendarWidget->styleSheet());
+    calWidget->setDarkMode(m_darkMode);
+    if (m_weather) calWidget->setWeatherData(m_weather->data());
+
+    // 날짜 클릭 → 친구 일정 조회 (읽기 전용)
+    connect(calWidget, &QCalendarWidget::clicked,
+            this, &MainWindow::onDateClicked);
+    // 월 이동 → 친구 월별 일정 요청
+    connect(calWidget, &QCalendarWidget::currentPageChanged,
+            this, &MainWindow::requestMonthSchedules);
+
+    pageLayout->addWidget(calWidget);
+    m_friendCalWidgets[friendId] = calWidget;
+
+    int tabIdx = m_calTabWidget->addTab(page, "👤 " + friendId);
+    m_calTabWidget->tabBar()->setTabData(tabIdx, QString("F:") + friendId);
+    // 공유 탭처럼 닫기 버튼 유지 (이미 tabsClosable=true)
+
+    m_calTabWidget->setCurrentIndex(tabIdx);
+    // currentChanged 에서 m_selectedId = friendId 로 설정되고 REQMONTH 전송됨
+}
+
 void MainWindow::requestSharedCals() {
     if (m_socket->state() != QAbstractSocket::ConnectedState) return;
     m_socket->write((Protocol::REQCALS + Protocol::SEP + m_myId + "\n").toUtf8());
@@ -690,7 +826,7 @@ void MainWindow::refreshSharedCalTabs() {
         m_sharedCalWidgets[calId] = calWidget;
 
         int tabIdx = m_calTabWidget->addTab(page, "🗓 " + cal.name);
-        m_calTabWidget->tabBar()->setTabData(tabIdx, calId);
+        m_calTabWidget->tabBar()->setTabData(tabIdx, QString("S:%1").arg(calId));
     }
 }
 
@@ -813,27 +949,64 @@ void MainWindow::showSharedDateDialog(int calId, const QDate& date,
 }
 
 void MainWindow::updateFriendsList() {
+    // 기존 버튼 전부 제거
+    while (m_friendsLayout->count() > 0) {
+        QLayoutItem* item = m_friendsLayout->takeAt(0);
+        if (item->widget()) item->widget()->deleteLater();
+        delete item;
+    }
+
     QStringList known = m_allKnownUsers;
     for (const QString& u : m_onlineUsers)
         if (!known.contains(u)) known << u;
 
-    if (known.isEmpty()) {
+    // 본인 제외, 온라인/오프라인 분리
+    QStringList onlineFriends, offlineFriends;
+    for (const QString& u : known) {
+        if (u == m_myId) continue;
+        if (m_onlineUsers.contains(u)) onlineFriends << u;
+        else                            offlineFriends << u;
+    }
+
+    int friendOnlineCount = onlineFriends.size();
+    if (known.size() <= 1) {
         ui->onlineLabel->setText("👥 친구 목록:  연결 중...");
         return;
     }
+    ui->onlineLabel->setText(QString("👥  %1명 접속 중  |").arg(friendOnlineCount));
 
-    // 온라인 먼저, 오프라인 나중
-    QStringList onlineItems, offlineItems;
-    for (const QString& u : known) {
-        if (m_onlineUsers.contains(u))
-            onlineItems << "🟢 " + u;
-        else
-            offlineItems << "⚫ " + u;
-    }
+    // 친구 버튼 생성 람다
+    auto addBtn = [this](const QString& userId, bool online) {
+        auto* btn = new QPushButton((online ? "🟢 " : "⚫ ") + userId);
+        btn->setFixedHeight(22);
+        btn->setCursor(Qt::PointingHandCursor);
+        btn->setFlat(true);
+        if (m_darkMode) {
+            btn->setStyleSheet(online
+                ? "QPushButton{background:#1A3A2A;color:#4CAF7D;border:1px solid #2D6A4F;"
+                  "border-radius:11px;padding:0 10px;font-size:12px;}"
+                  "QPushButton:hover{background:#22503A;}"
+                : "QPushButton{background:#3A3A3C;color:#8E8E93;border:1px solid #48484A;"
+                  "border-radius:11px;padding:0 10px;font-size:12px;}"
+                  "QPushButton:hover{background:#48484A;}");
+        } else {
+            btn->setStyleSheet(online
+                ? "QPushButton{background:#E8F5E9;color:#2D6A4F;border:1px solid #C3E6CB;"
+                  "border-radius:11px;padding:0 10px;font-size:12px;}"
+                  "QPushButton:hover{background:#C8E6C9;}"
+                : "QPushButton{background:#F5F5F5;color:#8E8E93;border:1px solid #E0E0E0;"
+                  "border-radius:11px;padding:0 10px;font-size:12px;}"
+                  "QPushButton:hover{background:#EEEEEE;}");
+        }
+        connect(btn, &QPushButton::clicked, this, [this, userId]() {
+            openFriendTab(userId);
+        });
+        m_friendsLayout->addWidget(btn);
+    };
 
-    QString text = QString("👥 친구 목록  (%1명 접속 중)    ").arg(m_onlineUsers.size());
-    text += (onlineItems + offlineItems).join("    ");
-    ui->onlineLabel->setText(text);
+    for (const QString& u : onlineFriends)  addBtn(u, true);
+    for (const QString& u : offlineFriends) addBtn(u, false);
+    m_friendsLayout->addStretch();
 }
 
 // ──────────────────────────────────────────────
@@ -847,12 +1020,12 @@ void MainWindow::onDateClicked(const QDate& date) {
 }
 
 void MainWindow::onUserChanged(int) {
-    m_selectedId = ui->userCombo->currentText();
-    m_monthSchedules.clear();
-    ui->calendarWidget->clearSchedules();
-    requestMonthSchedules(ui->calendarWidget->yearShown(),
-                          ui->calendarWidget->monthShown());
-    updateChatBtnText();
+    QString selected = ui->userCombo->currentText();
+    if (selected == m_myId) {
+        m_calTabWidget->setCurrentIndex(0);
+    } else {
+        openFriendTab(selected);
+    }
 }
 
 void MainWindow::showDateDialog() {
@@ -1131,6 +1304,8 @@ void MainWindow::applyTheme(bool dark)
             "QPushButton:hover { background:#F2F2F7; }");
     }
 
+    updateFriendsList();  // 친구 버튼 색상 갱신
+
     ui->calendarWidget->setDarkMode(dark);
     m_chatDialog->setDarkMode(dark);
     for (auto* dlg : m_dmDialogs)
@@ -1161,9 +1336,12 @@ void MainWindow::applyTheme(bool dark)
         }
     }
 
-    // 공유 캘린더 위젯 스타일 적용
-    QString shCalStyle = dark ? ui->calendarWidget->styleSheet() : ui->calendarWidget->styleSheet();
+    // 공유/친구 캘린더 위젯 스타일 적용
     for (auto* w : m_sharedCalWidgets) {
+        w->setStyleSheet(ui->calendarWidget->styleSheet());
+        w->setDarkMode(dark);
+    }
+    for (auto* w : m_friendCalWidgets) {
         w->setStyleSheet(ui->calendarWidget->styleSheet());
         w->setDarkMode(dark);
     }

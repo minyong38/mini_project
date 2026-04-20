@@ -80,6 +80,8 @@ namespace Protocol {
     inline const QString RESSHCHAT  = "RESSHCHAT";
     inline const QString SHCHAT     = "SHCHAT";
     inline const QString SHCHATRES  = "SHCHATRES";
+    inline const QString DELCAL     = "DELCAL";      // DELCAL:calId
+    inline const QString CALREMOVED = "CALREMOVED";  // CALREMOVED:calId (서버→전체)
 }
 
 #endif
