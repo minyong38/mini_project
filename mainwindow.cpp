@@ -68,26 +68,15 @@ MainWindow::MainWindow(const QString& ip, const QString& myId, QWidget *parent)
     auto* personalLayout = new QVBoxLayout(personalPage);
     personalLayout->setContentsMargins(0, 0, 0, 0);
     personalLayout->setSpacing(0);
-    personalLayout->addWidget(ui->calendarWidget);   // reparent → cardLayout에서 제거됨
+    personalLayout->addWidget(ui->calendarWidget);
     m_calTabWidget->addTab(personalPage, "📅 내 캘린더");
 
-    // "＋ 캘린더 추가" 코너 버튼
-    auto* addCalBtn = new QPushButton("＋ 캘린더 추가");
-    addCalBtn->setFixedHeight(28);
-    addCalBtn->setStyleSheet(
-        "QPushButton { background:#34C759; color:white; border:none; border-radius:10px;"
-        " padding:0 12px; font-size:12px; font-weight:600; }"
-        "QPushButton:hover { background:#2DB84F; }"
-    );
-    m_calTabWidget->setCornerWidget(addCalBtn, Qt::TopRightCorner);
-    connect(addCalBtn, &QPushButton::clicked, this, &MainWindow::showAddCalendarDialog);
-
-    // cardLayout 에 탭 위젯 추가 (calendarWidget은 이미 reparent됨)
+    // cardLayout 에 탭 위젯 추가
     ui->cardLayout->addWidget(m_calTabWidget);
 
     m_calTabWidget->setTabsClosable(true);
-    // 개인 탭은 닫기 버튼 제거 (나중에 공유탭도 동일하게 처리)
     m_calTabWidget->tabBar()->setTabButton(0, QTabBar::RightSide, nullptr);
+
 
     connect(m_calTabWidget, &QTabWidget::currentChanged, this, [this](int index) {
         QString tabKey = m_calTabWidget->tabBar()->tabData(index).toString();
@@ -170,12 +159,24 @@ MainWindow::MainWindow(const QString& ip, const QString& myId, QWidget *parent)
         "QPushButton { background:transparent; border:none; font-size:18px; border-radius:18px; }"
         "QPushButton:hover { background:#F2F2F7; }"
     );
-    // navLayout에서 spacer 다음 위치(chatBtn 앞)에 삽입
     auto* navLayout = qobject_cast<QHBoxLayout*>(ui->navBar->layout());
     if (navLayout) navLayout->insertWidget(2, m_themeBtn);
     connect(m_themeBtn, &QPushButton::clicked, this, [this]() {
         applyTheme(!m_darkMode);
     });
+
+    // 캘린더 추가 버튼 (채팅 버튼 왼쪽)
+    auto* addCalBtn = new QPushButton("＋ 캘린더 추가", this);
+    addCalBtn->setFixedHeight(36);
+    addCalBtn->setCursor(Qt::PointingHandCursor);
+    addCalBtn->setStyleSheet(
+        "QPushButton { background:#34C759; color:white; border:none;"
+        " border-radius:18px; padding:0 16px; font-size:13px; font-weight:600; }"
+        "QPushButton:hover { background:#2DB84F; }"
+        "QPushButton:pressed { background:#28A845; }"
+    );
+    if (navLayout) navLayout->insertWidget(4, addCalBtn);
+    connect(addCalBtn, &QPushButton::clicked, this, &MainWindow::showAddCalendarDialog);
 
     setupTray();
 
@@ -772,7 +773,6 @@ void MainWindow::openFriendTab(const QString& friendId) {
 
     int tabIdx = m_calTabWidget->addTab(page, "👤 " + friendId);
     m_calTabWidget->tabBar()->setTabData(tabIdx, QString("F:") + friendId);
-    // 공유 탭처럼 닫기 버튼 유지 (이미 tabsClosable=true)
 
     m_calTabWidget->setCurrentIndex(tabIdx);
     // currentChanged 에서 m_selectedId = friendId 로 설정되고 REQMONTH 전송됨
