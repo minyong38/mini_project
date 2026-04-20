@@ -8,6 +8,7 @@
 
 #include "../../../../LoginDialog.h"
 #include <QtGui/qtextcursor.h>
+#include <QtNetwork/QSslError>
 #include <QtCore/qmetatype.h>
 
 #include <QtCore/qtmochelpers.h>

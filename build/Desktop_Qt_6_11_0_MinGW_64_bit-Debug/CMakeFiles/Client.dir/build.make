@@ -150,11 +150,41 @@ CMakeFiles/Client.dir/WeatherManager.cpp.s: cmake_force
 	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green "Compiling CXX source to assembly CMakeFiles/Client.dir/WeatherManager.cpp.s"
 	C:\Qt\Tools\mingw1310_64\bin\g++.exe $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -S C:\workspace\project2\WeatherManager.cpp -o CMakeFiles\Client.dir\WeatherManager.cpp.s
 
+CMakeFiles/Client.dir/GoogleAuthManager.cpp.obj: CMakeFiles/Client.dir/flags.make
+CMakeFiles/Client.dir/GoogleAuthManager.cpp.obj: CMakeFiles/Client.dir/includes_CXX.rsp
+CMakeFiles/Client.dir/GoogleAuthManager.cpp.obj: C:/workspace/project2/GoogleAuthManager.cpp
+CMakeFiles/Client.dir/GoogleAuthManager.cpp.obj: CMakeFiles/Client.dir/compiler_depend.ts
+	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green --progress-dir=C:\workspace\project2\build\Desktop_Qt_6_11_0_MinGW_64_bit-Debug\CMakeFiles --progress-num=$(CMAKE_PROGRESS_7) "Building CXX object CMakeFiles/Client.dir/GoogleAuthManager.cpp.obj"
+	C:\Qt\Tools\mingw1310_64\bin\g++.exe $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -MD -MT CMakeFiles/Client.dir/GoogleAuthManager.cpp.obj -MF CMakeFiles\Client.dir\GoogleAuthManager.cpp.obj.d -o CMakeFiles\Client.dir\GoogleAuthManager.cpp.obj -c C:\workspace\project2\GoogleAuthManager.cpp
+
+CMakeFiles/Client.dir/GoogleAuthManager.cpp.i: cmake_force
+	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green "Preprocessing CXX source to CMakeFiles/Client.dir/GoogleAuthManager.cpp.i"
+	C:\Qt\Tools\mingw1310_64\bin\g++.exe $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -E C:\workspace\project2\GoogleAuthManager.cpp > CMakeFiles\Client.dir\GoogleAuthManager.cpp.i
+
+CMakeFiles/Client.dir/GoogleAuthManager.cpp.s: cmake_force
+	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green "Compiling CXX source to assembly CMakeFiles/Client.dir/GoogleAuthManager.cpp.s"
+	C:\Qt\Tools\mingw1310_64\bin\g++.exe $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -S C:\workspace\project2\GoogleAuthManager.cpp -o CMakeFiles\Client.dir\GoogleAuthManager.cpp.s
+
+CMakeFiles/Client.dir/LoginDialog.cpp.obj: CMakeFiles/Client.dir/flags.make
+CMakeFiles/Client.dir/LoginDialog.cpp.obj: CMakeFiles/Client.dir/includes_CXX.rsp
+CMakeFiles/Client.dir/LoginDialog.cpp.obj: C:/workspace/project2/LoginDialog.cpp
+CMakeFiles/Client.dir/LoginDialog.cpp.obj: CMakeFiles/Client.dir/compiler_depend.ts
+	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green --progress-dir=C:\workspace\project2\build\Desktop_Qt_6_11_0_MinGW_64_bit-Debug\CMakeFiles --progress-num=$(CMAKE_PROGRESS_8) "Building CXX object CMakeFiles/Client.dir/LoginDialog.cpp.obj"
+	C:\Qt\Tools\mingw1310_64\bin\g++.exe $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -MD -MT CMakeFiles/Client.dir/LoginDialog.cpp.obj -MF CMakeFiles\Client.dir\LoginDialog.cpp.obj.d -o CMakeFiles\Client.dir\LoginDialog.cpp.obj -c C:\workspace\project2\LoginDialog.cpp
+
+CMakeFiles/Client.dir/LoginDialog.cpp.i: cmake_force
+	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green "Preprocessing CXX source to CMakeFiles/Client.dir/LoginDialog.cpp.i"
+	C:\Qt\Tools\mingw1310_64\bin\g++.exe $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -E C:\workspace\project2\LoginDialog.cpp > CMakeFiles\Client.dir\LoginDialog.cpp.i
+
+CMakeFiles/Client.dir/LoginDialog.cpp.s: cmake_force
+	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green "Compiling CXX source to assembly CMakeFiles/Client.dir/LoginDialog.cpp.s"
+	C:\Qt\Tools\mingw1310_64\bin\g++.exe $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -S C:\workspace\project2\LoginDialog.cpp -o CMakeFiles\Client.dir\LoginDialog.cpp.s
+
 CMakeFiles/Client.dir/ScheduleDialog.cpp.obj: CMakeFiles/Client.dir/flags.make
 CMakeFiles/Client.dir/ScheduleDialog.cpp.obj: CMakeFiles/Client.dir/includes_CXX.rsp
 CMakeFiles/Client.dir/ScheduleDialog.cpp.obj: C:/workspace/project2/ScheduleDialog.cpp
 CMakeFiles/Client.dir/ScheduleDialog.cpp.obj: CMakeFiles/Client.dir/compiler_depend.ts
-	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green --progress-dir=C:\workspace\project2\build\Desktop_Qt_6_11_0_MinGW_64_bit-Debug\CMakeFiles --progress-num=$(CMAKE_PROGRESS_7) "Building CXX object CMakeFiles/Client.dir/ScheduleDialog.cpp.obj"
+	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green --progress-dir=C:\workspace\project2\build\Desktop_Qt_6_11_0_MinGW_64_bit-Debug\CMakeFiles --progress-num=$(CMAKE_PROGRESS_9) "Building CXX object CMakeFiles/Client.dir/ScheduleDialog.cpp.obj"
 	C:\Qt\Tools\mingw1310_64\bin\g++.exe $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -MD -MT CMakeFiles/Client.dir/ScheduleDialog.cpp.obj -MF CMakeFiles\Client.dir\ScheduleDialog.cpp.obj.d -o CMakeFiles\Client.dir\ScheduleDialog.cpp.obj -c C:\workspace\project2\ScheduleDialog.cpp
 
 CMakeFiles/Client.dir/ScheduleDialog.cpp.i: cmake_force
@@ -169,7 +199,7 @@ CMakeFiles/Client.dir/ChatDialog.cpp.obj: CMakeFiles/Client.dir/flags.make
 CMakeFiles/Client.dir/ChatDialog.cpp.obj: CMakeFiles/Client.dir/includes_CXX.rsp
 CMakeFiles/Client.dir/ChatDialog.cpp.obj: C:/workspace/project2/ChatDialog.cpp
 CMakeFiles/Client.dir/ChatDialog.cpp.obj: CMakeFiles/Client.dir/compiler_depend.ts
-	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green --progress-dir=C:\workspace\project2\build\Desktop_Qt_6_11_0_MinGW_64_bit-Debug\CMakeFiles --progress-num=$(CMAKE_PROGRESS_8) "Building CXX object CMakeFiles/Client.dir/ChatDialog.cpp.obj"
+	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green --progress-dir=C:\workspace\project2\build\Desktop_Qt_6_11_0_MinGW_64_bit-Debug\CMakeFiles --progress-num=$(CMAKE_PROGRESS_10) "Building CXX object CMakeFiles/Client.dir/ChatDialog.cpp.obj"
 	C:\Qt\Tools\mingw1310_64\bin\g++.exe $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -MD -MT CMakeFiles/Client.dir/ChatDialog.cpp.obj -MF CMakeFiles\Client.dir\ChatDialog.cpp.obj.d -o CMakeFiles\Client.dir\ChatDialog.cpp.obj -c C:\workspace\project2\ChatDialog.cpp
 
 CMakeFiles/Client.dir/ChatDialog.cpp.i: cmake_force
@@ -187,6 +217,8 @@ Client_OBJECTS = \
 "CMakeFiles/Client.dir/mainwindow.cpp.obj" \
 "CMakeFiles/Client.dir/CustomCalendarWidget.cpp.obj" \
 "CMakeFiles/Client.dir/WeatherManager.cpp.obj" \
+"CMakeFiles/Client.dir/GoogleAuthManager.cpp.obj" \
+"CMakeFiles/Client.dir/LoginDialog.cpp.obj" \
 "CMakeFiles/Client.dir/ScheduleDialog.cpp.obj" \
 "CMakeFiles/Client.dir/ChatDialog.cpp.obj"
 
@@ -198,6 +230,8 @@ Client.exe: CMakeFiles/Client.dir/client_main.cpp.obj
 Client.exe: CMakeFiles/Client.dir/mainwindow.cpp.obj
 Client.exe: CMakeFiles/Client.dir/CustomCalendarWidget.cpp.obj
 Client.exe: CMakeFiles/Client.dir/WeatherManager.cpp.obj
+Client.exe: CMakeFiles/Client.dir/GoogleAuthManager.cpp.obj
+Client.exe: CMakeFiles/Client.dir/LoginDialog.cpp.obj
 Client.exe: CMakeFiles/Client.dir/ScheduleDialog.cpp.obj
 Client.exe: CMakeFiles/Client.dir/ChatDialog.cpp.obj
 Client.exe: CMakeFiles/Client.dir/build.make
@@ -208,7 +242,7 @@ Client.exe: C:/Qt/6.11.0/mingw_64/lib/libQt6Core.a
 Client.exe: CMakeFiles/Client.dir/linkLibs.rsp
 Client.exe: CMakeFiles/Client.dir/objects1.rsp
 Client.exe: CMakeFiles/Client.dir/link.txt
-	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green --bold --progress-dir=C:\workspace\project2\build\Desktop_Qt_6_11_0_MinGW_64_bit-Debug\CMakeFiles --progress-num=$(CMAKE_PROGRESS_9) "Linking CXX executable Client.exe"
+	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green --bold --progress-dir=C:\workspace\project2\build\Desktop_Qt_6_11_0_MinGW_64_bit-Debug\CMakeFiles --progress-num=$(CMAKE_PROGRESS_11) "Linking CXX executable Client.exe"
 	$(CMAKE_COMMAND) -E cmake_link_script CMakeFiles\Client.dir\link.txt --verbose=$(VERBOSE)
 
 # Rule to build all files generated by this target.

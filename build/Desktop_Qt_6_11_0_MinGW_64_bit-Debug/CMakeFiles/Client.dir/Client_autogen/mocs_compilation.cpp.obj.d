@@ -461,10 +461,14 @@ CMakeFiles/Client.dir/Client_autogen/mocs_compilation.cpp.obj: \
  C:/Qt/6.11.0/mingw_64/include/QtNetwork/qsslpresharedkeyauthenticator.h \
  C:/Qt/6.11.0/mingw_64/include/QtCore/QMetaType \
  C:/Qt/6.11.0/mingw_64/include/QtNetwork/QSslError \
+ C:\workspace\project2\build\Desktop_Qt_6_11_0_MinGW_64_bit-Debug\Client_autogen\EWIEGA46WW/moc_GoogleAuthManager.cpp \
+ C:/workspace/project2/GoogleAuthManager.h \
+ C:/Qt/6.11.0/mingw_64/include/QtNetwork/QTcpServer \
+ C:/Qt/6.11.0/mingw_64/include/QtNetwork/qtcpserver.h \
+ C:/Qt/6.11.0/mingw_64/include/QtNetwork/QTcpSocket \
  C:\workspace\project2\build\Desktop_Qt_6_11_0_MinGW_64_bit-Debug\Client_autogen\EWIEGA46WW/moc_LoginDialog.cpp \
  C:/workspace/project2/LoginDialog.h \
- C:/Qt/6.11.0/mingw_64/include/QtWidgets/QDialogButtonBox \
- C:/Qt/6.11.0/mingw_64/include/QtWidgets/qdialogbuttonbox.h \
+ C:/workspace/project2/GoogleAuthManager.h \
  C:\workspace\project2\build\Desktop_Qt_6_11_0_MinGW_64_bit-Debug\Client_autogen\EWIEGA46WW/moc_ScheduleDialog.cpp \
  C:/workspace/project2/ScheduleDialog.h \
  C:/Qt/6.11.0/mingw_64/include/QtWidgets/QCheckBox \
@@ -515,7 +519,6 @@ CMakeFiles/Client.dir/Client_autogen/mocs_compilation.cpp.obj: \
  C:/Qt/6.11.0/mingw_64/include/QtWidgets/QMainWindow \
  C:/Qt/6.11.0/mingw_64/include/QtWidgets/qmainwindow.h \
  C:/Qt/6.11.0/mingw_64/include/QtWidgets/qtabwidget.h \
- C:/Qt/6.11.0/mingw_64/include/QtNetwork/QTcpSocket \
  C:/Qt/6.11.0/mingw_64/include/QtWidgets/QSystemTrayIcon \
  C:/Qt/6.11.0/mingw_64/include/QtWidgets/qsystemtrayicon.h \
  C:/Qt/6.11.0/mingw_64/include/QtWidgets/QMenu \

@@ -265,6 +265,54 @@ CustomCalendarWidget.cpp.s:
 	$(MAKE) $(MAKESILENT) -f CMakeFiles\Client.dir\build.make CMakeFiles/Client.dir/CustomCalendarWidget.cpp.s
 .PHONY : CustomCalendarWidget.cpp.s
 
+GoogleAuthManager.obj: GoogleAuthManager.cpp.obj
+.PHONY : GoogleAuthManager.obj
+
+# target to build an object file
+GoogleAuthManager.cpp.obj:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles\Client.dir\build.make CMakeFiles/Client.dir/GoogleAuthManager.cpp.obj
+.PHONY : GoogleAuthManager.cpp.obj
+
+GoogleAuthManager.i: GoogleAuthManager.cpp.i
+.PHONY : GoogleAuthManager.i
+
+# target to preprocess a source file
+GoogleAuthManager.cpp.i:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles\Client.dir\build.make CMakeFiles/Client.dir/GoogleAuthManager.cpp.i
+.PHONY : GoogleAuthManager.cpp.i
+
+GoogleAuthManager.s: GoogleAuthManager.cpp.s
+.PHONY : GoogleAuthManager.s
+
+# target to generate assembly for a file
+GoogleAuthManager.cpp.s:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles\Client.dir\build.make CMakeFiles/Client.dir/GoogleAuthManager.cpp.s
+.PHONY : GoogleAuthManager.cpp.s
+
+LoginDialog.obj: LoginDialog.cpp.obj
+.PHONY : LoginDialog.obj
+
+# target to build an object file
+LoginDialog.cpp.obj:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles\Client.dir\build.make CMakeFiles/Client.dir/LoginDialog.cpp.obj
+.PHONY : LoginDialog.cpp.obj
+
+LoginDialog.i: LoginDialog.cpp.i
+.PHONY : LoginDialog.i
+
+# target to preprocess a source file
+LoginDialog.cpp.i:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles\Client.dir\build.make CMakeFiles/Client.dir/LoginDialog.cpp.i
+.PHONY : LoginDialog.cpp.i
+
+LoginDialog.s: LoginDialog.cpp.s
+.PHONY : LoginDialog.s
+
+# target to generate assembly for a file
+LoginDialog.cpp.s:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles\Client.dir\build.make CMakeFiles/Client.dir/LoginDialog.cpp.s
+.PHONY : LoginDialog.cpp.s
+
 ScheduleDialog.obj: ScheduleDialog.cpp.obj
 .PHONY : ScheduleDialog.obj
 
@@ -456,6 +504,12 @@ help:
 	@echo ... CustomCalendarWidget.obj
 	@echo ... CustomCalendarWidget.i
 	@echo ... CustomCalendarWidget.s
+	@echo ... GoogleAuthManager.obj
+	@echo ... GoogleAuthManager.i
+	@echo ... GoogleAuthManager.s
+	@echo ... LoginDialog.obj
+	@echo ... LoginDialog.i
+	@echo ... LoginDialog.s
 	@echo ... ScheduleDialog.obj
 	@echo ... ScheduleDialog.i
 	@echo ... ScheduleDialog.s

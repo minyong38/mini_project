@@ -506,5 +506,6 @@ CMakeFiles/Client.dir/client_main.cpp.obj: \
  C:/Qt/6.11.0/mingw_64/include/QtNetwork/qsslpresharedkeyauthenticator.h \
  C:/Qt/6.11.0/mingw_64/include/QtCore/QMetaType \
  C:\workspace\project2\LoginDialog.h \
- C:/Qt/6.11.0/mingw_64/include/QtWidgets/QDialogButtonBox \
- C:/Qt/6.11.0/mingw_64/include/QtWidgets/qdialogbuttonbox.h
+ C:\workspace\project2\GoogleAuthManager.h \
+ C:/Qt/6.11.0/mingw_64/include/QtNetwork/QTcpServer \
+ C:/Qt/6.11.0/mingw_64/include/QtNetwork/qtcpserver.h

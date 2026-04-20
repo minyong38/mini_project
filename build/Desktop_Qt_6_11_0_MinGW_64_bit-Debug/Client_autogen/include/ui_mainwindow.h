@@ -163,7 +163,7 @@ public:
         userPrefixLabel->setStyleSheet(QCoreApplication::translate("MainWindow", "QLabel { font-size: 13px; color: #8E8E93; background: transparent; border: none; }", nullptr));
         userCombo->setStyleSheet(QCoreApplication::translate("MainWindow", "QComboBox { padding: 4px 12px; border: 1.5px solid #E5E5EA; border-radius: 18px; font-size: 13px; background: #F2F2F7; color: #1C1C1E; } QComboBox:hover { border-color: #007AFF; background: #FFFFFF; } QComboBox::drop-down { border: none; width: 20px; } QComboBox QAbstractItemView { border: 1px solid #E5E5EA; border-radius: 10px; background: #FFFFFF; selection-background-color: #E5F0FF; selection-color: #007AFF; font-size: 13px; }", nullptr));
         onlineBar->setStyleSheet(QCoreApplication::translate("MainWindow", "QFrame#onlineBar { background-color: #F0FFF4; border-bottom: 1px solid #C3E6CB; }", nullptr));
-        onlineLabel->setText(QCoreApplication::translate("MainWindow", "\354\240\221\354\206\215 \354\244\221: \354\227\260\352\262\260 \354\244\221...", nullptr));
+        onlineLabel->setText(QCoreApplication::translate("MainWindow", "\360\237\221\245 \354\271\234\352\265\254 \353\252\251\353\241\235:  \354\227\260\352\262\260 \354\244\221...", nullptr));
         onlineLabel->setStyleSheet(QCoreApplication::translate("MainWindow", "QLabel { font-size: 12px; color: #2D6A4F; background: transparent; border: none; }", nullptr));
         calendarWrapper->setStyleSheet(QCoreApplication::translate("MainWindow", "QWidget#calendarWrapper { background: #F2F2F7; }", nullptr));
         calendarCard->setStyleSheet(QCoreApplication::translate("MainWindow", "QFrame#calendarCard { background: #FFFFFF; border-radius: 16px; border: none; }", nullptr));

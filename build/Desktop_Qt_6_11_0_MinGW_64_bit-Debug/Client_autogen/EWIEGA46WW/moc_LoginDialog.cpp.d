@@ -1,5 +1,13 @@
 C:/workspace/project2/build/Desktop_Qt_6_11_0_MinGW_64_bit-Debug/Client_autogen/EWIEGA46WW/moc_LoginDialog.cpp: C:/workspace/project2/LoginDialog.h \
   C:/workspace/project2/build/Desktop_Qt_6_11_0_MinGW_64_bit-Debug/Client_autogen/moc_predefs.h \
+  C:/Qt/6.11.0/mingw_64/include/QtCore/QFlags \
+  C:/Qt/6.11.0/mingw_64/include/QtCore/QList \
+  C:/Qt/6.11.0/mingw_64/include/QtCore/QMetaType \
+  C:/Qt/6.11.0/mingw_64/include/QtCore/QObject \
+  C:/Qt/6.11.0/mingw_64/include/QtCore/QSharedDataPointer \
+  C:/Qt/6.11.0/mingw_64/include/QtCore/QString \
+  C:/Qt/6.11.0/mingw_64/include/QtCore/QUrl \
+  C:/Qt/6.11.0/mingw_64/include/QtCore/QVariant \
   C:/Qt/6.11.0/mingw_64/include/QtCore/q17memory.h \
   C:/Qt/6.11.0/mingw_64/include/QtCore/q20bit.h \
   C:/Qt/6.11.0/mingw_64/include/QtCore/q20functional.h \
@@ -9,6 +17,7 @@ C:/workspace/project2/build/Desktop_Qt_6_11_0_MinGW_64_bit-Debug/Client_autogen/
   C:/Qt/6.11.0/mingw_64/include/QtCore/q20utility.h \
   C:/Qt/6.11.0/mingw_64/include/QtCore/q23type_traits.h \
   C:/Qt/6.11.0/mingw_64/include/QtCore/q23utility.h \
+  C:/Qt/6.11.0/mingw_64/include/QtCore/q26numeric.h \
   C:/Qt/6.11.0/mingw_64/include/QtCore/qalgorithms.h \
   C:/Qt/6.11.0/mingw_64/include/QtCore/qalloc.h \
   C:/Qt/6.11.0/mingw_64/include/QtCore/qanystringview.h \
@@ -24,6 +33,7 @@ C:/workspace/project2/build/Desktop_Qt_6_11_0_MinGW_64_bit-Debug/Client_autogen/
   C:/Qt/6.11.0/mingw_64/include/QtCore/qbytearrayalgorithms.h \
   C:/Qt/6.11.0/mingw_64/include/QtCore/qbytearraylist.h \
   C:/Qt/6.11.0/mingw_64/include/QtCore/qbytearrayview.h \
+  C:/Qt/6.11.0/mingw_64/include/QtCore/qcalendar.h \
   C:/Qt/6.11.0/mingw_64/include/QtCore/qchar.h \
   C:/Qt/6.11.0/mingw_64/include/QtCore/qcheckedint_impl.h \
   C:/Qt/6.11.0/mingw_64/include/QtCore/qcompare.h \
@@ -36,8 +46,10 @@ C:/workspace/project2/build/Desktop_Qt_6_11_0_MinGW_64_bit-Debug/Client_autogen/
   C:/Qt/6.11.0/mingw_64/include/QtCore/qcontainerinfo.h \
   C:/Qt/6.11.0/mingw_64/include/QtCore/qcontainertools_impl.h \
   C:/Qt/6.11.0/mingw_64/include/QtCore/qcontiguouscache.h \
+  C:/Qt/6.11.0/mingw_64/include/QtCore/qcryptographichash.h \
   C:/Qt/6.11.0/mingw_64/include/QtCore/qdarwinhelpers.h \
   C:/Qt/6.11.0/mingw_64/include/QtCore/qdatastream.h \
+  C:/Qt/6.11.0/mingw_64/include/QtCore/qdatetime.h \
   C:/Qt/6.11.0/mingw_64/include/QtCore/qdebug.h \
   C:/Qt/6.11.0/mingw_64/include/QtCore/qendian.h \
   C:/Qt/6.11.0/mingw_64/include/QtCore/qexceptionhandling.h \
@@ -58,12 +70,14 @@ C:/workspace/project2/build/Desktop_Qt_6_11_0_MinGW_64_bit-Debug/Client_autogen/
   C:/Qt/6.11.0/mingw_64/include/QtCore/qlatin1stringview.h \
   C:/Qt/6.11.0/mingw_64/include/QtCore/qline.h \
   C:/Qt/6.11.0/mingw_64/include/QtCore/qlist.h \
+  C:/Qt/6.11.0/mingw_64/include/QtCore/qlocale.h \
   C:/Qt/6.11.0/mingw_64/include/QtCore/qlogging.h \
   C:/Qt/6.11.0/mingw_64/include/QtCore/qmalloc.h \
   C:/Qt/6.11.0/mingw_64/include/QtCore/qmap.h \
   C:/Qt/6.11.0/mingw_64/include/QtCore/qmargins.h \
   C:/Qt/6.11.0/mingw_64/include/QtCore/qmath.h \
   C:/Qt/6.11.0/mingw_64/include/QtCore/qmetacontainer.h \
+  C:/Qt/6.11.0/mingw_64/include/QtCore/qmetaobject.h \
   C:/Qt/6.11.0/mingw_64/include/QtCore/qmetatype.h \
   C:/Qt/6.11.0/mingw_64/include/QtCore/qminmax.h \
   C:/Qt/6.11.0/mingw_64/include/QtCore/qnamespace.h \
@@ -162,20 +176,37 @@ C:/workspace/project2/build/Desktop_Qt_6_11_0_MinGW_64_bit-Debug/Client_autogen/
   C:/Qt/6.11.0/mingw_64/include/QtGui/qtransform.h \
   C:/Qt/6.11.0/mingw_64/include/QtGui/qwindowdefs.h \
   C:/Qt/6.11.0/mingw_64/include/QtGui/qwindowdefs_win.h \
+  C:/Qt/6.11.0/mingw_64/include/QtNetwork/QNetworkAccessManager \
+  C:/Qt/6.11.0/mingw_64/include/QtNetwork/QSslConfiguration \
+  C:/Qt/6.11.0/mingw_64/include/QtNetwork/QSslPreSharedKeyAuthenticator \
+  C:/Qt/6.11.0/mingw_64/include/QtNetwork/QTcpServer \
+  C:/Qt/6.11.0/mingw_64/include/QtNetwork/QTcpSocket \
+  C:/Qt/6.11.0/mingw_64/include/QtNetwork/qabstractsocket.h \
+  C:/Qt/6.11.0/mingw_64/include/QtNetwork/qhostaddress.h \
+  C:/Qt/6.11.0/mingw_64/include/QtNetwork/qhttpheaders.h \
+  C:/Qt/6.11.0/mingw_64/include/QtNetwork/qnetworkaccessmanager.h \
+  C:/Qt/6.11.0/mingw_64/include/QtNetwork/qnetworkrequest.h \
+  C:/Qt/6.11.0/mingw_64/include/QtNetwork/qssl.h \
+  C:/Qt/6.11.0/mingw_64/include/QtNetwork/qsslcertificate.h \
+  C:/Qt/6.11.0/mingw_64/include/QtNetwork/qsslconfiguration.h \
+  C:/Qt/6.11.0/mingw_64/include/QtNetwork/qsslerror.h \
+  C:/Qt/6.11.0/mingw_64/include/QtNetwork/qsslpresharedkeyauthenticator.h \
+  C:/Qt/6.11.0/mingw_64/include/QtNetwork/qsslsocket.h \
+  C:/Qt/6.11.0/mingw_64/include/QtNetwork/qtcpserver.h \
+  C:/Qt/6.11.0/mingw_64/include/QtNetwork/qtcpsocket.h \
+  C:/Qt/6.11.0/mingw_64/include/QtNetwork/qtnetwork-config.h \
+  C:/Qt/6.11.0/mingw_64/include/QtNetwork/qtnetworkexports.h \
+  C:/Qt/6.11.0/mingw_64/include/QtNetwork/qtnetworkglobal.h \
   C:/Qt/6.11.0/mingw_64/include/QtWidgets/QDialog \
-  C:/Qt/6.11.0/mingw_64/include/QtWidgets/QDialogButtonBox \
   C:/Qt/6.11.0/mingw_64/include/QtWidgets/QLabel \
   C:/Qt/6.11.0/mingw_64/include/QtWidgets/QLineEdit \
-  C:/Qt/6.11.0/mingw_64/include/QtWidgets/QVBoxLayout \
-  C:/Qt/6.11.0/mingw_64/include/QtWidgets/qboxlayout.h \
+  C:/Qt/6.11.0/mingw_64/include/QtWidgets/QPushButton \
+  C:/Qt/6.11.0/mingw_64/include/QtWidgets/qabstractbutton.h \
   C:/Qt/6.11.0/mingw_64/include/QtWidgets/qdialog.h \
-  C:/Qt/6.11.0/mingw_64/include/QtWidgets/qdialogbuttonbox.h \
   C:/Qt/6.11.0/mingw_64/include/QtWidgets/qframe.h \
-  C:/Qt/6.11.0/mingw_64/include/QtWidgets/qgridlayout.h \
   C:/Qt/6.11.0/mingw_64/include/QtWidgets/qlabel.h \
-  C:/Qt/6.11.0/mingw_64/include/QtWidgets/qlayout.h \
-  C:/Qt/6.11.0/mingw_64/include/QtWidgets/qlayoutitem.h \
   C:/Qt/6.11.0/mingw_64/include/QtWidgets/qlineedit.h \
+  C:/Qt/6.11.0/mingw_64/include/QtWidgets/qpushbutton.h \
   C:/Qt/6.11.0/mingw_64/include/QtWidgets/qsizepolicy.h \
   C:/Qt/6.11.0/mingw_64/include/QtWidgets/qtwidgets-config.h \
   C:/Qt/6.11.0/mingw_64/include/QtWidgets/qtwidgetsexports.h \
@@ -393,4 +424,5 @@ C:/workspace/project2/build/Desktop_Qt_6_11_0_MinGW_64_bit-Debug/Client_autogen/
   C:/Qt/Tools/mingw1310_64/x86_64-w64-mingw32/include/sys/types.h \
   C:/Qt/Tools/mingw1310_64/x86_64-w64-mingw32/include/time.h \
   C:/Qt/Tools/mingw1310_64/x86_64-w64-mingw32/include/vadefs.h \
-  C:/Qt/Tools/mingw1310_64/x86_64-w64-mingw32/include/wchar.h
+  C:/Qt/Tools/mingw1310_64/x86_64-w64-mingw32/include/wchar.h \
+  C:/workspace/project2/GoogleAuthManager.h
