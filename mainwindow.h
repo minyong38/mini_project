@@ -40,13 +40,14 @@ private slots:
     void onUserChanged(int index);
     void onError(QAbstractSocket::SocketError socketError);
     void reconnect();
+    void startReconnectTimer();
+    void stopReconnectTimer();
 
     void onDialogAdd(const QString& content);
     void onDialogEdit(qint64 rowid, const QString& newContent);
     void onDialogDelete(qint64 rowid);
 
     void onChatBtnClicked();
-    void onChatMessageSent(const QString& message);
 
 private:
     void requestSchedules(const QDate& date);
@@ -71,10 +72,7 @@ private:
     QMap<QDate, QStringList> m_monthSchedules;
 
     ScheduleDialog*  m_activeDialog = nullptr;
-    ChatDialog*      m_chatDialog   = nullptr;
     QString          m_buffer;
-
-    int              m_unreadCount  = 0;
 
     QStringList      m_onlineUsers;
     QStringList      m_allKnownUsers;
@@ -103,7 +101,9 @@ private:
     QMenu*           m_trayMenu   = nullptr;
 
     QPushButton*     m_themeBtn   = nullptr;
-    bool             m_darkMode   = false;
+    bool             m_darkMode        = false;
+    QTimer*          m_reconnectTimer  = nullptr;
+    int              m_reconnectSecs   = 5;
 
     WeatherManager*  m_weather    = nullptr;
 
@@ -111,9 +111,9 @@ private:
     QMap<QString, int>         m_dmUnreadCounts;
     QString                    m_pendingDmPeer;
 
-    bool          m_groupChatLoaded = false;
     QSet<QString> m_dmLoaded;
     QString       m_lastNotifPeer;
+    int           m_lastNotifCalId = -1;
 
     // 공유 캘린더 상태
     int                                     m_activeCalId    = -1;

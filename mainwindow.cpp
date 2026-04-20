@@ -85,6 +85,9 @@ MainWindow::MainWindow(const QString& ip, const QString& myId, QWidget *parent)
     // cardLayout 에 탭 위젯 추가 (calendarWidget은 이미 reparent됨)
     ui->cardLayout->addWidget(m_calTabWidget);
 
+    // 초기 상태: 내 캘린더 탭 → 채팅 버튼 숨김
+    ui->chatBtn->setVisible(false);
+
     m_calTabWidget->setTabsClosable(true);
     // 개인 탭은 닫기 버튼 제거 (나중에 공유탭도 동일하게 처리)
     m_calTabWidget->tabBar()->setTabButton(0, QTabBar::RightSide, nullptr);
@@ -157,9 +160,6 @@ MainWindow::MainWindow(const QString& ip, const QString& myId, QWidget *parent)
         }
     });
 
-    // 채팅 다이얼로그 미리 생성
-    m_chatDialog = new ChatDialog(m_myId, this);
-    connect(m_chatDialog, &ChatDialog::messageSent, this, &MainWindow::onChatMessageSent);
     connect(ui->chatBtn, &QPushButton::clicked, this, &MainWindow::onChatBtnClicked);
 
     // 다크모드 토글 버튼 (navBar에 삽입)
@@ -200,6 +200,10 @@ MainWindow::MainWindow(const QString& ip, const QString& myId, QWidget *parent)
     connect(m_socket, &QTcpSocket::connected,     this, &MainWindow::onConnectSuccess);
     connect(m_socket, &QTcpSocket::readyRead,     this, &MainWindow::onReadyRead);
     connect(m_socket, &QTcpSocket::errorOccurred, this, &MainWindow::onError);
+    connect(m_socket, &QTcpSocket::disconnected,  this, [this]() {
+        if (!m_reconnectTimer || !m_reconnectTimer->isActive())
+            startReconnectTimer();
+    });
 
     m_socket->connectToHost(m_serverIp, Protocol::PORT);
 }
@@ -211,7 +215,8 @@ MainWindow::~MainWindow() { delete ui; }
 // ──────────────────────────────────────────────
 
 void MainWindow::onConnectSuccess() {
-    // 접속 후 먼저 로그인
+    stopReconnectTimer();
+    setWindowTitle("캘린더 — " + m_myId);
     m_socket->write((Protocol::LOGIN + Protocol::SEP + m_myId + "\n").toUtf8());
 }
 
@@ -344,65 +349,6 @@ void MainWindow::processMessage(const QString& data) {
         }
     }
 
-    // ── 채팅 기록 (기존 메시지) ──────────────────────────────
-    else if (data.startsWith(Protocol::RESCHAT + Protocol::SEP)) {
-        // RESCHAT:ROWID:UNREAD:USER_ID:HHmm:MSG|...
-        m_chatDialog->clearMessages();
-        QString payload = data.mid(Protocol::RESCHAT.length() + Protocol::SEP.length());
-        if (!payload.isEmpty()) {
-            for (const QString& entry : payload.split("|")) {
-                QStringList p = entry.split(Protocol::SEP);
-                if (p.size() < 5) continue;
-                qint64  rowid  = p[0].toLongLong();
-                int     unread = p[1].toInt();
-                QString uid    = p[2];
-                QString rawT   = p[3];
-                QString msg    = p.mid(4).join(Protocol::SEP);
-                QString time   = rawT.length() == 4 ? rawT.left(2) + ":" + rawT.right(2) : "";
-                m_chatDialog->appendMessage(rowid, unread, uid, msg, time);
-            }
-        }
-    }
-
-    // ── 채팅 실시간 수신 ─────────────────────────────────────
-    else if (data.startsWith(Protocol::CHATRES + Protocol::SEP)) {
-        // CHATRES:ROWID:UNREAD:USER_ID:HHmm:MESSAGE
-        QString payload = data.mid(Protocol::CHATRES.length() + Protocol::SEP.length());
-        QStringList p = payload.split(Protocol::SEP);
-        if (p.size() >= 5) {
-            qint64  rowid  = p[0].toLongLong();
-            int     unread = p[1].toInt();
-            QString uid    = p[2];
-            QString rawT   = p[3];
-            QString msg    = p.mid(4).join(Protocol::SEP);
-            QString time   = rawT.length() == 4 ? rawT.left(2) + ":" + rawT.right(2) : "";
-
-            m_chatDialog->appendMessage(rowid, unread, uid, msg, time);
-
-            if (!m_chatDialog->isVisible()) {
-                m_unreadCount++;
-                updateChatBtnText();
-                updateTrayIcon();
-                if (m_trayIcon && !isActiveWindow()) {
-                    m_lastNotifPeer = "";  // 단체 채팅
-                    m_trayIcon->showMessage(
-                        uid + "님의 메시지",
-                        msg.startsWith("IMG:") ? "[이미지]" : msg,
-                        QSystemTrayIcon::NoIcon, 3000
-                    );
-                }
-            }
-        }
-    }
-
-    // ── 읽음 처리 실시간 업데이트 ────────────────────────────
-    else if (data.startsWith(Protocol::READRES + Protocol::SEP)) {
-        // READRES:ROWID:COUNT
-        QStringList p = data.split(Protocol::SEP);
-        if (p.size() >= 3)
-            m_chatDialog->updateUnread(p[1].toLongLong(), p[2].toInt());
-    }
-
     // ── 1:1 DM 기록 수신 ─────────────────────────────────────
     else if (data.startsWith(Protocol::RESDM + Protocol::SEP)) {
         // RESDM:sender:HHmm:msg|sender:HHmm:msg|...
@@ -461,7 +407,8 @@ void MainWindow::processMessage(const QString& data) {
             m_dmUnreadCounts[peer] = m_dmUnreadCounts.value(peer, 0) + 1;
             if (m_selectedId == peer) updateChatBtnText();
             if (m_trayIcon && !isActiveWindow()) {
-                m_lastNotifPeer = peer;  // DM 발신자
+                m_lastNotifPeer  = peer;
+                m_lastNotifCalId = -1;
                 m_trayIcon->showMessage(
                     sender + "님의 메시지",
                     msg.startsWith("IMG:") ? "[이미지]" : msg,
@@ -638,7 +585,8 @@ void MainWindow::processMessage(const QString& data) {
         if (!dlg->isVisible() && m_trayIcon && !isActiveWindow()) {
             QString calName;
             for (const auto& cal : m_sharedCals) if (cal.id == calId) { calName = cal.name; break; }
-            m_lastNotifPeer = "";   // 단체 채팅 알림으로 처리
+            m_lastNotifPeer  = "";
+            m_lastNotifCalId = calId;  // 공유 캘린더 알림으로 표시
             m_trayIcon->showMessage(
                 sender + " (" + calName + ")",
                 msg.startsWith("IMG:") ? "[이미지]" : msg,
@@ -660,26 +608,9 @@ void MainWindow::processMessage(const QString& data) {
 
 void MainWindow::onChatBtnClicked() {
     if (m_activeCalId != -1) {
-        // 공유 캘린더 탭 → 해당 캘린더 단톡방
         openSharedChat(m_activeCalId);
     } else if (m_selectedId != m_myId) {
-        // 친구 캘린더 탭 → 1:1 DM
         openDmChat(m_selectedId);
-    } else {
-        // 내 캘린더 탭 → 전체 단체 채팅
-        if (m_chatDialog->isVisible()) {
-            m_chatDialog->hide();
-        } else {
-            if (!m_groupChatLoaded && m_socket->state() == QAbstractSocket::ConnectedState) {
-                m_socket->write((Protocol::REQCHAT + Protocol::SEP + m_myId + "\n").toUtf8());
-                m_groupChatLoaded = true;
-            }
-            m_unreadCount = 0;
-            updateChatBtnText();
-            updateTrayIcon();
-            m_chatDialog->show();
-            m_chatDialog->raise();
-        }
     }
 }
 
@@ -717,25 +648,16 @@ void MainWindow::openDmChat(const QString& peerId) {
     }
 }
 
-void MainWindow::onChatMessageSent(const QString& message) {
-    if (m_socket->state() != QAbstractSocket::ConnectedState) return;
-    m_socket->write((Protocol::CHAT + Protocol::SEP + m_myId + Protocol::SEP + message + "\n").toUtf8());
-}
 
 void MainWindow::updateChatBtnText() {
     if (m_activeCalId != -1) {
         ui->chatBtn->setText("💬 공유 채팅");
-    } else if (m_selectedId != m_myId) {
+    } else {
         int dmUnread = m_dmUnreadCounts.value(m_selectedId, 0);
         if (dmUnread > 0)
             ui->chatBtn->setText(QString("💬 1:1 채팅 (%1)").arg(dmUnread));
         else
             ui->chatBtn->setText("💬 1:1 채팅");
-    } else {
-        if (m_unreadCount > 0)
-            ui->chatBtn->setText(QString("💬 채팅 (%1)").arg(m_unreadCount));
-        else
-            ui->chatBtn->setText("💬 채팅");
     }
 }
 
@@ -1316,7 +1238,6 @@ void MainWindow::applyTheme(bool dark)
     updateFriendsList();  // 친구 버튼 색상 갱신
 
     ui->calendarWidget->setDarkMode(dark);
-    m_chatDialog->setDarkMode(dark);
     for (auto* dlg : m_dmDialogs)
         dlg->setDarkMode(dark);
     for (auto* dlg : m_sharedChatDialogs)
@@ -1372,19 +1293,10 @@ void MainWindow::setupTray() {
         activateWindow();
     });
 
-    auto* chatAction = new QAction("채팅 열기", this);
-    connect(chatAction, &QAction::triggered, this, [this]() {
-        showNormal();
-        raise();
-        activateWindow();
-        onChatBtnClicked();
-    });
-
     auto* quitAction = new QAction("종료", this);
     connect(quitAction, &QAction::triggered, qApp, &QApplication::quit);
 
     m_trayMenu->addAction(showAction);
-    m_trayMenu->addAction(chatAction);
     m_trayMenu->addSeparator();
     m_trayMenu->addAction(quitAction);
 
@@ -1410,21 +1322,10 @@ void MainWindow::setupTray() {
         raise();
         activateWindow();
 
-        if (m_lastNotifPeer.isEmpty()) {
-            // 단체 채팅 열기
-            if (!m_chatDialog->isVisible()) {
-                if (!m_groupChatLoaded && m_socket->state() == QAbstractSocket::ConnectedState) {
-                    m_socket->write((Protocol::REQCHAT + Protocol::SEP + m_myId + "\n").toUtf8());
-                    m_groupChatLoaded = true;
-                }
-                m_unreadCount = 0;
-                updateChatBtnText();
-                updateTrayIcon();
-                m_chatDialog->show();
-                m_chatDialog->raise();
-            }
-        } else {
-            // 1:1 DM 열기
+        if (m_lastNotifCalId != -1) {
+            openSharedChat(m_lastNotifCalId);
+            m_lastNotifCalId = -1;
+        } else if (!m_lastNotifPeer.isEmpty()) {
             openDmChat(m_lastNotifPeer);
         }
     });
@@ -1434,12 +1335,8 @@ void MainWindow::setupTray() {
 
 void MainWindow::updateTrayIcon() {
     if (!m_trayIcon) return;
-    int today = QDate::currentDate().day();
-    m_trayIcon->setIcon(makeCalendarIcon(today, m_unreadCount));
-    if (m_unreadCount > 0)
-        m_trayIcon->setToolTip(QString("캘린더 — %1  |  미읽음 %2").arg(m_myId).arg(m_unreadCount));
-    else
-        m_trayIcon->setToolTip("캘린더 — " + m_myId);
+    m_trayIcon->setIcon(makeCalendarIcon(QDate::currentDate().day()));
+    m_trayIcon->setToolTip("캘린더 — " + m_myId);
 }
 
 void MainWindow::closeEvent(QCloseEvent* event) {
@@ -1456,16 +1353,33 @@ void MainWindow::closeEvent(QCloseEvent* event) {
     }
 }
 
-void MainWindow::onError(QAbstractSocket::SocketError) {
-    auto reply = QMessageBox::critical(
-        this, "연결 오류",
-        "서버와 연결할 수 없습니다.\n" + m_socket->errorString() +
-            "\n\nServer.exe가 실행 중인지 확인 후 재시도하세요.",
-        QMessageBox::Retry | QMessageBox::Cancel);
-    if (reply == QMessageBox::Retry) reconnect();
+void MainWindow::onError(QAbstractSocket::SocketError err) {
+    // RemoteHostClosed는 정상 종료 — 재연결 시도
+    // 이미 재연결 타이머가 돌고 있으면 무시
+    if (m_reconnectTimer && m_reconnectTimer->isActive()) return;
+    startReconnectTimer();
 }
 
 void MainWindow::reconnect() {
     m_socket->abort();
+    setWindowTitle(QString("캘린더 — %1  |  재연결 중...").arg(m_myId));
     m_socket->connectToHost(m_serverIp, Protocol::PORT);
+}
+
+void MainWindow::startReconnectTimer() {
+    if (!m_reconnectTimer) {
+        m_reconnectTimer = new QTimer(this);
+        m_reconnectTimer->setInterval(5000);
+        connect(m_reconnectTimer, &QTimer::timeout, this, [this]() {
+            if (m_socket->state() == QAbstractSocket::UnconnectedState)
+                reconnect();
+        });
+    }
+    reconnect();                // 즉시 한 번 시도
+    m_reconnectTimer->start();
+}
+
+void MainWindow::stopReconnectTimer() {
+    if (m_reconnectTimer) m_reconnectTimer->stop();
+    m_reconnectSecs = 5;
 }
