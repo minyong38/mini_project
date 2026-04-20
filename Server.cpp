@@ -438,6 +438,27 @@ void ScheduleServer::handleRequest(QTcpSocket* socket, const QString& data) {
                        + entries.join("|") + "\n").toUtf8());
     }
 
+    // ── 공유 캘린더 삭제 ─────────────────────────────────────
+    else if (cmd == Protocol::DELCAL && parts.size() >= 2) {
+        int calId = parts[1].toInt();
+
+        // 삭제 전에 모든 온라인 클라이언트에게 알림 (멤버 기록이 지워지기 전에 전송)
+        QString notif = Protocol::CALREMOVED + Protocol::SEP + QString::number(calId) + "\n";
+        for (QTcpSocket* s : m_clients)
+            if (s && s->state() == QAbstractSocket::ConnectedState)
+                s->write(notif.toUtf8());
+
+        QSqlQuery q;
+        q.prepare("DELETE FROM shared_calendars WHERE ID=?");
+        q.addBindValue(calId); q.exec();
+        q.prepare("DELETE FROM shared_members WHERE CAL_ID=?");
+        q.addBindValue(calId); q.exec();
+        q.prepare("DELETE FROM shared_schedules WHERE CAL_ID=?");
+        q.addBindValue(calId); q.exec();
+        q.prepare("DELETE FROM shared_chats WHERE CAL_ID=?");
+        q.addBindValue(calId); q.exec();
+    }
+
     // ── 공유 채팅 전송 ────────────────────────────────────────
     else if (cmd == Protocol::SHCHAT && parts.size() >= 4) {
         int     calId   = parts[1].toInt();

@@ -127,6 +127,15 @@ private:
     QDate           m_pendingShDate;
     bool            m_pendingShModal  = false;
     ScheduleDialog* m_activeShDialog  = nullptr;
+
+    // 친구 캘린더 탭
+    QMap<QString, CustomCalendarWidget*>        m_friendCalWidgets;
+    QMap<QString, QMap<QDate, QStringList>>     m_friendMonthSchedules;
+    QString                                     m_pendingMonthUserId;
+    void openFriendTab(const QString& friendId);
+
+    // 클릭 가능한 친구 목록 레이아웃
+    QHBoxLayout* m_friendsLayout = nullptr;
 };
 
 #endif
