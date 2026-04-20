@@ -1,0 +1,176 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ui version="4.0">
+ <class>ScheduleDialog</class>
+ <widget class="QDialog" name="ScheduleDialog">
+  <property name="geometry">
+   <rect>
+    <x>0</x>
+    <y>0</y>
+    <width>400</width>
+    <height>480</height>
+   </rect>
+  </property>
+  <property name="windowTitle">
+   <string>일정</string>
+  </property>
+  <property name="styleSheet">
+   <string>QDialog { background: transparent; }</string>
+  </property>
+  <layout class="QVBoxLayout" name="outerLayout">
+   <property name="spacing">
+    <number>0</number>
+   </property>
+   <property name="leftMargin"><number>0</number></property>
+   <property name="topMargin"><number>0</number></property>
+   <property name="rightMargin"><number>0</number></property>
+   <property name="bottomMargin"><number>0</number></property>
+   <item>
+    <widget class="QFrame" name="card">
+     <property name="styleSheet">
+      <string>QFrame#card { background-color: #FFFFFF; border-radius: 16px; border: none; }</string>
+     </property>
+     <layout class="QVBoxLayout" name="cardLayout">
+      <property name="spacing"><number>0</number></property>
+      <property name="leftMargin"><number>0</number></property>
+      <property name="topMargin"><number>0</number></property>
+      <property name="rightMargin"><number>0</number></property>
+      <property name="bottomMargin"><number>0</number></property>
+
+      <!-- 헤더 -->
+      <item>
+       <widget class="QFrame" name="headerFrame">
+        <property name="minimumSize"><size><width>0</width><height>64</height></size></property>
+        <property name="maximumSize"><size><width>16777215</width><height>64</height></size></property>
+        <property name="styleSheet">
+         <string>QFrame#headerFrame { background: #FFFFFF; border-top-left-radius: 16px; border-top-right-radius: 16px; border-bottom: 1px solid #F2F2F7; }</string>
+        </property>
+        <layout class="QHBoxLayout" name="headerLayout">
+         <property name="leftMargin"><number>20</number></property>
+         <property name="rightMargin"><number>12</number></property>
+         <property name="topMargin"><number>0</number></property>
+         <property name="bottomMargin"><number>0</number></property>
+         <item>
+          <widget class="QLabel" name="dateLabel">
+           <property name="text"><string>날짜</string></property>
+           <property name="styleSheet">
+            <string>QLabel { font-size: 20px; font-weight: bold; color: #000000; background: transparent; border: none; }</string>
+           </property>
+          </widget>
+         </item>
+         <item>
+          <spacer name="headerSpacer">
+           <property name="orientation"><enum>Qt::Horizontal</enum></property>
+           <property name="sizeHint" stdset="0"><size><width>40</width><height>20</height></size></property>
+          </spacer>
+         </item>
+         <item>
+          <widget class="QPushButton" name="closeBtn">
+           <property name="text"><string>✕</string></property>
+           <property name="minimumSize"><size><width>32</width><height>32</height></size></property>
+           <property name="maximumSize"><size><width>32</width><height>32</height></size></property>
+           <property name="styleSheet">
+            <string>QPushButton { background-color: #F2F2F7; color: #8E8E93; border: none; border-radius: 16px; font-size: 14px; font-weight: bold; } QPushButton:hover { background-color: #E5E5EA; }</string>
+           </property>
+          </widget>
+         </item>
+        </layout>
+       </widget>
+      </item>
+
+      <!-- 본문: 빈 상태 라벨 + 리스트 (코드에서 show/hide) -->
+      <item>
+       <widget class="QLabel" name="emptyLabel">
+        <property name="text"><string>일정이 없습니다</string></property>
+        <property name="alignment"><set>Qt::AlignCenter</set></property>
+        <property name="styleSheet">
+         <string>QLabel { font-size: 15px; color: #C7C7CC; background: transparent; border: none; padding: 40px 0; }</string>
+        </property>
+       </widget>
+      </item>
+      <item>
+       <widget class="QListWidget" name="listWidget">
+        <property name="styleSheet">
+         <string>
+QListWidget {
+    border: none;
+    background: transparent;
+    outline: none;
+    font-size: 15px;
+    color: #000000;
+}
+QListWidget::item {
+    padding: 10px 20px;
+    border-bottom: 1px solid #F2F2F7;
+    min-height: 44px;
+}
+QListWidget::item:selected {
+    background-color: #E5F0FF;
+    color: #007AFF;
+}
+QListWidget::item:hover:!selected {
+    background-color: #F9F9F9;
+}
+         </string>
+        </property>
+       </widget>
+      </item>
+
+      <!-- 하단 버튼 -->
+      <item>
+       <widget class="QFrame" name="footerFrame">
+        <property name="minimumSize"><size><width>0</width><height>64</height></size></property>
+        <property name="maximumSize"><size><width>16777215</width><height>64</height></size></property>
+        <property name="styleSheet">
+         <string>QFrame#footerFrame { background: #FFFFFF; border-top: 1px solid #F2F2F7; border-bottom-left-radius: 16px; border-bottom-right-radius: 16px; }</string>
+        </property>
+        <layout class="QHBoxLayout" name="footerLayout">
+         <property name="leftMargin"><number>16</number></property>
+         <property name="rightMargin"><number>16</number></property>
+         <property name="topMargin"><number>0</number></property>
+         <property name="bottomMargin"><number>0</number></property>
+         <property name="spacing"><number>8</number></property>
+         <item>
+          <widget class="QPushButton" name="addBtn">
+           <property name="text"><string>+ 추가</string></property>
+           <property name="minimumSize"><size><width>80</width><height>38</height></size></property>
+           <property name="styleSheet">
+            <string>QPushButton { background-color: #007AFF; color: white; border: none; border-radius: 19px; font-size: 14px; font-weight: 600; padding: 0 18px; } QPushButton:hover { background-color: #0066D6; } QPushButton:pressed { background-color: #0055B3; }</string>
+           </property>
+          </widget>
+         </item>
+         <item>
+          <spacer name="footerSpacer">
+           <property name="orientation"><enum>Qt::Horizontal</enum></property>
+           <property name="sizeHint" stdset="0"><size><width>40</width><height>20</height></size></property>
+          </spacer>
+         </item>
+         <item>
+          <widget class="QPushButton" name="editBtn">
+           <property name="text"><string>수정</string></property>
+           <property name="minimumSize"><size><width>72</width><height>38</height></size></property>
+           <property name="styleSheet">
+            <string>QPushButton { background-color: transparent; color: #007AFF; border: 1.5px solid #007AFF; border-radius: 19px; font-size: 14px; font-weight: 500; padding: 0 16px; } QPushButton:hover { background-color: #E5F0FF; } QPushButton:disabled { color: #C7C7CC; border-color: #C7C7CC; }</string>
+           </property>
+          </widget>
+         </item>
+         <item>
+          <widget class="QPushButton" name="deleteBtn">
+           <property name="text"><string>삭제</string></property>
+           <property name="minimumSize"><size><width>72</width><height>38</height></size></property>
+           <property name="styleSheet">
+            <string>QPushButton { background-color: transparent; color: #FF3B30; border: 1.5px solid #FF3B30; border-radius: 19px; font-size: 14px; font-weight: 500; padding: 0 16px; } QPushButton:hover { background-color: #FFF0EF; } QPushButton:disabled { color: #C7C7CC; border-color: #C7C7CC; }</string>
+           </property>
+          </widget>
+         </item>
+        </layout>
+       </widget>
+      </item>
+
+     </layout>
+    </widget>
+   </item>
+  </layout>
+ </widget>
+ <resources/>
+ <connections/>
+</ui>

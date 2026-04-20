@@ -1,0 +1,234 @@
+#include "Server.h"
+#include "Common.h"
+#include <QSqlError>
+#include <QTime>
+#include <QDebug>
+
+ScheduleServer::ScheduleServer(QObject *parent) : QTcpServer(parent) {
+    initDatabase();
+}
+
+void ScheduleServer::initDatabase() {
+    m_db = QSqlDatabase::addDatabase("QSQLITE");
+    m_db.setDatabaseName("schedule.db");
+    if (!m_db.open()) { qCritical() << "DB Error:" << m_db.lastError().text(); return; }
+
+    QSqlQuery q;
+    q.exec("CREATE TABLE IF NOT EXISTS schedules (USER_ID TEXT, DATE TEXT, CONTENT TEXT)");
+    q.exec("CREATE TABLE IF NOT EXISTS chats (USER_ID TEXT, MESSAGE TEXT, SEND_TIME TEXT)");
+    q.exec("ALTER TABLE chats ADD COLUMN SEND_TIME TEXT DEFAULT ''"); // 기존 테이블 마이그레이션
+    qDebug() << "Database initialized.";
+}
+
+bool ScheduleServer::startServer() {
+    connect(this, &QTcpServer::newConnection, this, &ScheduleServer::onNewConnection);
+    bool ok = listen(QHostAddress::Any, Protocol::PORT);
+    if (ok) qDebug() << "Server started on port" << Protocol::PORT;
+    return ok;
+}
+
+void ScheduleServer::onNewConnection() {
+    while (hasPendingConnections()) {
+        QTcpSocket* s = nextPendingConnection();
+        connect(s, &QTcpSocket::readyRead,    this, &ScheduleServer::onReadyRead);
+        connect(s, &QTcpSocket::disconnected, this, &ScheduleServer::onDisconnected);
+        m_clients.append(s);
+        qDebug() << "New connection:" << s->peerAddress().toString();
+    }
+}
+
+void ScheduleServer::onReadyRead() {
+    QTcpSocket* socket = qobject_cast<QTcpSocket*>(sender());
+    if (!socket) return;
+    m_buffers[socket] += QString::fromUtf8(socket->readAll());
+    while (m_buffers[socket].contains('\n')) {
+        int idx = m_buffers[socket].indexOf('\n');
+        QString line = m_buffers[socket].left(idx).trimmed();
+        m_buffers[socket] = m_buffers[socket].mid(idx + 1);
+        if (!line.isEmpty()) handleRequest(socket, line);
+    }
+}
+
+void ScheduleServer::handleRequest(QTcpSocket* socket, const QString& data) {
+    QStringList parts = data.split(Protocol::SEP);
+    if (parts.isEmpty()) return;
+    const QString cmd = parts[0];
+
+    // ── 로그인 ──────────────────────────────────────────────────
+    if (cmd == Protocol::LOGIN && parts.size() >= 2) {
+        QString userId = parts[1];
+        if (m_clientIds.values().contains(userId)) {
+            socket->write((Protocol::LOGIN_REJECT + "\n").toUtf8());
+            return;
+        }
+        m_clientIds[socket] = userId;
+        socket->write((Protocol::LOGIN_OK + "\n").toUtf8());
+        broadcastOnlineList();
+    }
+
+    // ── 일정 조회 ────────────────────────────────────────────────
+    else if (cmd == Protocol::REQ && parts.size() >= 3) {
+        QSqlQuery q;
+        q.prepare("SELECT rowid, CONTENT FROM schedules WHERE USER_ID=? AND DATE=?");
+        q.addBindValue(parts[1]); q.addBindValue(parts[2]);
+        if (q.exec()) {
+            QStringList res;
+            while (q.next()) res << q.value(0).toString() + Protocol::SEP + q.value(1).toString();
+            socket->write((Protocol::RES + Protocol::SEP + res.join("|") + "\n").toUtf8());
+        }
+    }
+
+    // ── 일정 추가 ────────────────────────────────────────────────
+    else if (cmd == Protocol::ADD && parts.size() >= 4) {
+        QSqlQuery q;
+        q.prepare("INSERT INTO schedules (USER_ID,DATE,CONTENT) VALUES(?,?,?)");
+        q.addBindValue(parts[1]); q.addBindValue(parts[2]);
+        q.addBindValue(parts.mid(3).join(Protocol::SEP));
+        socket->write(q.exec()
+            ? (Protocol::ACK + ":OK\n").toUtf8()
+            : (Protocol::ACK + ":ERR\n").toUtf8());
+    }
+
+    // ── 일정 삭제 ────────────────────────────────────────────────
+    else if (cmd == Protocol::DEL && parts.size() >= 2) {
+        QSqlQuery q;
+        q.prepare("DELETE FROM schedules WHERE rowid=?");
+        q.addBindValue(parts[1].toLongLong());
+        socket->write(q.exec()
+            ? (Protocol::ACK + ":OK\n").toUtf8()
+            : (Protocol::ACK + ":ERR\n").toUtf8());
+    }
+
+    // ── 일정 수정 ────────────────────────────────────────────────
+    else if (cmd == Protocol::MOD && parts.size() >= 3) {
+        QSqlQuery q;
+        q.prepare("UPDATE schedules SET CONTENT=? WHERE rowid=?");
+        q.addBindValue(parts.mid(2).join(Protocol::SEP));
+        q.addBindValue(parts[1].toLongLong());
+        socket->write(q.exec()
+            ? (Protocol::ACK + ":OK\n").toUtf8()
+            : (Protocol::ACK + ":ERR\n").toUtf8());
+    }
+
+    // ── 월별 조회 ────────────────────────────────────────────────
+    else if (cmd == Protocol::REQMONTH && parts.size() >= 3) {
+        QSqlQuery q;
+        q.prepare("SELECT rowid,DATE,CONTENT FROM schedules WHERE USER_ID=? AND DATE LIKE ?");
+        q.addBindValue(parts[1]); q.addBindValue(parts[2] + "%");
+        if (q.exec()) {
+            QStringList res;
+            while (q.next())
+                res << q.value(1).toString() + "@" + q.value(0).toString() + "@" + q.value(2).toString();
+            socket->write((Protocol::RESMONTH + Protocol::SEP + res.join("|") + "\n").toUtf8());
+        }
+    }
+
+    // ── 유저 목록 ────────────────────────────────────────────────
+    else if (cmd == Protocol::REQUSERS) {
+        QSqlQuery q;
+        q.exec("SELECT DISTINCT USER_ID FROM schedules ORDER BY USER_ID");
+        QStringList users;
+        while (q.next()) users << q.value(0).toString();
+        socket->write((Protocol::RESUSERS + Protocol::SEP + users.join("|") + "\n").toUtf8());
+    }
+
+    // ── 채팅 전송 ────────────────────────────────────────────────
+    else if (cmd == Protocol::CHAT && parts.size() >= 3) {
+        QString userId  = parts[1];
+        QString message = parts.mid(2).join(Protocol::SEP);
+        QString timeStr = QTime::currentTime().toString("HHmm");
+
+        QSqlQuery q;
+        q.prepare("INSERT INTO chats (USER_ID,MESSAGE,SEND_TIME) VALUES(?,?,?)");
+        q.addBindValue(userId); q.addBindValue(message); q.addBindValue(timeStr);
+        if (!q.exec()) return;
+
+        qint64 rowid = q.lastInsertId().toLongLong();
+
+        // 전송자 제외 온라인 사용자 수 = 미읽음 초기값
+        int unread = qMax(0, m_clientIds.size() - 1);
+        m_unreadCount[rowid]      = unread;
+        m_lastReadRowid[userId]   = rowid; // 전송자는 자신의 메시지를 이미 읽음
+
+        broadcastChat(rowid, unread, userId, timeStr, message);
+    }
+
+    // ── 채팅 기록 요청 ───────────────────────────────────────────
+    else if (cmd == Protocol::REQCHAT && parts.size() >= 2) {
+        QString userId = parts[1];
+
+        // 1) 먼저 이 유저의 미읽음 카운트 차감 (차감 후 RESCHAT을 보내야 최신 카운트가 반영됨)
+        qint64 lastRead = m_lastReadRowid.value(userId, -1);
+        for (auto it = m_unreadCount.begin(); it != m_unreadCount.end(); ++it) {
+            if (it.key() > lastRead && it.value() > 0) {
+                it.value() = qMax(0, it.value() - 1);
+                broadcastReadRes(it.key(), it.value(), socket); // 다른 클라이언트에게 알림
+            }
+        }
+
+        // 2) 최근 50개 채팅 기록 (차감된 카운트 기준)
+        QSqlQuery q;
+        q.exec("SELECT rowid,USER_ID,MESSAGE,SEND_TIME "
+               "FROM (SELECT rowid,USER_ID,MESSAGE,SEND_TIME FROM chats ORDER BY rowid DESC LIMIT 50) "
+               "ORDER BY rowid ASC");
+        QStringList entries;
+        qint64 maxRowid = -1;
+        while (q.next()) {
+            qint64  rid   = q.value(0).toLongLong();
+            QString uid   = q.value(1).toString();
+            QString msg   = q.value(2).toString();
+            QString time  = q.value(3).toString();
+            int     unread = m_unreadCount.value(rid, 0);
+            entries << QString::number(rid) + Protocol::SEP
+                     + QString::number(unread) + Protocol::SEP
+                     + uid + Protocol::SEP + time + Protocol::SEP + msg;
+            maxRowid = qMax(maxRowid, rid);
+        }
+        socket->write((Protocol::RESCHAT + Protocol::SEP + entries.join("|") + "\n").toUtf8());
+
+        // 3) lastRead 갱신
+        if (maxRowid > lastRead)
+            m_lastReadRowid[userId] = maxRowid;
+    }
+}
+
+void ScheduleServer::broadcastChat(qint64 rowid, int unread, const QString& userId,
+                                    const QString& timeStr, const QString& message)
+{
+    QString msg = Protocol::CHATRES + Protocol::SEP
+                + QString::number(rowid) + Protocol::SEP
+                + QString::number(unread) + Protocol::SEP
+                + userId + Protocol::SEP
+                + timeStr + Protocol::SEP
+                + message + "\n";
+    for (QTcpSocket* s : m_clients)
+        if (s && s->state() == QAbstractSocket::ConnectedState)
+            s->write(msg.toUtf8());
+}
+
+void ScheduleServer::broadcastReadRes(qint64 rowid, int count, QTcpSocket* exclude) {
+    QString msg = Protocol::READRES + Protocol::SEP
+                + QString::number(rowid) + Protocol::SEP
+                + QString::number(count) + "\n";
+    for (QTcpSocket* s : m_clients)
+        if (s != exclude && s && s->state() == QAbstractSocket::ConnectedState)
+            s->write(msg.toUtf8());
+}
+
+void ScheduleServer::broadcastOnlineList() {
+    QString msg = Protocol::ONLINE + Protocol::SEP + m_clientIds.values().join("|") + "\n";
+    for (QTcpSocket* s : m_clients)
+        if (s && s->state() == QAbstractSocket::ConnectedState)
+            s->write(msg.toUtf8());
+}
+
+void ScheduleServer::onDisconnected() {
+    QTcpSocket* socket = qobject_cast<QTcpSocket*>(sender());
+    if (!socket) return;
+    qDebug() << "Disconnected:" << m_clientIds.value(socket, "unknown");
+    m_buffers.remove(socket);
+    m_clients.removeAll(socket);
+    m_clientIds.remove(socket);
+    broadcastOnlineList();
+    socket->deleteLater();
+}
