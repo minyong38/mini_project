@@ -2,6 +2,7 @@
 #include "ui_mainwindow.h"
 #include "Common.h"
 #include "SharedCalDialog.h"
+#include "MyPageDialog.h"
 #include <QMessageBox>
 #include <QFrame>
 #include <QHBoxLayout>
@@ -147,7 +148,8 @@ MainWindow::MainWindow(const QString& ip, const QString& myId,
         }
     });
 
-    connect(ui->chatBtn, &QPushButton::clicked, this, &MainWindow::onChatBtnClicked);
+    connect(ui->chatBtn,   &QPushButton::clicked, this, &MainWindow::onChatBtnClicked);
+    connect(ui->myPageBtn, &QPushButton::clicked, this, &MainWindow::onMyPageBtnClicked);
 
     // 다크모드 토글 버튼 (navBar에 삽입)
     m_themeBtn = new QPushButton("🌙", this);
@@ -260,21 +262,34 @@ void MainWindow::processMessage(const QString& data) {
         requestMonthSchedules(ui->calendarWidget->yearShown(),
                               ui->calendarWidget->monthShown());
         requestSharedCals();
+        m_socket->write((Protocol::NICK_REQ    + Protocol::SEP + m_myId + "\n").toUtf8());
+        m_socket->write((Protocol::PROFILE_REQ + Protocol::SEP + m_myId + "\n").toUtf8());
     }
 
     else if (data.startsWith(Protocol::PROFILE_RES + Protocol::SEP)) {
         QStringList p = data.split(Protocol::SEP);
-        if (p.size() >= 3) {
+        if (p.size() >= 2) {
             QString userId = p[1];
-            QString base64 = p.mid(2).join(Protocol::SEP);
-            QByteArray bytes = QByteArray::fromBase64(base64.toLatin1());
-            QPixmap pix;
-            pix.loadFromData(bytes, "JPEG");
-            if (!pix.isNull()) {
-                m_profileCache[userId] = circularPixmap(pix, 36);
-                updateFriendsList();
+            QString base64 = p.size() >= 3 ? p.mid(2).join(Protocol::SEP) : QString();
+            if (base64.isEmpty()) {
+                m_profileCache.remove(userId);
+            } else {
+                QByteArray bytes = QByteArray::fromBase64(base64.toLatin1());
+                QPixmap pix;
+                pix.loadFromData(bytes, "JPEG");
+                if (!pix.isNull())
+                    m_profileCache[userId] = circularPixmap(pix, 36);
             }
+            updateFriendsList();
         }
+    }
+    else if (data.startsWith(Protocol::NICK_RES + Protocol::SEP)) {
+        QStringList p = data.split(Protocol::SEP);
+        if (p.size() >= 3 && p[1] == m_myId)
+            m_nickname = p.mid(2).join(Protocol::SEP);
+    }
+    else if (data.startsWith(Protocol::NICK_OK + Protocol::SEP)) {
+        m_nickname = data.mid(Protocol::NICK_OK.length() + 1);
     }
     else if (data == Protocol::LOGIN_FAIL) {
         QMessageBox::critical(this, "로그인 실패",
@@ -625,6 +640,47 @@ void MainWindow::onChatBtnClicked() {
         openSharedChat(m_activeCalId);
     } else if (m_selectedId != m_myId) {
         openDmChat(m_selectedId);
+    }
+}
+
+void MainWindow::onMyPageBtnClicked() {
+    QPixmap currentPhoto;
+    if (m_profileCache.contains(m_myId))
+        currentPhoto = m_profileCache[m_myId];
+
+    QString nickname = m_nickname.isEmpty() ? m_myId : m_nickname;
+    MyPageDialog dlg(m_myId, currentPhoto, nickname, this);
+
+    if (dlg.exec() != QDialog::Accepted) return;
+
+    // 닉네임 변경
+    QString newNick = dlg.newNickname();
+    if (newNick != nickname && !newNick.isEmpty()) {
+        m_socket->write((Protocol::NICK_UPDATE + Protocol::SEP
+                         + m_myId + Protocol::SEP + newNick + "\n").toUtf8());
+    }
+
+    // 프로필 사진 삭제
+    if (dlg.photoDeleted()) {
+        m_profileCache.remove(m_myId);
+        m_socket->write((Protocol::PROFILE_DELETE + Protocol::SEP + m_myId + "\n").toUtf8());
+        updateFriendsList();
+        return;
+    }
+
+    // 프로필 사진 변경
+    if (dlg.photoChanged()) {
+        QPixmap pix = dlg.newPhoto();
+        QByteArray bytes;
+        QBuffer buf(&bytes);
+        buf.open(QIODevice::WriteOnly);
+        pix.scaled(256, 256, Qt::KeepAspectRatio, Qt::SmoothTransformation)
+           .save(&buf, "JPEG", 85);
+        QString b64 = QString::fromLatin1(bytes.toBase64());
+        m_socket->write((Protocol::PROFILE_UPLOAD + Protocol::SEP
+                         + m_myId + Protocol::SEP + b64 + "\n").toUtf8());
+        m_profileCache[m_myId] = circularPixmap(pix, 36);
+        updateFriendsList();
     }
 }
 

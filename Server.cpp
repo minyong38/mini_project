@@ -19,6 +19,8 @@ void ScheduleServer::initDatabase() {
            "(USER_ID TEXT PRIMARY KEY, PASSWORD TEXT)");
     q.exec("CREATE TABLE IF NOT EXISTS profiles "
            "(USER_ID TEXT PRIMARY KEY, PHOTO TEXT)");
+    q.exec("CREATE TABLE IF NOT EXISTS nicknames "
+           "(USER_ID TEXT PRIMARY KEY, NICKNAME TEXT)");
     q.exec("CREATE TABLE IF NOT EXISTS schedules (USER_ID TEXT, DATE TEXT, CONTENT TEXT)");
     q.exec("CREATE TABLE IF NOT EXISTS chats (USER_ID TEXT, MESSAGE TEXT, SEND_TIME TEXT)");
     q.exec("ALTER TABLE chats ADD COLUMN SEND_TIME TEXT DEFAULT ''"); // 기존 테이블 마이그레이션
@@ -76,9 +78,18 @@ void ScheduleServer::handleRequest(QTcpSocket* socket, const QString& data) {
         QSqlQuery q;
         q.prepare("INSERT OR REPLACE INTO profiles (USER_ID, PHOTO) VALUES(?,?)");
         q.addBindValue(userId); q.addBindValue(base64);
-        socket->write(q.exec()
-            ? (Protocol::PROFILE_OK + "\n").toUtf8()
-            : QString("PROFILE_ERR\n").toUtf8());
+        if (q.exec()) {
+            socket->write((Protocol::PROFILE_OK + "\n").toUtf8());
+            // 접속 중인 다른 클라이언트에 프로필 변경 브로드캐스트
+            QString broadcast = Protocol::PROFILE_RES + Protocol::SEP
+                                + userId + Protocol::SEP + base64 + "\n";
+            for (QTcpSocket* s : m_clients) {
+                if (s && s != socket && s->state() == QAbstractSocket::ConnectedState)
+                    s->write(broadcast.toUtf8());
+            }
+        } else {
+            socket->write(QString("PROFILE_ERR\n").toUtf8());
+        }
         return;
     }
 
@@ -93,6 +104,53 @@ void ScheduleServer::handleRequest(QTcpSocket* socket, const QString& data) {
             socket->write((Protocol::PROFILE_RES + Protocol::SEP
                            + userId + Protocol::SEP + q.value(0).toString() + "\n").toUtf8());
         }
+        return;
+    }
+
+    // ── 프로필 삭제 ──────────────────────────────────────────────
+    else if (cmd == Protocol::PROFILE_DELETE && parts.size() >= 2) {
+        QString userId = parts[1];
+        QSqlQuery q;
+        q.prepare("DELETE FROM profiles WHERE USER_ID=?");
+        q.addBindValue(userId);
+        if (q.exec()) {
+            socket->write((Protocol::PROFILE_OK + "\n").toUtf8());
+            // 삭제도 브로드캐스트 (빈 base64 = 사진 없음)
+            QString broadcast = Protocol::PROFILE_RES + Protocol::SEP
+                                + userId + Protocol::SEP + "\n";
+            for (QTcpSocket* s : m_clients) {
+                if (s && s != socket && s->state() == QAbstractSocket::ConnectedState)
+                    s->write(broadcast.toUtf8());
+            }
+        } else {
+            socket->write(QString("PROFILE_ERR\n").toUtf8());
+        }
+        return;
+    }
+
+    // ── 닉네임 업데이트 ──────────────────────────────────────────
+    else if (cmd == Protocol::NICK_UPDATE && parts.size() >= 3) {
+        QString userId   = parts[1];
+        QString nickname = parts.mid(2).join(Protocol::SEP);
+        QSqlQuery q;
+        q.prepare("INSERT OR REPLACE INTO nicknames (USER_ID, NICKNAME) VALUES(?,?)");
+        q.addBindValue(userId); q.addBindValue(nickname);
+        socket->write(q.exec()
+            ? (Protocol::NICK_OK + Protocol::SEP + nickname + "\n").toUtf8()
+            : QString("NICK_FAIL:서버 오류\n").toUtf8());
+        return;
+    }
+
+    // ── 닉네임 조회 ──────────────────────────────────────────────
+    else if (cmd == Protocol::NICK_REQ && parts.size() >= 2) {
+        QString userId = parts[1];
+        QSqlQuery q;
+        q.prepare("SELECT NICKNAME FROM nicknames WHERE USER_ID=?");
+        q.addBindValue(userId);
+        q.exec();
+        QString nick = q.next() ? q.value(0).toString() : userId;
+        socket->write((Protocol::NICK_RES + Protocol::SEP
+                       + userId + Protocol::SEP + nick + "\n").toUtf8());
         return;
     }
 

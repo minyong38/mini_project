@@ -101,6 +101,19 @@ namespace Protocol {
     inline const QString SHCHATRES  = "SHCHATRES";
     inline const QString DELCAL     = "DELCAL";      // DELCAL:calId
     inline const QString CALREMOVED = "CALREMOVED";  // CALREMOVED:calId (서버→전체)
+
+    // 닉네임
+    // NICK_UPDATE : NICK_UPDATE:userId:nickname
+    // NICK_OK     : NICK_OK:nickname
+    // NICK_REQ    : NICK_REQ:userId
+    // NICK_RES    : NICK_RES:userId:nickname
+    inline const QString NICK_UPDATE = "NICK_UPDATE";
+    inline const QString NICK_OK     = "NICK_OK";
+    inline const QString NICK_REQ    = "NICK_REQ";
+    inline const QString NICK_RES    = "NICK_RES";
+
+    // 프로필 사진 삭제
+    inline const QString PROFILE_DELETE = "PROFILE_DELETE";  // PROFILE_DELETE:userId
 }
 
 #endif

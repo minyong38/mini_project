@@ -16,6 +16,7 @@
 #include "CustomCalendarWidget.h"
 #include <QTabWidget>
 #include <QPixmap>
+#include "MyPageDialog.h"
 
 QT_BEGIN_NAMESPACE
 namespace Ui { class MainWindow; }
@@ -49,6 +50,7 @@ private slots:
     void onDialogDelete(qint64 rowid);
 
     void onChatBtnClicked();
+    void onMyPageBtnClicked();
 
 private:
     void requestSchedules(const QDate& date);
@@ -63,6 +65,7 @@ private:
 
     QString          m_myId;
     QString          m_password;
+    QString          m_nickname;
     QString          m_selectedId;
     QString          m_serverIp;
 

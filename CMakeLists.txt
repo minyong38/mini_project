@@ -45,6 +45,8 @@ add_executable(Client
     ChatDialog.cpp
     ChatDialog.h
     SharedCalDialog.h
+    MyPageDialog.cpp
+    MyPageDialog.h
     Common.h
     resources.qrc
 )
