@@ -38,7 +38,6 @@ private slots:
     void onConnectSuccess();
     void onReadyRead();
     void onDateClicked(const QDate& date);
-    void onUserChanged(int index);
     void onError(QAbstractSocket::SocketError socketError);
     void reconnect();
     void startReconnectTimer();

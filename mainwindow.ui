@@ -105,29 +105,6 @@
          </property>
         </widget>
        </item>
-       <item>
-        <widget class="QLabel" name="userPrefixLabel">
-         <property name="styleSheet">
-          <string>QLabel { font-size: 13px; color: #8E8E93; background: transparent; border: none; }</string>
-         </property>
-         <property name="text">
-          <string>친구목록:</string>
-         </property>
-        </widget>
-       </item>
-       <item>
-        <widget class="QComboBox" name="userCombo">
-         <property name="minimumSize">
-          <size>
-           <width>130</width>
-           <height>36</height>
-          </size>
-         </property>
-         <property name="styleSheet">
-          <string>QComboBox { padding: 4px 12px; border: 1.5px solid #E5E5EA; border-radius: 18px; font-size: 13px; background: #F2F2F7; color: #1C1C1E; } QComboBox:hover { border-color: #007AFF; background: #FFFFFF; } QComboBox::drop-down { border: none; width: 20px; } QComboBox QAbstractItemView { border: 1px solid #E5E5EA; border-radius: 10px; background: #FFFFFF; selection-background-color: #E5F0FF; selection-color: #007AFF; font-size: 13px; }</string>
-         </property>
-        </widget>
-       </item>
       </layout>
      </widget>
     </item>

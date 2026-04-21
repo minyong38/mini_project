@@ -43,10 +43,6 @@ MainWindow::MainWindow(const QString& ip, const QString& myId,
     auto* onlineBarLayout = qobject_cast<QHBoxLayout*>(ui->onlineBar->layout());
     if (onlineBarLayout) onlineBarLayout->addWidget(friendContainer, 1);
 
-    ui->userCombo->addItems({m_myId});
-    connect(ui->userCombo, QOverload<int>::of(&QComboBox::currentIndexChanged),
-            this, &MainWindow::onUserChanged);
-
     connect(ui->calendarWidget, &QCalendarWidget::clicked,
             this, &MainWindow::onDateClicked);
     connect(ui->calendarWidget, &QCalendarWidget::currentPageChanged,
@@ -299,14 +295,7 @@ void MainWindow::processMessage(const QString& data) {
         QString payload = data.mid(Protocol::RESUSERS.length() + Protocol::SEP.length());
         QStringList users = payload.isEmpty() ? QStringList() : payload.split("|");
 
-        users.removeAll(m_myId);  // 콤보박스에 본인 표시 안 함
-
-        ui->userCombo->blockSignals(true);
-        ui->userCombo->clear();
-        ui->userCombo->addItems(users);
-        int idx = users.indexOf(m_selectedId);
-        ui->userCombo->setCurrentIndex(idx >= 0 ? idx : 0);
-        ui->userCombo->blockSignals(false);
+        users.removeAll(m_myId);
 
         m_allKnownUsers = users;
         updateFriendsList();
@@ -954,14 +943,6 @@ void MainWindow::onDateClicked(const QDate& date) {
     requestSchedules(date);
 }
 
-void MainWindow::onUserChanged(int) {
-    QString selected = ui->userCombo->currentText();
-    if (selected == m_myId) {
-        m_calTabWidget->setCurrentIndex(0);
-    } else {
-        openFriendTab(selected);
-    }
-}
 
 void MainWindow::showDateDialog() {
     if (m_activeDialog) {
@@ -1161,15 +1142,6 @@ void MainWindow::applyTheme(bool dark)
             "QFrame#navBar { background:#2C2C2E; border-bottom:1px solid #3A3A3C; }");
         ui->titleLabel->setStyleSheet(
             "QLabel { font-size:20px; font-weight:bold; color:#FFFFFF; background:transparent; border:none; }");
-        ui->userPrefixLabel->setStyleSheet(
-            "QLabel { font-size:13px; color:#8E8E93; background:transparent; border:none; }");
-        ui->userCombo->setStyleSheet(
-            "QComboBox { padding:4px 12px; border:1.5px solid #3A3A3C; border-radius:18px;"
-            " font-size:13px; background:#3A3A3C; color:#FFFFFF; }"
-            "QComboBox:hover { border-color:#007AFF; }"
-            "QComboBox::drop-down { border:none; width:20px; }"
-            "QComboBox QAbstractItemView { background:#2C2C2E; color:#FFFFFF;"
-            " selection-background-color:#1A3A5C; selection-color:#FFFFFF; font-size:13px; }");
         ui->onlineBar->setStyleSheet(
             "QFrame#onlineBar { background:#0D2318; border-bottom:1px solid #1A4230; }");
         ui->onlineLabel->setStyleSheet(
@@ -1202,16 +1174,6 @@ void MainWindow::applyTheme(bool dark)
             "QFrame#navBar { background:#FFFFFF; border-bottom:1px solid #E5E5EA; }");
         ui->titleLabel->setStyleSheet(
             "QLabel { font-size:20px; font-weight:bold; color:#1C1C1E; background:transparent; border:none; }");
-        ui->userPrefixLabel->setStyleSheet(
-            "QLabel { font-size:13px; color:#8E8E93; background:transparent; border:none; }");
-        ui->userCombo->setStyleSheet(
-            "QComboBox { padding:4px 12px; border:1.5px solid #E5E5EA; border-radius:18px;"
-            " font-size:13px; background:#F2F2F7; color:#1C1C1E; }"
-            "QComboBox:hover { border-color:#007AFF; background:#FFFFFF; }"
-            "QComboBox::drop-down { border:none; width:20px; }"
-            "QComboBox QAbstractItemView { border:1px solid #E5E5EA; border-radius:10px;"
-            " background:#FFFFFF; selection-background-color:#E5F0FF;"
-            " selection-color:#007AFF; font-size:13px; }");
         ui->onlineBar->setStyleSheet(
             "QFrame#onlineBar { background:#F0FFF4; border-bottom:1px solid #C3E6CB; }");
         ui->onlineLabel->setStyleSheet(
