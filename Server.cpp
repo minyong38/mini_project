@@ -3,6 +3,7 @@
 #include <QSqlError>
 #include <QTime>
 #include <QDebug>
+#include <QCoreApplication>
 
 ScheduleServer::ScheduleServer(QObject *parent) : QTcpServer(parent) {
     initDatabase();
@@ -10,7 +11,7 @@ ScheduleServer::ScheduleServer(QObject *parent) : QTcpServer(parent) {
 
 void ScheduleServer::initDatabase() {
     m_db = QSqlDatabase::addDatabase("QSQLITE");
-    m_db.setDatabaseName("schedule.db");
+    m_db.setDatabaseName(QCoreApplication::applicationDirPath() + "/schedule.db");
     if (!m_db.open()) { qCritical() << "DB Error:" << m_db.lastError().text(); return; }
 
     QSqlQuery q;

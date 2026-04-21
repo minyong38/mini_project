@@ -52,7 +52,7 @@ LoginDialog::LoginDialog(QWidget* parent) : QDialog(parent)
     root->addWidget(ipLabel);
     root->addSpacing(5);
 
-    m_ipEdit = new QLineEdit("172.20.35.212", this);
+    m_ipEdit = new QLineEdit("172.20.35.239", this);
     m_ipEdit->setFixedHeight(40);
     m_ipEdit->setStyleSheet(
         "QLineEdit { padding:0 12px; border:1.5px solid #E0E0E0; border-radius:8px;"

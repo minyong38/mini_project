@@ -900,10 +900,6 @@ void MainWindow::updateFriendsList() {
     }
 
     int friendOnlineCount = onlineFriends.size();
-    if (known.size() <= 1) {
-        ui->onlineLabel->setText("👥 친구 목록:  연결 중...");
-        return;
-    }
     ui->onlineLabel->setText(QString("👥  %1명 접속 중  |").arg(friendOnlineCount));
 
     // 친구 버튼 생성 람다
@@ -1375,8 +1371,8 @@ void MainWindow::startReconnectTimer() {
                 reconnect();
         });
     }
-    reconnect();                // 즉시 한 번 시도
-    m_reconnectTimer->start();
+    m_reconnectTimer->start();  // reconnect() 전에 먼저 시작해야 abort()의 disconnected 재귀 방지
+    reconnect();
 }
 
 void MainWindow::stopReconnectTimer() {
