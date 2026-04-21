@@ -180,7 +180,7 @@ QPixmap MyPageDialog::makeCircular(const QPixmap& src, int size) {
 }
 
 void MyPageDialog::updatePhotoLabel() {
-    const QPixmap& base = m_photoChanged ? m_newPhoto : m_currentPhoto;
+    const QPixmap& base = m_photoDeleted ? QPixmap() : (m_photoChanged ? m_newPhoto : m_currentPhoto);
     if (base.isNull()) {
         m_photoLabel->setText("👤");
         m_photoLabel->setStyleSheet(
@@ -197,11 +197,17 @@ void MyPageDialog::onUpload() {
         "이미지 파일 (*.png *.jpg *.jpeg *.bmp *.gif)");
     if (path.isEmpty()) return;
 
-    QPixmap pix(path);
-    if (pix.isNull()) {
+    QImageReader reader(path);
+    reader.setAutoTransform(true);  // EXIF 회전 자동 보정
+    QImage img = reader.read();
+    if (img.isNull()) {
         QMessageBox::warning(this, "오류", "이미지를 불러올 수 없습니다.");
         return;
     }
+    // 중앙 정사각형 크롭
+    int side = qMin(img.width(), img.height());
+    img = img.copy((img.width() - side) / 2, (img.height() - side) / 2, side, side);
+    QPixmap pix = QPixmap::fromImage(img);
     m_newPhoto      = pix;
     m_photoChanged  = true;
     m_photoDeleted  = false;
@@ -245,7 +251,11 @@ void MyPageDialog::onCaptureClicked() {
 
 void MyPageDialog::onImageCaptured(int, const QImage& img) {
     m_camera->stop();
-    m_newPhoto     = QPixmap::fromImage(img);
+    // 중앙 정사각형 크롭
+    int side = qMin(img.width(), img.height());
+    QImage cropped = img.copy((img.width() - side) / 2,
+                              (img.height() - side) / 2, side, side);
+    m_newPhoto     = QPixmap::fromImage(cropped);
     m_photoChanged = true;
     m_photoDeleted = false;
     updatePhotoLabel();

@@ -143,7 +143,8 @@ private:
     QHBoxLayout* m_friendsLayout = nullptr;
 
     // 프로필 사진 캐시
-    QMap<QString, QPixmap> m_profileCache;
+    QMap<QString, QPixmap>  m_profileCache;
+    QMap<QString, QString>  m_nicknameCache;
     void requestProfile(const QString& userId);
     QPixmap circularPixmap(const QPixmap& src, int size);
 };

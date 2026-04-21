@@ -285,11 +285,25 @@ void MainWindow::processMessage(const QString& data) {
     }
     else if (data.startsWith(Protocol::NICK_RES + Protocol::SEP)) {
         QStringList p = data.split(Protocol::SEP);
-        if (p.size() >= 3 && p[1] == m_myId)
-            m_nickname = p.mid(2).join(Protocol::SEP);
+        if (p.size() >= 3) {
+            QString userId = p[1];
+            QString nick   = p.mid(2).join(Protocol::SEP);
+            m_nicknameCache[userId] = nick;
+            if (userId == m_myId)
+                m_nickname = nick;
+            // 이미 열린 친구 탭 이름 갱신
+            for (int i = 0; i < m_calTabWidget->count(); i++) {
+                if (m_calTabWidget->tabBar()->tabData(i).toString() == "F:" + userId) {
+                    m_calTabWidget->setTabText(i, "👤 " + nick);
+                    break;
+                }
+            }
+            updateFriendsList();
+        }
     }
     else if (data.startsWith(Protocol::NICK_OK + Protocol::SEP)) {
         m_nickname = data.mid(Protocol::NICK_OK.length() + 1);
+        m_nicknameCache[m_myId] = m_nickname;
     }
     else if (data == Protocol::LOGIN_FAIL) {
         QMessageBox::critical(this, "로그인 실패",
@@ -762,7 +776,8 @@ void MainWindow::openFriendTab(const QString& friendId) {
     pageLayout->addWidget(calWidget);
     m_friendCalWidgets[friendId] = calWidget;
 
-    int tabIdx = m_calTabWidget->addTab(page, "👤 " + friendId);
+    QString displayName = m_nicknameCache.value(friendId, friendId);
+    int tabIdx = m_calTabWidget->addTab(page, "👤 " + displayName);
     m_calTabWidget->tabBar()->setTabData(tabIdx, QString("F:") + friendId);
 
     m_calTabWidget->setCurrentIndex(tabIdx);
@@ -1005,9 +1020,12 @@ void MainWindow::updateFriendsList() {
             avatar->setPixmap(def);
         }
 
-        // 온라인 상태 점
+        // 닉네임이 있으면 닉네임 표시, 없으면 userId
+        if (!m_nicknameCache.contains(userId))
+            m_socket->write((Protocol::NICK_REQ + Protocol::SEP + userId + "\n").toUtf8());
+        QString displayName = m_nicknameCache.value(userId, userId);
         QString dot = online ? "🟢" : "⚫";
-        auto* nameLabel = new QLabel(dot + " " + userId);
+        auto* nameLabel = new QLabel(dot + " " + displayName);
         nameLabel->setStyleSheet(online
             ? "font-size:12px; color:#2D6A4F; font-weight:600;"
             : "font-size:12px; color:#8E8E93;");

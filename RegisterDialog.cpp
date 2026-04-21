@@ -310,11 +310,15 @@ void RegisterDialog::onReadyRead()
         m_signupDone = true;
         m_statusLabel->setText("사진 업로드 중...");
 
-        // 이미지를 128x128로 리사이즈 후 Base64 변환
-        QImage thumb = m_capturedImage.scaled(128, 128, Qt::KeepAspectRatioByExpanding, Qt::SmoothTransformation);
+        // 중앙 정사각형 크롭 후 256x256, quality 90
+        QImage src = m_capturedImage;
+        int side = qMin(src.width(), src.height());
+        QImage cropped = src.copy((src.width() - side) / 2,
+                                  (src.height() - side) / 2, side, side);
+        QImage thumb = cropped.scaled(256, 256, Qt::IgnoreAspectRatio, Qt::SmoothTransformation);
         QBuffer buf;
         buf.open(QIODevice::WriteOnly);
-        thumb.save(&buf, "JPEG", 70);
+        thumb.save(&buf, "JPEG", 90);
         QString base64 = buf.data().toBase64();
 
         QString userId = m_idEdit->text().trimmed();

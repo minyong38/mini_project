@@ -135,9 +135,17 @@ void ScheduleServer::handleRequest(QTcpSocket* socket, const QString& data) {
         QSqlQuery q;
         q.prepare("INSERT OR REPLACE INTO nicknames (USER_ID, NICKNAME) VALUES(?,?)");
         q.addBindValue(userId); q.addBindValue(nickname);
-        socket->write(q.exec()
-            ? (Protocol::NICK_OK + Protocol::SEP + nickname + "\n").toUtf8()
-            : QString("NICK_FAIL:서버 오류\n").toUtf8());
+        if (q.exec()) {
+            socket->write((Protocol::NICK_OK + Protocol::SEP + nickname + "\n").toUtf8());
+            QString broadcast = Protocol::NICK_RES + Protocol::SEP
+                                + userId + Protocol::SEP + nickname + "\n";
+            for (QTcpSocket* s : m_clients) {
+                if (s && s != socket && s->state() == QAbstractSocket::ConnectedState)
+                    s->write(broadcast.toUtf8());
+            }
+        } else {
+            socket->write(QString("NICK_FAIL:서버 오류\n").toUtf8());
+        }
         return;
     }
 
