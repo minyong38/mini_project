@@ -3,7 +3,6 @@
 #include <QFontMetrics>
 #include <QHash>
 
-// ── 공휴일 ────────────────────────────────────────────────────────────
 
 QString CustomCalendarWidget::holidayName(const QDate& date)
 {
@@ -25,7 +24,6 @@ QString CustomCalendarWidget::holidayName(const QDate& date)
     // 음력 기반 공휴일 (연도별 양력 날짜 하드코딩)
     // 설날 연휴(전날·당일·다음날), 추석 연휴, 부처님오신날
     static const QHash<QDate, QString> lunar = {
-                                                // ── 2024 ──
                                                 { QDate(2024,  2,  9), "설날 연휴"       },
                                                 { QDate(2024,  2, 10), "설날"            },
                                                 { QDate(2024,  2, 11), "설날 연휴"       },
@@ -33,7 +31,6 @@ QString CustomCalendarWidget::holidayName(const QDate& date)
                                                 { QDate(2024,  9, 16), "추석 연휴"       },
                                                 { QDate(2024,  9, 17), "추석"            },
                                                 { QDate(2024,  9, 18), "추석 연휴"       },
-                                                // ── 2025 ──
                                                 { QDate(2025,  1, 28), "설날 연휴"       },
                                                 { QDate(2025,  1, 29), "설날"            },
                                                 { QDate(2025,  1, 30), "설날 연휴"       },
@@ -41,7 +38,6 @@ QString CustomCalendarWidget::holidayName(const QDate& date)
                                                 { QDate(2025, 10,  5), "추석 연휴"       },
                                                 { QDate(2025, 10,  6), "추석"            },
                                                 { QDate(2025, 10,  7), "추석 연휴"       },
-                                                // ── 2026 ──
                                                 { QDate(2026,  2, 16), "설날 연휴"       },
                                                 { QDate(2026,  2, 17), "설날"            },
                                                 { QDate(2026,  2, 18), "설날 연휴"       },
@@ -49,7 +45,6 @@ QString CustomCalendarWidget::holidayName(const QDate& date)
                                                 { QDate(2026,  9, 24), "추석 연휴"       },
                                                 { QDate(2026,  9, 25), "추석"            },
                                                 { QDate(2026,  9, 26), "추석 연휴"       },
-                                                // ── 2027 ──
                                                 { QDate(2027,  2,  5), "설날 연휴"       },
                                                 { QDate(2027,  2,  6), "설날"            },
                                                 { QDate(2027,  2,  7), "설날 연휴"       },
@@ -57,7 +52,6 @@ QString CustomCalendarWidget::holidayName(const QDate& date)
                                                 { QDate(2027, 10, 14), "추석 연휴"       },
                                                 { QDate(2027, 10, 15), "추석"            },
                                                 { QDate(2027, 10, 16), "추석 연휴"       },
-                                                // ── 2028 ──
                                                 { QDate(2028,  1, 25), "설날 연휴"       },
                                                 { QDate(2028,  1, 26), "설날"            },
                                                 { QDate(2028,  1, 27), "설날 연휴"       },
@@ -65,7 +59,6 @@ QString CustomCalendarWidget::holidayName(const QDate& date)
                                                 { QDate(2028, 10,  2), "추석 연휴"       },
                                                 { QDate(2028, 10,  3), "추석"            },
                                                 { QDate(2028, 10,  4), "추석 연휴"       },
-                                                // ── 2029 ──
                                                 { QDate(2029,  2, 12), "설날 연휴"       },
                                                 { QDate(2029,  2, 13), "설날"            },
                                                 { QDate(2029,  2, 14), "설날 연휴"       },
@@ -73,7 +66,6 @@ QString CustomCalendarWidget::holidayName(const QDate& date)
                                                 { QDate(2029,  9, 21), "추석 연휴"       },
                                                 { QDate(2029,  9, 22), "추석"            },
                                                 { QDate(2029,  9, 23), "추석 연휴"       },
-                                                // ── 2030 ──
                                                 { QDate(2030,  2,  2), "설날 연휴"       },
                                                 { QDate(2030,  2,  3), "설날"            },
                                                 { QDate(2030,  2,  4), "설날 연휴"       },
@@ -86,7 +78,6 @@ QString CustomCalendarWidget::holidayName(const QDate& date)
     return lunar.value(date, QString());
 }
 
-// ─────────────────────────────────────────────────────────────────────
 
 CustomCalendarWidget::CustomCalendarWidget(QWidget *parent)
     : QCalendarWidget(parent)
@@ -140,12 +131,10 @@ void CustomCalendarWidget::paintCell(QPainter *painter, const QRect &rect, QDate
     bool isSunday       = (date.dayOfWeek() == 7);
     bool isSaturday     = (date.dayOfWeek() == 6);
 
-    // ── 셀 배경 ──────────────────────────────────────
     const QColor bgBase    = m_darkMode ? QColor("#2C2C2E") : Qt::white;
     const QColor bgSelected= m_darkMode ? QColor("#1A3A5C") : QColor("#F0F6FF");
     painter->fillRect(rect, isSelected && !isToday ? bgSelected : bgBase);
 
-    // ── 날짜 숫자 원 ──────────────────────────────────
     int circleD = 28;
     QRect circleRect(
         rect.left() + (rect.width() - circleD) / 2,
@@ -163,7 +152,6 @@ void CustomCalendarWidget::paintCell(QPainter *painter, const QRect &rect, QDate
         painter->drawEllipse(circleRect);
     }
 
-    // ── 날짜 숫자 ─────────────────────────────────────
     QString holiday = isCurrentMonth ? holidayName(date) : QString();
     bool isHoliday  = !holiday.isEmpty();
 
@@ -182,7 +170,6 @@ void CustomCalendarWidget::paintCell(QPainter *painter, const QRect &rect, QDate
     painter->setPen(dateColor);
     painter->drawText(circleRect, Qt::AlignCenter, QString::number(date.day()));
 
-    // ── 공휴일 이름 ───────────────────────────────────
     if (isHoliday) {
         QFont hf = painter->font();
         hf.setPixelSize(8);
@@ -195,7 +182,6 @@ void CustomCalendarWidget::paintCell(QPainter *painter, const QRect &rect, QDate
         painter->drawText(hRect, Qt::AlignHCenter | Qt::AlignTop, elided);
     }
 
-    // ── 날씨 (우상단) ─────────────────────────────────
     {
         auto wit = m_weatherData.find(date);
         if (wit != m_weatherData.end()) {
@@ -246,7 +232,6 @@ void CustomCalendarWidget::paintCell(QPainter *painter, const QRect &rect, QDate
         }
     }
 
-    // ── 일정 칩 ──────────────────────────────────────
     if (!isCurrentMonth) { painter->restore(); return; }
 
     auto it = m_schedules.find(date);

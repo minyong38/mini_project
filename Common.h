@@ -3,35 +3,61 @@
 
 #include <QString>
 
-namespace Protocol {
+namespace Protocol  //서버와 클라이언트 간의 통신 규약 정의
+{
+//통신에 사용하는 포트 고정
 inline constexpr int PORT = 25000;
+//데이터 구분자 (EX : LOGIN : id:pw)
 inline const QString SEP = ":";
 
-// 일정
-inline const QString REQ      = "REQ";
+// 일정관련 프로토콜
+inline const QString REQ      = "REQ";  //특정 날짜 일정 요청
+
+//일정 추가
 inline const QString ADD      = "ADD";
+
+//일정 삭제
 inline const QString DEL      = "DEL";
+
+//일정 수정
 inline const QString MOD      = "MOD";
+
+//일정 응답  (server -> client)
 inline const QString RES      = "RES";
+
+//한달치 일정 요청
 inline const QString REQMONTH = "REQMONTH";
+
+//한달치 일정 응답
 inline const QString RESMONTH = "RESMONTH";
+
+//명령 수신 확인 응답
 inline const QString ACK      = "ACK";
+
+//사용자 목록 요청
 inline const QString REQUSERS = "REQUSERS";
+
+//사용자 목록 응답
 inline const QString RESUSERS = "RESUSERS";
 
-// 로그인 / 접속자
-inline const QString LOGIN        = "LOGIN";
+
+// 로그인 및 접속자 상태 관련
+inline const QString LOGIN        = "LOGIN";    //로그인 시도
+
+//로그인 성공
 inline const QString LOGIN_OK     = "LOGIN_OK";
+
+//로그인 거부
 inline const QString LOGIN_REJECT = "LOGIN_REJECT";
-inline const QString LOGIN_FAIL   = "LOGIN_FAIL";   // 비밀번호 불일치
+
+//로그인 실패
+inline const QString LOGIN_FAIL   = "LOGIN_FAIL";
+
+//현재 접속자 정보
 inline const QString ONLINE       = "ONLINE";
 
-// 프로필 사진
-// PROFILE_UPLOAD : PROFILE_UPLOAD:userId:base64data
-// PROFILE_OK     : PROFILE_OK
-// PROFILE_REQ    : PROFILE_REQ:userId
-// PROFILE_RES    : PROFILE_RES:userId:base64data
-inline const QString PROFILE_UPLOAD = "PROFILE_UPLOAD";
+//프로필 사진 관련
+inline const QString PROFILE_UPLOAD = "PROFILE_UPLOAD"; // 프로필 업로
 inline const QString PROFILE_OK     = "PROFILE_OK";
 inline const QString PROFILE_REQ    = "PROFILE_REQ";
 inline const QString PROFILE_RES    = "PROFILE_RES";
@@ -117,7 +143,7 @@ inline const QString PROFILE_DELETE = "PROFILE_DELETE";  // PROFILE_DELETE:userI
 
 // 일정 검색
 // SEARCH_REQ : SEARCH_REQ:userId:keyword
-// SEARCH_RES : SEARCH_RES:date~content|date~content|...  (결과 없으면 SEARCH_RES: 만 전송)
+// SEARCH_RES : SEARCH_RES:calId\tcalName\tdate\tcontent|...
 inline const QString SEARCH_REQ = "SEARCH_REQ";
 inline const QString SEARCH_RES = "SEARCH_RES";
 }
