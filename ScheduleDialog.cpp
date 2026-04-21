@@ -8,9 +8,7 @@
 #include <QMessageBox>
 #include <QListWidgetItem>
 
-// ─────────────────────────────────────────────────────────────────────
 //  색상 태그 유틸
-// ─────────────────────────────────────────────────────────────────────
 
 static const QStringList COLOR_NAMES = {"", "red", "orange", "yellow", "green", "purple"};
 static const QStringList COLOR_CODES = {"#007AFF", "#FF3B30", "#FF9500", "#FFCC00", "#34C759", "#AF52DE"};
@@ -22,10 +20,8 @@ static QColor colorFromTag(const QString& tag) {
     return QColor("#007AFF");
 }
 
-// ─────────────────────────────────────────────────────────────────────
 //  내부 헬퍼: content 인코딩 / 디코딩 / 표시 포맷
 //  content = "제목\t시작시간\t종료시간\t상세내용\t색상태그"
-// ─────────────────────────────────────────────────────────────────────
 
 static QString encodeContent(const QString& title, const QString& start,
                              const QString& end, const QString& desc,
@@ -50,9 +46,7 @@ static QString displayText(const QString& content)
     return text;
 }
 
-// ─────────────────────────────────────────────────────────────────────
 //  AddScheduleDialog
-// ─────────────────────────────────────────────────────────────────────
 
 AddScheduleDialog::AddScheduleDialog(QWidget* parent) : QDialog(parent)
 {
@@ -71,7 +65,6 @@ AddScheduleDialog::AddScheduleDialog(QWidget* parent) : QDialog(parent)
     cardLayout->setContentsMargins(0, 0, 0, 0);
     cardLayout->setSpacing(0);
 
-    // ── 헤더 ─────────────────────────────────────────────────
     auto* header = new QFrame;
     header->setFixedHeight(56);
     header->setStyleSheet(
@@ -91,7 +84,6 @@ AddScheduleDialog::AddScheduleDialog(QWidget* parent) : QDialog(parent)
     headerLayout->addStretch();
     cardLayout->addWidget(header);
 
-    // ── 본문 ─────────────────────────────────────────────────
     auto* body = new QWidget;
     body->setStyleSheet("background: transparent;");
     auto* bodyLayout = new QVBoxLayout(body);
@@ -224,7 +216,6 @@ AddScheduleDialog::AddScheduleDialog(QWidget* parent) : QDialog(parent)
     bodyLayout->addWidget(m_descEdit);
     cardLayout->addWidget(body, 1);
 
-    // ── 푸터 ─────────────────────────────────────────────────
     auto* footer = new QFrame;
     footer->setFixedHeight(64);
     footer->setStyleSheet(
@@ -306,9 +297,7 @@ QString AddScheduleDialog::colorTag()    const {
     return (id >= 0 && id < COLOR_NAMES.size()) ? COLOR_NAMES[id] : "";
 }
 
-// ─────────────────────────────────────────────────────────────────────
 //  ScheduleDialog
-// ─────────────────────────────────────────────────────────────────────
 
 ScheduleDialog::ScheduleDialog(const QDate& date, QWidget *parent)
     : QDialog(parent), ui(new Ui::ScheduleDialog), m_date(date)

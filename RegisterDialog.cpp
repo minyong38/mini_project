@@ -43,7 +43,6 @@ RegisterDialog::RegisterDialog(const QString& serverIp, QWidget* parent)
     m_stack = new QStackedWidget(this);
     root->addWidget(m_stack);
 
-    // ── Step 1: 카메라 페이지 ────────────────────────────────
     m_cameraPage = new QWidget();
     auto* camLayout = new QVBoxLayout(m_cameraPage);
     camLayout->setContentsMargins(28, 24, 28, 24);
@@ -107,7 +106,6 @@ RegisterDialog::RegisterDialog(const QString& serverIp, QWidget* parent)
 
     m_stack->addWidget(m_cameraPage);
 
-    // ── Step 2: 가입 폼 페이지 ──────────────────────────────
     m_formPage = new QWidget();
     auto* formLayout = new QVBoxLayout(m_formPage);
     formLayout->setContentsMargins(36, 28, 36, 24);
@@ -185,13 +183,11 @@ RegisterDialog::RegisterDialog(const QString& serverIp, QWidget* parent)
 
     m_stack->addWidget(m_formPage);
 
-    // ── 소켓 ────────────────────────────────────────────────
     m_socket = new QTcpSocket(this);
     connect(m_socket, &QTcpSocket::connected,              this, &RegisterDialog::onConnected);
     connect(m_socket, &QTcpSocket::readyRead,              this, &RegisterDialog::onReadyRead);
     connect(m_socket, &QAbstractSocket::errorOccurred,     this, &RegisterDialog::onSocketError);
 
-    // ── 시그널 연결 ──────────────────────────────────────────
     connect(m_captureBtn,  &QPushButton::clicked, this, &RegisterDialog::onCaptureClicked);
     connect(m_retakeBtn,   &QPushButton::clicked, this, &RegisterDialog::onRetakeClicked);
     connect(m_nextBtn,     &QPushButton::clicked, this, [this]() { showFormStep(); });
@@ -310,15 +306,15 @@ void RegisterDialog::onReadyRead()
         m_signupDone = true;
         m_statusLabel->setText("사진 업로드 중...");
 
-        // 중앙 정사각형 크롭 후 256x256, quality 90
+        // 중앙 정사각형 크롭 후 512x512, quality 95로 고화질 유지
         QImage src = m_capturedImage;
         int side = qMin(src.width(), src.height());
         QImage cropped = src.copy((src.width() - side) / 2,
                                   (src.height() - side) / 2, side, side);
-        QImage thumb = cropped.scaled(256, 256, Qt::IgnoreAspectRatio, Qt::SmoothTransformation);
+        QImage thumb = cropped.scaled(512, 512, Qt::IgnoreAspectRatio, Qt::SmoothTransformation);
         QBuffer buf;
         buf.open(QIODevice::WriteOnly);
-        thumb.save(&buf, "JPEG", 90);
+        thumb.save(&buf, "JPEG", 95);
         QString base64 = buf.data().toBase64();
 
         QString userId = m_idEdit->text().trimmed();

@@ -22,11 +22,9 @@ MyPageDialog::MyPageDialog(const QString& userId,
     root->setSpacing(0);
     root->setContentsMargins(0, 0, 0, 0);
 
-    // ── 스택: 0=프로필뷰, 1=카메라뷰 ──────────────────────────
     m_stack = new QStackedWidget(this);
     root->addWidget(m_stack);
 
-    // ── 페이지 0: 프로필 편집 ──────────────────────────────────
     auto* profilePage = new QWidget;
     auto* pLayout = new QVBoxLayout(profilePage);
     pLayout->setSpacing(20);
@@ -116,7 +114,6 @@ MyPageDialog::MyPageDialog(const QString& userId,
 
     m_stack->addWidget(profilePage);
 
-    // ── 페이지 1: 카메라 촬영 ──────────────────────────────────
     auto* cameraPage = new QWidget;
     auto* cLayout = new QVBoxLayout(cameraPage);
     cLayout->setSpacing(12);
@@ -152,7 +149,6 @@ MyPageDialog::MyPageDialog(const QString& userId,
 
     m_stack->addWidget(cameraPage);
 
-    // ── 시그널 연결 ────────────────────────────────────────────
     connect(retakeBtn,    &QPushButton::clicked, this, &MyPageDialog::onRetake);
     connect(uploadBtn,    &QPushButton::clicked, this, &MyPageDialog::onUpload);
     connect(deleteBtn,    &QPushButton::clicked, this, &MyPageDialog::onDelete);

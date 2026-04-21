@@ -12,7 +12,6 @@
 
 namespace Ui { class ScheduleDialog; }
 
-// ── 일정 추가 / 수정용 입력 다이얼로그 ──────────────────────────────
 class AddScheduleDialog : public QDialog {
     Q_OBJECT
 public:
@@ -38,7 +37,6 @@ private:
     QButtonGroup*   m_colorBtns;
 };
 
-// ── 날짜별 일정 목록 다이얼로그 ─────────────────────────────────────
 class ScheduleDialog : public QDialog {
     Q_OBJECT
 public:

@@ -24,7 +24,7 @@ MainWindow::MainWindow(const QString& ip, const QString& myId,
     ui->setupUi(this);
     setWindowTitle("캘린더 — " + m_myId);
 
-    // 로고 (navBar 맨 왼쪽)
+    // 로고가 없으면 그냥 공간 없이 무시
     auto* logoLabel = new QLabel(this);
     QPixmap logoPixmap(":/logo.png");
     if (!logoPixmap.isNull())
@@ -35,7 +35,8 @@ MainWindow::MainWindow(const QString& ip, const QString& myId,
     m_selectedDate       = QDate::currentDate();
     m_pendingMonthUserId = m_myId;
 
-    // onlineLabel 옆에 클릭 가능한 친구 버튼 컨테이너 추가
+    // onlineBar에 친구 아바타 버튼들을 동적으로 채울 컨테이너
+    // stretch(1)로 넣어서 오른쪽 여백까지 자연스럽게 채움
     auto* friendContainer = new QWidget(ui->onlineBar);
     friendContainer->setStyleSheet("background: transparent;");
     m_friendsLayout = new QHBoxLayout(friendContainer);
@@ -49,7 +50,6 @@ MainWindow::MainWindow(const QString& ip, const QString& myId,
     connect(ui->calendarWidget, &QCalendarWidget::currentPageChanged,
             this, &MainWindow::requestMonthSchedules);
 
-    // ── 탭 위젯으로 캘린더 카드 재구성 ──────────────────────
     m_calTabWidget = new QTabWidget(ui->calendarCard);
     m_calTabWidget->setDocumentMode(false);
     m_calTabWidget->setStyleSheet(R"(
@@ -61,7 +61,8 @@ MainWindow::MainWindow(const QString& ip, const QString& myId,
         QTabBar::tab:!selected:hover { background: #E5E5EA; }
     )");
 
-    // 개인 캘린더 탭 (calendarWidget 옮기기)
+    // calendarWidget을 직접 탭에 넣으면 부모가 바뀌면서 레이아웃이 꼬이는 경우가 있어서
+    // 래퍼 위젯으로 한 번 감싸서 넣는 방식으로 처리
     auto* personalPage   = new QWidget();
     auto* personalLayout = new QVBoxLayout(personalPage);
     personalLayout->setContentsMargins(0, 0, 0, 0);
@@ -69,13 +70,13 @@ MainWindow::MainWindow(const QString& ip, const QString& myId,
     personalLayout->addWidget(ui->calendarWidget);
     m_calTabWidget->addTab(personalPage, "📅 내 캘린더");
 
-    // cardLayout 에 탭 위젯 추가
     ui->cardLayout->addWidget(m_calTabWidget);
 
-    // 초기 상태: 내 캘린더 탭 → 채팅 버튼 숨김
+    // 내 캘린더 탭에서는 채팅 대상이 없으므로 채팅 버튼 숨김
     ui->chatBtn->setVisible(false);
 
     m_calTabWidget->setTabsClosable(true);
+    // 첫 번째 탭(내 캘린더)은 닫기 버튼 제거
     m_calTabWidget->tabBar()->setTabButton(0, QTabBar::RightSide, nullptr);
 
 
@@ -151,7 +152,6 @@ MainWindow::MainWindow(const QString& ip, const QString& myId,
     connect(ui->myPageBtn, &QPushButton::clicked, this, &MainWindow::onMyPageBtnClicked);
     connect(ui->searchBtn, &QPushButton::clicked, this, &MainWindow::onSearchBtnClicked);
 
-    // 다크모드 토글 버튼 (navBar에 삽입)
     m_themeBtn = new QPushButton("🌙", this);
     m_themeBtn->setFixedSize(36, 36);
     m_themeBtn->setToolTip("다크 모드 전환");
@@ -165,7 +165,6 @@ MainWindow::MainWindow(const QString& ip, const QString& myId,
         applyTheme(!m_darkMode);
     });
 
-    // 캘린더 추가 버튼 (채팅 버튼 왼쪽)
     auto* addCalBtn = new QPushButton("＋ 캘린더 추가", this);
     addCalBtn->setFixedHeight(36);
     addCalBtn->setCursor(Qt::PointingHandCursor);
@@ -180,7 +179,7 @@ MainWindow::MainWindow(const QString& ip, const QString& myId,
 
     setupTray();
 
-    // 날씨 매니저 (서울 기준, 30분마다 갱신)
+    // 날씨 데이터는 모든 캘린더 위젯에 공유해서 표시
     m_weather = new WeatherManager("84befa7d5f3b34072813213012110a05", this);
     connect(m_weather, &WeatherManager::weatherUpdated, this, [this]() {
         ui->calendarWidget->setWeatherData(m_weather->data());
@@ -194,14 +193,14 @@ MainWindow::MainWindow(const QString& ip, const QString& myId,
     connect(weatherTimer, &QTimer::timeout, this, [this]() {
         m_weather->fetchWeather();
     });
-    weatherTimer->start(30 * 60 * 1000);
+    weatherTimer->start(30 * 60 * 1000); // OpenWeatherMap 무료 플랜 기준 30분 간격
 
-    // 소켓
     m_socket = new QTcpSocket(this);
     connect(m_socket, &QTcpSocket::connected,     this, &MainWindow::onConnectSuccess);
     connect(m_socket, &QTcpSocket::readyRead,     this, &MainWindow::onReadyRead);
     connect(m_socket, &QTcpSocket::errorOccurred, this, &MainWindow::onError);
     connect(m_socket, &QTcpSocket::disconnected,  this, [this]() {
+        // 정상 종료든 비정상 종료든 끊기면 재연결 시도
         if (!m_reconnectTimer || !m_reconnectTimer->isActive())
             startReconnectTimer();
     });
@@ -211,9 +210,7 @@ MainWindow::MainWindow(const QString& ip, const QString& myId,
 
 MainWindow::~MainWindow() { delete ui; }
 
-// ──────────────────────────────────────────────
-//  네트워크
-// ──────────────────────────────────────────────
+
 
 void MainWindow::onConnectSuccess() {
     stopReconnectTimer();
@@ -256,7 +253,6 @@ void MainWindow::onReadyRead() {
 
 void MainWindow::processMessage(const QString& data) {
 
-    // ── 로그인 결과 ──────────────────────────────────────────
     if (data == Protocol::LOGIN_OK) {
         requestUsers();
         requestMonthSchedules(ui->calendarWidget->yearShown(),
@@ -278,7 +274,7 @@ void MainWindow::processMessage(const QString& data) {
                 QPixmap pix;
                 pix.loadFromData(bytes, "JPEG");
                 if (!pix.isNull())
-                    m_profileCache[userId] = circularPixmap(pix, 36);
+                    m_profileCache[userId] = pix; // 원본 해상도 그대로 캐시, 표시할 때 크기별로 자름
             }
             updateFriendsList();
         }
@@ -337,12 +333,12 @@ void MainWindow::processMessage(const QString& data) {
         close();
     }
 
-    // ── 접속자 목록 ──────────────────────────────────────────
     else if (data.startsWith(Protocol::ONLINE + Protocol::SEP)) {
         QString payload = data.mid(Protocol::ONLINE.length() + Protocol::SEP.length());
         QStringList users = payload.isEmpty() ? QStringList() : payload.split("|");
 
-        // 첫 수신은 현재 목록 저장만 (이미 있던 사람들은 알림 없음)
+        // 로그인 직후 첫 수신 때는 알림 없이 목록만 저장
+        // 그 이후부터 새로 들어온 사람이 생기면 알림 표시
         if (m_initialOnlineReceived) {
             for (const QString& u : users) {
                 if (!m_onlineUsers.contains(u) && u != m_myId)
@@ -354,7 +350,6 @@ void MainWindow::processMessage(const QString& data) {
         updateFriendsList();
     }
 
-    // ── 유저 목록 ────────────────────────────────────────────
     else if (data.startsWith(Protocol::RESUSERS + Protocol::SEP)) {
         QString payload = data.mid(Protocol::RESUSERS.length() + Protocol::SEP.length());
         QStringList users = payload.isEmpty() ? QStringList() : payload.split("|");
@@ -365,7 +360,6 @@ void MainWindow::processMessage(const QString& data) {
         updateFriendsList();
     }
 
-    // ── 월별 일정 ────────────────────────────────────────────
     else if (data.startsWith(Protocol::RESMONTH + Protocol::SEP)) {
         QMap<QDate, QStringList> sched;
         QString payload = data.mid(Protocol::RESMONTH.length() + Protocol::SEP.length());
@@ -387,7 +381,6 @@ void MainWindow::processMessage(const QString& data) {
         }
     }
 
-    // ── 일별 일정 ────────────────────────────────────────────
     else if (data.startsWith(Protocol::RES + Protocol::SEP)) {
         m_currentRowids.clear();
         m_currentContents.clear();
@@ -411,9 +404,8 @@ void MainWindow::processMessage(const QString& data) {
         }
     }
 
-    // ── 1:1 DM 기록 수신 ─────────────────────────────────────
     else if (data.startsWith(Protocol::RESDM + Protocol::SEP)) {
-        // RESDM:sender:HHmm:msg|sender:HHmm:msg|...
+        // 히스토리 요청은 한 번에 하나씩만 보내므로 m_pendingDmPeer로 대상 추적
         if (m_pendingDmPeer.isEmpty()) return;
         QString peer = m_pendingDmPeer;
         m_pendingDmPeer.clear();
@@ -435,9 +427,7 @@ void MainWindow::processMessage(const QString& data) {
         }
     }
 
-    // ── 1:1 DM 실시간 수신 ───────────────────────────────────
     else if (data.startsWith(Protocol::DMRES + Protocol::SEP)) {
-        // DMRES:sender:receiver:HHmm:message
         QStringList p = data.split(Protocol::SEP);
         if (p.size() < 5) return;
         QString sender   = p[1];
@@ -480,15 +470,13 @@ void MainWindow::processMessage(const QString& data) {
         }
     }
 
-    // ── 공유 캘린더 새 ID 알림 (CALID) ──────────────────────
     else if (data.startsWith(Protocol::CALID + Protocol::SEP)) {
         requestSharedCals();
     }
 
-    // ── 공유 캘린더 삭제 알림 (CALREMOVED) ───────────────────
     else if (data.startsWith(Protocol::CALREMOVED + Protocol::SEP)) {
         int calId = data.mid(Protocol::CALREMOVED.length() + Protocol::SEP.length()).toInt();
-        // 관련 채팅 다이얼로그 정리
+        // 캘린더 삭제 시 열려있는 채팅창도 같이 닫아줘야 함
         if (m_sharedChatDialogs.contains(calId)) {
             m_sharedChatDialogs[calId]->deleteLater();
             m_sharedChatDialogs.remove(calId);
@@ -502,7 +490,6 @@ void MainWindow::processMessage(const QString& data) {
         requestSharedCals();
     }
 
-    // ── 공유 캘린더 목록 수신 ────────────────────────────────
     else if (data.startsWith(Protocol::RESCALS + Protocol::SEP)) {
         QString payload = data.mid(Protocol::RESCALS.length() + Protocol::SEP.length());
         m_sharedCals.clear();
@@ -521,7 +508,6 @@ void MainWindow::processMessage(const QString& data) {
         refreshSharedCalTabs();
     }
 
-    // ── 공유 캘린더 월별 일정 수신 ───────────────────────────
     else if (data.startsWith(Protocol::RESSHMONTH + Protocol::SEP)) {
         QString payload = data.mid(Protocol::RESSHMONTH.length() + Protocol::SEP.length());
         int sep = payload.indexOf(Protocol::SEP);
@@ -543,7 +529,6 @@ void MainWindow::processMessage(const QString& data) {
             m_sharedCalWidgets[calId]->setMonthSchedules(ms);
     }
 
-    // ── 공유 캘린더 일별 일정 수신 ───────────────────────────
     else if (data.startsWith(Protocol::RESSHDAY + Protocol::SEP)) {
         QString payload = data.mid(Protocol::RESSHDAY.length() + Protocol::SEP.length());
         int sep = payload.indexOf(Protocol::SEP);
@@ -562,7 +547,7 @@ void MainWindow::processMessage(const QString& data) {
             }
         }
 
-        // 월별 캐시 업데이트
+        // 일별 조회 결과로 월별 캐시도 같이 갱신해서 캘린더 점 표시 동기화
         m_sharedMonthSchedules[calId][m_pendingShDate] = contents;
         if (m_sharedCalWidgets.contains(calId))
             m_sharedCalWidgets[calId]->setMonthSchedules(m_sharedMonthSchedules[calId]);
@@ -576,14 +561,13 @@ void MainWindow::processMessage(const QString& data) {
         m_pendingShCalId = -1;
     }
 
-    // ── 공유 캘린더 일정 변경 알림 (SHUPDATE) ────────────────
     else if (data.startsWith(Protocol::SHUPDATE + Protocol::SEP)) {
         int calId = data.mid(Protocol::SHUPDATE.length() + Protocol::SEP.length()).toInt();
         if (m_sharedCalWidgets.contains(calId)) {
             auto* w = m_sharedCalWidgets[calId];
             requestSharedMonthSchedules(calId, w->yearShown(), w->monthShown());
         }
-        // 다이얼로그가 열려 있으면 날짜 재조회
+        // 일정 편집 창이 열려 있는 상태에서 다른 멤버가 수정하면 자동으로 새로고침
         if (m_activeShDialog && m_activeCalId == calId) {
             m_socket->write((Protocol::REQSHDAY + Protocol::SEP
                              + QString::number(calId) + Protocol::SEP
@@ -591,7 +575,6 @@ void MainWindow::processMessage(const QString& data) {
         }
     }
 
-    // ── 공유 채팅 기록 수신 ──────────────────────────────────
     else if (data.startsWith(Protocol::RESSHCHAT + Protocol::SEP)) {
         QString payload = data.mid(Protocol::RESSHCHAT.length() + Protocol::SEP.length());
         int sep = payload.indexOf(Protocol::SEP);
@@ -615,13 +598,11 @@ void MainWindow::processMessage(const QString& data) {
         }
     }
 
-    // ── 공유 채팅 실시간 수신 ────────────────────────────────
     else if (data.startsWith(Protocol::SHCHATRES + Protocol::SEP)) {
         QString payload = data.mid(Protocol::SHCHATRES.length() + Protocol::SEP.length());
         QStringList p = payload.split(Protocol::SEP);
         if (p.size() < 5) return;
         int     calId  = p[0].toInt();
-        // p[1]은 rowid (클라이언트 미사용)
         QString sender = p[2];
         QString rawT   = p[3];
         QString msg    = p.mid(4).join(Protocol::SEP);
@@ -657,16 +638,13 @@ void MainWindow::processMessage(const QString& data) {
         }
     }
 
-    // ── ACK ──────────────────────────────────────────────────
     else if (data.startsWith(Protocol::ACK)) {
         if (!data.contains("OK"))
             QMessageBox::critical(this, "오류", "요청 처리에 실패했습니다.");
     }
 }
 
-// ──────────────────────────────────────────────
-//  채팅
-// ──────────────────────────────────────────────
+
 
 void MainWindow::onChatBtnClicked() {
     if (m_activeCalId != -1) {
@@ -692,7 +670,6 @@ void MainWindow::onSearchBtnClicked() {
     });
     connect(m_searchDialog, &SearchDialog::dateSelected, this, [this](const QDate& date, int calId) {
         if (calId == 0) {
-            // 내 캘린더 탭으로 이동
             m_calTabWidget->setCurrentIndex(0);
             ui->calendarWidget->setSelectedDate(date);
             ui->calendarWidget->showSelectedDate();
@@ -745,21 +722,21 @@ void MainWindow::onMyPageBtnClicked() {
     // 프로필 사진 변경
     if (dlg.photoChanged()) {
         QPixmap pix = dlg.newPhoto();
+        // 전송용: 512x512로 맞추되 JPEG 95로 고화질 유지
+        QPixmap upload = pix.scaled(512, 512, Qt::KeepAspectRatioByExpanding, Qt::SmoothTransformation);
         QByteArray bytes;
         QBuffer buf(&bytes);
         buf.open(QIODevice::WriteOnly);
-        pix.scaled(256, 256, Qt::KeepAspectRatio, Qt::SmoothTransformation)
-            .save(&buf, "JPEG", 85);
+        upload.save(&buf, "JPEG", 95);
         QString b64 = QString::fromLatin1(bytes.toBase64());
         m_socket->write((Protocol::PROFILE_UPLOAD + Protocol::SEP
                          + m_myId + Protocol::SEP + b64 + "\n").toUtf8());
-        m_profileCache[m_myId] = circularPixmap(pix, 36);
+        m_profileCache[m_myId] = upload; // 표시할 때 크기별로 자름
         updateFriendsList();
     }
 }
 
 void MainWindow::openDmChat(const QString& peerId) {
-    // 다이얼로그가 없으면 새로 생성
     if (!m_dmDialogs.contains(peerId)) {
         auto* dlg = new ChatDialog(m_myId, this);
         dlg->setTitle("💬 " + peerId);
@@ -777,7 +754,7 @@ void MainWindow::openDmChat(const QString& peerId) {
     if (dlg->isVisible()) {
         dlg->hide();
     } else {
-        // 최초 1회만 기록 요청 (이후엔 실시간 DMRES로 누적)
+        // 세션당 최초 1회만 히스토리 로드, 이후 실시간 메시지는 DMRES로 누적
         if (!m_dmLoaded.contains(peerId) && m_socket->state() == QAbstractSocket::ConnectedState) {
             m_pendingDmPeer = peerId;
             m_socket->write((Protocol::REQDM + Protocol::SEP
@@ -806,7 +783,6 @@ void MainWindow::updateChatBtnText() {
 }
 
 void MainWindow::openFriendTab(const QString& friendId) {
-    // 이미 탭이 있으면 그 탭으로 전환
     for (int i = 0; i < m_calTabWidget->count(); i++) {
         if (m_calTabWidget->tabBar()->tabData(i).toString() == "F:" + friendId) {
             m_calTabWidget->setCurrentIndex(i);
@@ -826,10 +802,9 @@ void MainWindow::openFriendTab(const QString& friendId) {
     calWidget->setDarkMode(m_darkMode);
     if (m_weather) calWidget->setWeatherData(m_weather->data());
 
-    // 날짜 클릭 → 친구 일정 조회 (읽기 전용)
+    // 친구 캘린더는 읽기 전용이지만 날짜 클릭 핸들러는 공유해서 씀
     connect(calWidget, &QCalendarWidget::clicked,
             this, &MainWindow::onDateClicked);
-    // 월 이동 → 친구 월별 일정 요청
     connect(calWidget, &QCalendarWidget::currentPageChanged,
             this, &MainWindow::requestMonthSchedules);
 
@@ -841,7 +816,6 @@ void MainWindow::openFriendTab(const QString& friendId) {
     m_calTabWidget->tabBar()->setTabData(tabIdx, QString("F:") + friendId);
 
     m_calTabWidget->setCurrentIndex(tabIdx);
-    // currentChanged 에서 m_selectedId = friendId 로 설정되고 REQMONTH 전송됨
 }
 
 void MainWindow::requestSharedCals() {
@@ -857,7 +831,6 @@ void MainWindow::requestSharedMonthSchedules(int calId, int year, int month) {
 }
 
 void MainWindow::refreshSharedCalTabs() {
-    // 기존 공유 탭 제거 (개인 탭 0번 제외)
     while (m_calTabWidget->count() > 1)
         m_calTabWidget->removeTab(1);
 
@@ -1024,18 +997,18 @@ void MainWindow::showSharedDateDialog(int calId, const QDate& date,
 }
 
 void MainWindow::updateFriendsList() {
-    // 기존 버튼 전부 제거
+    // 매번 전체를 다시 그림. 위젯 수가 많지 않아서 성능 문제 없음
     while (m_friendsLayout->count() > 0) {
         QLayoutItem* item = m_friendsLayout->takeAt(0);
         if (item->widget()) item->widget()->deleteLater();
         delete item;
     }
 
+    // RESUSERS로 받은 전체 목록 + ONLINE으로 받은 현재 접속자를 합쳐서 표시
     QStringList known = m_allKnownUsers;
     for (const QString& u : m_onlineUsers)
         if (!known.contains(u)) known << u;
 
-    // 본인 제외, 온라인/오프라인 분리
     QStringList onlineFriends, offlineFriends;
     for (const QString& u : known) {
         if (u == m_myId) continue;
@@ -1046,13 +1019,12 @@ void MainWindow::updateFriendsList() {
     int friendOnlineCount = onlineFriends.size();
     ui->onlineLabel->setText(QString("👥  %1명 접속 중  |").arg(friendOnlineCount));
 
-    // 프로필 없는 유저는 요청
+    // 온라인 먼저, 그 다음 오프라인 순으로 표시
     QStringList allFriends = onlineFriends + offlineFriends;
     for (const QString& u : allFriends)
         if (!m_profileCache.contains(u))
             requestProfile(u);
 
-    // 친구 위젯 생성 람다 (아바타 + 이름)
     auto addBtn = [this](const QString& userId, bool online) {
         auto* container = new QWidget();
         container->setCursor(Qt::PointingHandCursor);
@@ -1060,13 +1032,12 @@ void MainWindow::updateFriendsList() {
         hbox->setContentsMargins(6, 2, 10, 2);
         hbox->setSpacing(6);
 
-        // 동그란 프로필 사진
         auto* avatar = new QLabel();
         avatar->setFixedSize(28, 28);
         if (m_profileCache.contains(userId)) {
             avatar->setPixmap(circularPixmap(m_profileCache[userId], 28));
         } else {
-            // 기본 아바타: 이니셜
+            // 프로필 없으면 이니셜로 기본 아바타 생성
             QPixmap def(28, 28);
             def.fill(Qt::transparent);
             QPainter p(&def);
@@ -1080,7 +1051,7 @@ void MainWindow::updateFriendsList() {
             avatar->setPixmap(def);
         }
 
-        // 닉네임이 있으면 닉네임 표시, 없으면 userId
+        // 닉네임 캐시에 없으면 서버에 요청 (응답 오면 updateFriendsList 재호출됨)
         if (!m_nicknameCache.contains(userId))
             m_socket->write((Protocol::NICK_REQ + Protocol::SEP + userId + "\n").toUtf8());
         QString displayName = m_nicknameCache.value(userId, userId);
@@ -1103,12 +1074,11 @@ void MainWindow::updateFriendsList() {
         container->installEventFilter(this);
         container->setProperty("userId", userId);
 
-        // 클릭 이벤트를 위해 마우스 press를 감지
+        // QWidget에는 clicked 시그널이 없어서 투명 버튼을 위에 올려서 클릭 처리
         connect(new QObject(container), &QObject::destroyed, this, []{});
         auto* clickFilter = new QObject(container);
         container->installEventFilter(clickFilter);
 
-        // QPushButton을 투명하게 위에 덮어서 클릭 처리
         auto* clickBtn = new QPushButton(container);
         clickBtn->setFlat(true);
         clickBtn->setStyleSheet("QPushButton{background:transparent;border:none;}");
@@ -1126,9 +1096,7 @@ void MainWindow::updateFriendsList() {
     m_friendsLayout->addStretch();
 }
 
-// ──────────────────────────────────────────────
-//  UI 이벤트
-// ──────────────────────────────────────────────
+
 
 void MainWindow::onDateClicked(const QDate& date) {
     m_selectedDate = date;
@@ -1158,9 +1126,7 @@ void MainWindow::showDateDialog() {
     m_activeDialog->open();
 }
 
-// ──────────────────────────────────────────────
-//  다이얼로그 → 서버 요청
-// ──────────────────────────────────────────────
+
 
 void MainWindow::onDialogAdd(const QString& content) {
     QString msg = Protocol::ADD + Protocol::SEP
@@ -1192,9 +1158,7 @@ void MainWindow::onDialogDelete(qint64 rowid) {
                           ui->calendarWidget->monthShown());
 }
 
-// ──────────────────────────────────────────────
-//  연결 오류
-// ──────────────────────────────────────────────
+
 
 void MainWindow::showJoinNotification(const QString& userId) {
     auto* popup = new QWidget(nullptr,
@@ -1237,12 +1201,10 @@ void MainWindow::showJoinNotification(const QString& userId) {
     layout->addLayout(textLayout);
     layout->addStretch();
 
-    // 우측 하단 위치 계산
     QPoint pos = mapToGlobal(QPoint(width() - 320, height() - 86));
     popup->move(pos);
     popup->show();
 
-    // 3초 후 자동 닫힘
     QTimer::singleShot(3000, popup, &QWidget::close);
 }
 
@@ -1255,35 +1217,27 @@ static QIcon makeCalendarIcon(int today, int unread = 0) {
     QPainter p(&pm);
     p.setRenderHint(QPainter::Antialiasing);
 
-    // ── 흰 카드 배경 (둥근 모서리) ─────────────────────
     p.setPen(Qt::NoPen);
     p.setBrush(QColor("#FFFFFF"));
     p.drawRoundedRect(1, 1, S - 2, S - 2, 5, 5);
 
-    // ── 테두리 ─────────────────────────────────────────
     p.setPen(QPen(QColor("#C7C7CC"), 1));
     p.setBrush(Qt::NoBrush);
     p.drawRoundedRect(1, 1, S - 2, S - 2, 5, 5);
 
-    // ── 빨간 헤더 바 ───────────────────────────────────
     p.setPen(Qt::NoPen);
     p.setBrush(QColor("#FF3B30"));
-    // 상단만 둥글게
     QPainterPath header;
     header.addRoundedRect(1, 1, S - 2, 9, 5, 5);
     header.addRect(1, 5, S - 2, 5);   // 하단 직각으로 채움
     p.drawPath(header);
 
-    // ── 격자선 (날짜 칸) ───────────────────────────────
     p.setPen(QPen(QColor("#E5E5EA"), 0.5));
-    // 가로선
     p.drawLine(2, 16, S - 2, 16);
     p.drawLine(2, 23, S - 2, 23);
-    // 세로선
     for (int x : {12, 22})
         p.drawLine(x, 10, x, S - 2);
 
-    // ── 오늘 날짜 숫자 (중앙 칸에 파란 원) ─────────────
     QRect numCircle(10, 11, 12, 12);
     p.setPen(Qt::NoPen);
     p.setBrush(QColor("#007AFF"));
@@ -1296,13 +1250,11 @@ static QIcon makeCalendarIcon(int today, int unread = 0) {
     p.setFont(nf);
     p.drawText(numCircle, Qt::AlignCenter, QString::number(today));
 
-    // ── 나머지 칸 점 (일정 있음 표시) ─────────────────
     p.setPen(Qt::NoPen);
     p.setBrush(QColor("#C7C7CC"));
     for (QPoint dot : {QPoint(6,19), QPoint(26,19), QPoint(6,26), QPoint(16,26), QPoint(26,26)})
         p.drawEllipse(dot.x() - 1, dot.y() - 1, 3, 3);
 
-    // ── 미읽음 뱃지 ────────────────────────────────────
     if (unread > 0) {
         QString cnt = unread > 99 ? "99+" : QString::number(unread);
         int bW = (unread > 9) ? 14 : 11;
@@ -1329,7 +1281,6 @@ void MainWindow::applyTheme(bool dark)
     m_themeBtn->setText(dark ? "☀️" : "🌙");
 
     if (dark) {
-        // ── 메인 윈도우 ──────────────────────────────────
         ui->centralwidget->setStyleSheet("QWidget { background:#1C1C1E; }");
         ui->navBar->setStyleSheet(
             "QFrame#navBar { background:#2C2C2E; border-bottom:1px solid #3A3A3C; }");
@@ -1361,7 +1312,6 @@ void MainWindow::applyTheme(bool dark)
             "QPushButton { background:transparent; border:none; font-size:18px; border-radius:18px; }"
             "QPushButton:hover { background:#3A3A3C; }");
     } else {
-        // ── 라이트 복원 ───────────────────────────────────
         ui->centralwidget->setStyleSheet("");
         ui->navBar->setStyleSheet(
             "QFrame#navBar { background:#FFFFFF; border-bottom:1px solid #E5E5EA; }");
@@ -1402,7 +1352,6 @@ void MainWindow::applyTheme(bool dark)
     for (auto* dlg : m_sharedChatDialogs)
         dlg->setDarkMode(dark);
 
-    // 탭 위젯 스타일
     if (m_calTabWidget) {
         if (dark) {
             m_calTabWidget->setStyleSheet(R"(
@@ -1425,7 +1374,6 @@ void MainWindow::applyTheme(bool dark)
         }
     }
 
-    // 공유/친구 캘린더 위젯 스타일 적용
     for (auto* w : m_sharedCalWidgets) {
         w->setStyleSheet(ui->calendarWidget->styleSheet());
         w->setDarkMode(dark);
@@ -1475,7 +1423,6 @@ void MainWindow::setupTray() {
                 }
             });
 
-    // 알림 클릭 → 해당 채팅 바로 열기
     connect(m_trayIcon, &QSystemTrayIcon::messageClicked, this, [this]() {
         showNormal();
         raise();

@@ -17,7 +17,6 @@ LoginDialog::LoginDialog(QWidget* parent) : QDialog(parent)
     root->setSpacing(0);
     root->setContentsMargins(40, 36, 40, 32);
 
-    // ── 로고 + 타이틀 ────────────────────────────────────
     auto* topRow = new QHBoxLayout();
     topRow->setSpacing(14);
     topRow->setAlignment(Qt::AlignLeft | Qt::AlignVCenter);
@@ -40,14 +39,12 @@ LoginDialog::LoginDialog(QWidget* parent) : QDialog(parent)
     root->addLayout(topRow);
     root->addSpacing(24);
 
-    // ── 구분선 ────────────────────────────────────────────
     auto* div0 = new QFrame(this);
     div0->setFrameShape(QFrame::HLine);
     div0->setStyleSheet("color:#EEEEEE;");
     root->addWidget(div0);
     root->addSpacing(20);
 
-    // ── 서버 IP ───────────────────────────────────────────
     auto* ipLabel = new QLabel("서버 IP", this);
     ipLabel->setStyleSheet("font-size:11px; font-weight:700; color:#757575; letter-spacing:0.8px;");
     root->addWidget(ipLabel);
@@ -63,7 +60,6 @@ LoginDialog::LoginDialog(QWidget* parent) : QDialog(parent)
     root->addWidget(m_ipEdit);
     root->addSpacing(18);
 
-    // ── Google 로그인 ─────────────────────────────────────
     m_googleBtn = new QPushButton(this);
     m_googleBtn->setText("  Google 계정으로 로그인");
     m_googleBtn->setFixedHeight(42);
@@ -95,7 +91,6 @@ LoginDialog::LoginDialog(QWidget* parent) : QDialog(parent)
     root->addWidget(m_statusLabel);
     root->addSpacing(14);
 
-    // ── 또는 ─────────────────────────────────────────────
     auto* sepLayout = new QHBoxLayout();
     auto makeLine = [this]() {
         auto* f = new QFrame(this);
@@ -111,7 +106,6 @@ LoginDialog::LoginDialog(QWidget* parent) : QDialog(parent)
     root->addLayout(sepLayout);
     root->addSpacing(14);
 
-    // ── ID 직접 입력 ──────────────────────────────────────
     auto* idLabel = new QLabel("사용자 ID", this);
     idLabel->setStyleSheet("font-size:11px; font-weight:700; color:#757575; letter-spacing:0.8px;");
     root->addWidget(idLabel);
@@ -128,7 +122,6 @@ LoginDialog::LoginDialog(QWidget* parent) : QDialog(parent)
     root->addWidget(m_idEdit);
     root->addSpacing(14);
 
-    // ── 비밀번호 ──────────────────────────────────────────
     auto* pwLabel = new QLabel("비밀번호", this);
     pwLabel->setStyleSheet("font-size:11px; font-weight:700; color:#757575; letter-spacing:0.8px;");
     root->addWidget(pwLabel);
@@ -146,7 +139,6 @@ LoginDialog::LoginDialog(QWidget* parent) : QDialog(parent)
     root->addWidget(m_pwEdit);
     root->addSpacing(18);
 
-    // ── 버튼 행 ───────────────────────────────────────────
     auto* btnRow = new QHBoxLayout();
     btnRow->setSpacing(10);
 
@@ -173,7 +165,6 @@ LoginDialog::LoginDialog(QWidget* parent) : QDialog(parent)
     root->addLayout(btnRow);
     root->addSpacing(10);
 
-    // ── 회원가입 링크 ──────────────────────────────────────
     auto* signupRow = new QHBoxLayout();
     signupRow->setAlignment(Qt::AlignHCenter);
     auto* signupHint = new QLabel("계정이 없으신가요?", this);

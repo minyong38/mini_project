@@ -15,7 +15,6 @@ ChatDialog::ChatDialog(const QString& myId, QWidget* parent)
     mainLayout->setSpacing(0);
     mainLayout->setContentsMargins(0, 0, 0, 0);
 
-    // ── 타이틀 바 ──────────────────────────────────────
     auto* titleBar = new QWidget();
     titleBar->setFixedHeight(52);
     titleBar->setStyleSheet("background: #3C1E1E;");
@@ -26,7 +25,6 @@ ChatDialog::ChatDialog(const QString& myId, QWidget* parent)
     titleLayout->addWidget(m_titleLabel);
     mainLayout->addWidget(titleBar);
 
-    // ── 메시지 스크롤 영역 ─────────────────────────────
     m_scrollArea = new QScrollArea();
     m_scrollArea->setWidgetResizable(true);
     m_scrollArea->setHorizontalScrollBarPolicy(Qt::ScrollBarAlwaysOff);
@@ -47,7 +45,6 @@ ChatDialog::ChatDialog(const QString& myId, QWidget* parent)
     m_scrollArea->setWidget(m_messageContainer);
     mainLayout->addWidget(m_scrollArea);
 
-    // ── 입력 바 ────────────────────────────────────────
     auto* inputBar = new QWidget();
     inputBar->setFixedHeight(60);
     inputBar->setStyleSheet("background: #F5F5F5; border-top: 1px solid #DDDDDD;");
@@ -141,14 +138,12 @@ void ChatDialog::appendMessage(qint64 rowid, int unread,
 {
     bool isMe = (userId == m_myId);
 
-    // ── 행 ────────────────────────────────────────────
     auto* row = new QWidget();
     row->setStyleSheet("background: transparent;");
     auto* rowLayout = new QHBoxLayout(row);
     rowLayout->setContentsMargins(0, 0, 0, 0);
     rowLayout->setSpacing(4);
 
-    // ── 말풍선 ────────────────────────────────────────
     auto* bubble = new QWidget();
     auto* bubbleLayout = new QVBoxLayout(bubble);
     bubbleLayout->setContentsMargins(12, 8, 12, 8);
@@ -189,12 +184,10 @@ void ChatDialog::appendMessage(qint64 rowid, int unread,
                               : "background:#FFFFFF; border-radius:12px; border-top-left-radius:2px;"
                           );
 
-    // ── 시간 라벨 ─────────────────────────────────────
     auto* timeLabel = new QLabel(time);
     timeLabel->setStyleSheet("color:#6E8B9A; font-size:10px; background:transparent;");
     timeLabel->setAlignment(Qt::AlignBottom);
 
-    // ── 미읽음 숫자 라벨 ──────────────────────────────
     auto* unreadLabel = new QLabel(unread > 0 ? QString::number(unread) : "");
     unreadLabel->setStyleSheet(
         "color:#34C759; font-size:10px; font-weight:bold; background:transparent;"
@@ -203,7 +196,6 @@ void ChatDialog::appendMessage(qint64 rowid, int unread,
     unreadLabel->setVisible(unread > 0);
     m_unreadLabels[rowid] = unreadLabel;
 
-    // ── 정렬 ──────────────────────────────────────────
     if (isMe) {
         // 오른쪽 정렬: [stretch][미읽음][시간][버블]
         rowLayout->addStretch();

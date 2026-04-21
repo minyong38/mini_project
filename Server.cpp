@@ -56,6 +56,7 @@ void ScheduleServer::onNewConnection() {
 void ScheduleServer::onReadyRead() {
     QTcpSocket* socket = qobject_cast<QTcpSocket*>(sender());
     if (!socket) return;
+    // 이미지 같은 큰 메시지는 여러 번에 걸쳐 도착할 수 있어서 버퍼에 쌓아두고 처리
     m_buffers[socket] += QString::fromUtf8(socket->readAll());
     while (m_buffers[socket].contains('\n')) {
         int idx = m_buffers[socket].indexOf('\n');
@@ -70,16 +71,15 @@ void ScheduleServer::handleRequest(QTcpSocket* socket, const QString& data) {
     if (parts.isEmpty()) return;
     const QString cmd = parts[0];
 
-    // ── 프로필 업로드 ────────────────────────────────────────────
     if (cmd == Protocol::PROFILE_UPLOAD && parts.size() >= 3) {
         QString userId = parts[1];
-        QString base64 = parts.mid(2).join(Protocol::SEP);
+        QString base64 = parts.mid(2).join(Protocol::SEP); // base64에 ':' 포함될 수 있어서 join으로 재조립
         QSqlQuery q;
         q.prepare("INSERT OR REPLACE INTO profiles (USER_ID, PHOTO) VALUES(?,?)");
         q.addBindValue(userId); q.addBindValue(base64);
         if (q.exec()) {
             socket->write((Protocol::PROFILE_OK + "\n").toUtf8());
-            // 접속 중인 다른 클라이언트에 프로필 변경 브로드캐스트
+            // 저장 후 다른 접속자들에게 바로 전파해서 실시간으로 프로필 갱신되게 함
             QString broadcast = Protocol::PROFILE_RES + Protocol::SEP
                                 + userId + Protocol::SEP + base64 + "\n";
             for (QTcpSocket* s : m_clients) {
@@ -92,7 +92,6 @@ void ScheduleServer::handleRequest(QTcpSocket* socket, const QString& data) {
         return;
     }
 
-    // ── 프로필 조회 ──────────────────────────────────────────────
     else if (cmd == Protocol::PROFILE_REQ && parts.size() >= 2) {
         QString userId = parts[1];
         QSqlQuery q;
@@ -106,7 +105,6 @@ void ScheduleServer::handleRequest(QTcpSocket* socket, const QString& data) {
         return;
     }
 
-    // ── 프로필 삭제 ──────────────────────────────────────────────
     else if (cmd == Protocol::PROFILE_DELETE && parts.size() >= 2) {
         QString userId = parts[1];
         QSqlQuery q;
@@ -114,7 +112,6 @@ void ScheduleServer::handleRequest(QTcpSocket* socket, const QString& data) {
         q.addBindValue(userId);
         if (q.exec()) {
             socket->write((Protocol::PROFILE_OK + "\n").toUtf8());
-            // 삭제도 브로드캐스트 (빈 base64 = 사진 없음)
             QString broadcast = Protocol::PROFILE_RES + Protocol::SEP
                                 + userId + Protocol::SEP + "\n";
             for (QTcpSocket* s : m_clients) {
@@ -127,7 +124,6 @@ void ScheduleServer::handleRequest(QTcpSocket* socket, const QString& data) {
         return;
     }
 
-    // ── 닉네임 업데이트 ──────────────────────────────────────────
     else if (cmd == Protocol::NICK_UPDATE && parts.size() >= 3) {
         QString userId   = parts[1];
         QString nickname = parts.mid(2).join(Protocol::SEP);
@@ -148,7 +144,6 @@ void ScheduleServer::handleRequest(QTcpSocket* socket, const QString& data) {
         return;
     }
 
-    // ── 닉네임 조회 ──────────────────────────────────────────────
     else if (cmd == Protocol::NICK_REQ && parts.size() >= 2) {
         QString userId = parts[1];
         QSqlQuery q;
@@ -161,13 +156,11 @@ void ScheduleServer::handleRequest(QTcpSocket* socket, const QString& data) {
         return;
     }
 
-    // ── 일정 검색 ────────────────────────────────────────────────
     else if (cmd == Protocol::SEARCH_REQ && parts.size() >= 3) {
         QString userId  = parts[1];
         QString keyword = parts.mid(2).join(Protocol::SEP);
         QStringList entries;
 
-        // 개인 일정 검색
         QSqlQuery q;
         q.prepare("SELECT DATE, CONTENT FROM schedules "
                   "WHERE USER_ID=? AND CONTENT LIKE ? ORDER BY DATE ASC");
@@ -177,7 +170,6 @@ void ScheduleServer::handleRequest(QTcpSocket* socket, const QString& data) {
         while (q.next())
             entries << "0\t내 캘린더\t" + q.value(0).toString() + "\t" + q.value(1).toString();
 
-        // 멤버로 속한 공유 캘린더 일정 검색
         QSqlQuery q2;
         q2.prepare("SELECT ss.DATE, ss.CONTENT, sc.ID, sc.NAME "
                    "FROM shared_schedules ss "
@@ -196,7 +188,6 @@ void ScheduleServer::handleRequest(QTcpSocket* socket, const QString& data) {
         return;
     }
 
-    // ── 회원가입 ─────────────────────────────────────────────────
     else if (cmd == Protocol::SIGNUP && parts.size() >= 3) {
         QString userId   = parts[1];
         QString password = parts[2];
@@ -216,7 +207,6 @@ void ScheduleServer::handleRequest(QTcpSocket* socket, const QString& data) {
         return;
     }
 
-    // ── 로그인 ──────────────────────────────────────────────────
     else if (cmd == Protocol::LOGIN && parts.size() >= 2) {
         QString userId   = parts[1];
         QString password = (parts.size() >= 3) ? parts[2] : "";
@@ -249,7 +239,6 @@ void ScheduleServer::handleRequest(QTcpSocket* socket, const QString& data) {
         broadcastOnlineList();
     }
 
-    // ── 일정 조회 ────────────────────────────────────────────────
     else if (cmd == Protocol::REQ && parts.size() >= 3) {
         QSqlQuery q;
         q.prepare("SELECT rowid, CONTENT FROM schedules WHERE USER_ID=? AND DATE=?");
@@ -261,7 +250,6 @@ void ScheduleServer::handleRequest(QTcpSocket* socket, const QString& data) {
         }
     }
 
-    // ── 일정 추가 ────────────────────────────────────────────────
     else if (cmd == Protocol::ADD && parts.size() >= 4) {
         QSqlQuery q;
         q.prepare("INSERT INTO schedules (USER_ID,DATE,CONTENT) VALUES(?,?,?)");
@@ -272,7 +260,6 @@ void ScheduleServer::handleRequest(QTcpSocket* socket, const QString& data) {
                           : (Protocol::ACK + ":ERR\n").toUtf8());
     }
 
-    // ── 일정 삭제 ────────────────────────────────────────────────
     else if (cmd == Protocol::DEL && parts.size() >= 2) {
         QSqlQuery q;
         q.prepare("DELETE FROM schedules WHERE rowid=?");
@@ -282,7 +269,6 @@ void ScheduleServer::handleRequest(QTcpSocket* socket, const QString& data) {
                           : (Protocol::ACK + ":ERR\n").toUtf8());
     }
 
-    // ── 일정 수정 ────────────────────────────────────────────────
     else if (cmd == Protocol::MOD && parts.size() >= 3) {
         QSqlQuery q;
         q.prepare("UPDATE schedules SET CONTENT=? WHERE rowid=?");
@@ -293,7 +279,6 @@ void ScheduleServer::handleRequest(QTcpSocket* socket, const QString& data) {
                           : (Protocol::ACK + ":ERR\n").toUtf8());
     }
 
-    // ── 월별 조회 ────────────────────────────────────────────────
     else if (cmd == Protocol::REQMONTH && parts.size() >= 3) {
         QSqlQuery q;
         q.prepare("SELECT rowid,DATE,CONTENT FROM schedules WHERE USER_ID=? AND DATE LIKE ?");
@@ -306,7 +291,6 @@ void ScheduleServer::handleRequest(QTcpSocket* socket, const QString& data) {
         }
     }
 
-    // ── 유저 목록 ────────────────────────────────────────────────
     else if (cmd == Protocol::REQUSERS) {
         QSqlQuery q;
         q.exec("SELECT DISTINCT USER_ID FROM schedules ORDER BY USER_ID");
@@ -319,7 +303,6 @@ void ScheduleServer::handleRequest(QTcpSocket* socket, const QString& data) {
         socket->write((Protocol::RESUSERS + Protocol::SEP + users.join("|") + "\n").toUtf8());
     }
 
-    // ── 채팅 전송 ────────────────────────────────────────────────
     else if (cmd == Protocol::CHAT && parts.size() >= 3) {
         QString userId  = parts[1];
         QString message = parts.mid(2).join(Protocol::SEP);
@@ -332,15 +315,12 @@ void ScheduleServer::handleRequest(QTcpSocket* socket, const QString& data) {
 
         qint64 rowid = q.lastInsertId().toLongLong();
 
-        // 전송자 제외 온라인 사용자 수 = 미읽음 초기값
         int unread = qMax(0, m_clientIds.size() - 1);
         m_unreadCount[rowid]      = unread;
-        m_lastReadRowid[userId]   = rowid; // 전송자는 자신의 메시지를 이미 읽음
 
         broadcastChat(rowid, unread, userId, timeStr, message);
     }
 
-    // ── 1대1 DM 전송 ─────────────────────────────────────────────
     else if (cmd == Protocol::DM && parts.size() >= 4) {
         QString sender   = parts[1];
         QString receiver = parts[2];
@@ -366,10 +346,10 @@ void ScheduleServer::handleRequest(QTcpSocket* socket, const QString& data) {
         }
     }
 
-    // ── 1대1 DM 기록 요청 ────────────────────────────────────────
     else if (cmd == Protocol::REQDM && parts.size() >= 3) {
         QString u1 = parts[1], u2 = parts[2];
         QSqlQuery q;
+        // 서브쿼리에 rowid를 포함해야 바깥 ORDER BY rowid ASC가 제대로 동작함
         q.prepare(
             "SELECT SENDER,SEND_TIME,MESSAGE FROM "
             "  (SELECT rowid,SENDER,SEND_TIME,MESSAGE FROM dm_chats "
@@ -383,17 +363,16 @@ void ScheduleServer::handleRequest(QTcpSocket* socket, const QString& data) {
         QStringList entries;
         if (q.exec()) {
             while (q.next()) {
-                entries << q.value(0).toString()   // SENDER
+                entries << q.value(0).toString()
                                + Protocol::SEP
-                               + q.value(1).toString()   // SEND_TIME
+                               + q.value(1).toString()
                                + Protocol::SEP
-                               + q.value(2).toString();  // MESSAGE
+                               + q.value(2).toString();
             }
         }
         socket->write((Protocol::RESDM + Protocol::SEP + entries.join("|") + "\n").toUtf8());
     }
 
-    // ── 단체 채팅 기록 요청 ──────────────────────────────────────
     else if (cmd == Protocol::REQCHAT && parts.size() >= 2) {
         QString userId = parts[1];
 
@@ -431,7 +410,6 @@ void ScheduleServer::handleRequest(QTcpSocket* socket, const QString& data) {
             m_lastReadRowid[userId] = maxRowid;
     }
 
-    // ── 공유 캘린더 생성 ─────────────────────────────────────
     else if (cmd == Protocol::CREATECAL && parts.size() >= 3) {
         QString owner   = parts[1];
         QString calName = parts[2];
@@ -460,7 +438,6 @@ void ScheduleServer::handleRequest(QTcpSocket* socket, const QString& data) {
         sendToCalMembers(calId, notif);
     }
 
-    // ── 공유 캘린더 목록 조회 ────────────────────────────────
     else if (cmd == Protocol::REQCALS && parts.size() >= 2) {
         QString userId = parts[1];
         QSqlQuery q;
@@ -490,7 +467,6 @@ void ScheduleServer::handleRequest(QTcpSocket* socket, const QString& data) {
         socket->write((Protocol::RESCALS + Protocol::SEP + entries.join("|") + "\n").toUtf8());
     }
 
-    // ── 공유 캘린더 월별 일정 ────────────────────────────────
     else if (cmd == Protocol::REQSHMONTH && parts.size() >= 3) {
         int     calId = parts[1].toInt();
         QString ym    = parts[2];
@@ -511,7 +487,6 @@ void ScheduleServer::handleRequest(QTcpSocket* socket, const QString& data) {
                        + res.join("|") + "\n").toUtf8());
     }
 
-    // ── 공유 캘린더 일별 일정 ────────────────────────────────
     else if (cmd == Protocol::REQSHDAY && parts.size() >= 3) {
         int     calId = parts[1].toInt();
         QString date  = parts[2];
@@ -530,7 +505,6 @@ void ScheduleServer::handleRequest(QTcpSocket* socket, const QString& data) {
                        + res.join("|") + "\n").toUtf8());
     }
 
-    // ── 공유 캘린더 일정 추가 ────────────────────────────────
     else if (cmd == Protocol::ADDSH && parts.size() >= 5) {
         int     calId   = parts[1].toInt();
         QString userId  = parts[2];
@@ -551,7 +525,6 @@ void ScheduleServer::handleRequest(QTcpSocket* socket, const QString& data) {
         }
     }
 
-    // ── 공유 캘린더 일정 삭제 ────────────────────────────────
     else if (cmd == Protocol::DELSH && parts.size() >= 3) {
         int    calId = parts[1].toInt();
         qint64 rowid = parts[2].toLongLong();
@@ -569,7 +542,6 @@ void ScheduleServer::handleRequest(QTcpSocket* socket, const QString& data) {
         }
     }
 
-    // ── 공유 캘린더 일정 수정 ────────────────────────────────
     else if (cmd == Protocol::MODSH && parts.size() >= 4) {
         int     calId   = parts[1].toInt();
         qint64  rowid   = parts[2].toLongLong();
@@ -588,7 +560,6 @@ void ScheduleServer::handleRequest(QTcpSocket* socket, const QString& data) {
         }
     }
 
-    // ── 공유 채팅 기록 조회 ──────────────────────────────────
     else if (cmd == Protocol::REQSHCHAT && parts.size() >= 2) {
         int calId = parts[1].toInt();
 
@@ -611,7 +582,6 @@ void ScheduleServer::handleRequest(QTcpSocket* socket, const QString& data) {
                        + entries.join("|") + "\n").toUtf8());
     }
 
-    // ── 공유 캘린더 삭제 ─────────────────────────────────────
     else if (cmd == Protocol::DELCAL && parts.size() >= 2) {
         int calId = parts[1].toInt();
 
@@ -632,7 +602,6 @@ void ScheduleServer::handleRequest(QTcpSocket* socket, const QString& data) {
         q.addBindValue(calId); q.exec();
     }
 
-    // ── 공유 채팅 전송 ────────────────────────────────────────
     else if (cmd == Protocol::SHCHAT && parts.size() >= 4) {
         int     calId   = parts[1].toInt();
         QString sender  = parts[2];
