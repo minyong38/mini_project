@@ -67,40 +67,58 @@ inline const QString REQDM = "REQDM";
 inline const QString RESDM = "RESDM";
 
 // 공유 캘린더
-// CREATECAL  : CREATECAL:owner:calName:member1~member2~...
-// CALID      : CALID:id  (서버→클라, 새 캘린더 ID 알림)
-// REQCALS    : REQCALS:userId
-// RESCALS    : RESCALS:id~name~owner~m1,m2|...
-// REQSHMONTH : REQSHMONTH:calId:yyyy-MM
-// RESSHMONTH : RESSHMONTH:calId:date@rowid@content|...
-// REQSHDAY   : REQSHDAY:calId:date
-// RESSHDAY   : RESSHDAY:calId:rowid:content|rowid:content|...
-// ADDSH      : ADDSH:calId:userId:date:content
-// DELSH      : DELSH:calId:rowid
-// MODSH      : MODSH:calId:rowid:content
-// SHUPDATE   : SHUPDATE:calId  (서버→전체 멤버, 일정 변경 알림)
-// REQSHCHAT  : REQSHCHAT:calId:userId
-// RESSHCHAT  : RESSHCHAT:calId:sender:HHmm:msg|...
-// SHCHAT     : SHCHAT:calId:sender:message
-// SHCHATRES  : SHCHATRES:calId:rowid:sender:HHmm:message
-inline const QString CREATECAL  = "CREATECAL";
+inline const QString CREATECAL  = "CREATECAL";  //캘린더 생성
+
+//생성된 캘린더 고유 ID 알림
 inline const QString CALID      = "CALID";
+
+//내가 참여중인 공유 캘린더 목록 요청
 inline const QString REQCALS    = "REQCALS";
+
+//목록 응답
 inline const QString RESCALS    = "RESCALS";
+
+//월별 일정 요청
 inline const QString REQSHMONTH = "REQSHMONTH";
+
+//월별 일정 응답
 inline const QString RESSHMONTH = "RESSHMONTH";
+
+//월별 상세 요청
 inline const QString REQSHDAY   = "REQSHDAY";
+
+//월별 상세 응답
 inline const QString RESSHDAY   = "RESSHDAY";
+
+//일정 추가
 inline const QString ADDSH      = "ADDSH";
+
+//일정삭제
 inline const QString DELSH      = "DELSH";
+
+//일정 수정
 inline const QString MODSH      = "MODSH";
+
 inline const QString SHUPDATE   = "SHUPDATE";
+
+
 inline const QString REQSHCHAT  = "REQSHCHAT";
+
+
 inline const QString RESSHCHAT  = "RESSHCHAT";
+
+
 inline const QString SHCHAT     = "SHCHAT";
+
+
 inline const QString SHCHATRES  = "SHCHATRES";
+
+
 inline const QString DELCAL     = "DELCAL";      // DELCAL:calId
+
+
 inline const QString CALREMOVED = "CALREMOVED";  // CALREMOVED:calId (서버→전체)
+
 
 // 닉네임
 // NICK_UPDATE : NICK_UPDATE:userId:nickname
