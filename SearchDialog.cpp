@@ -81,7 +81,7 @@ void SearchDialog::onSearch() {
     emit searchRequested(keyword);
 }
 
-void SearchDialog::setResults(const QList<QPair<QString, QString>>& results) {
+void SearchDialog::setResults(const QList<SearchResult>& results) {
     m_searchBtn->setEnabled(true);
     m_resultList->clear();
 
@@ -94,23 +94,26 @@ void SearchDialog::setResults(const QList<QPair<QString, QString>>& results) {
     m_statusLabel->setText(QString("검색 결과 %1건").arg(results.size()));
 
     for (const auto& r : results) {
-        QDate  date    = QDate::fromString(r.first, "yyyy-MM-dd");
-        QString title  = r.second.split('\t').value(0); // 탭 구분 제목만 추출
+        QDate   date    = QDate::fromString(r.date, "yyyy-MM-dd");
+        QString title   = r.content.split('\t').value(0);
         QString dateStr = date.toString("yyyy년 M월 d일 (ddd)");
+        QString calTag  = r.calId == 0 ? "📋 내 캘린더" : ("🗓 " + r.calName);
 
         auto* item = new QListWidgetItem;
-        item->setText(QString("📅  %1\n     %2").arg(dateStr, title));
-        item->setData(Qt::UserRole, r.first); // 날짜 저장
-        item->setSizeHint(QSize(0, 56));
+        item->setText(QString("[%1]\n%2  %3").arg(calTag, dateStr, title));
+        item->setData(Qt::UserRole,     r.date);
+        item->setData(Qt::UserRole + 1, r.calId);
+        item->setSizeHint(QSize(0, 64));
         m_resultList->addItem(item);
     }
 }
 
 void SearchDialog::onItemDoubleClicked(QListWidgetItem* item) {
     QString dateStr = item->data(Qt::UserRole).toString();
-    QDate date = QDate::fromString(dateStr, "yyyy-MM-dd");
+    int     calId   = item->data(Qt::UserRole + 1).toInt();
+    QDate   date    = QDate::fromString(dateStr, "yyyy-MM-dd");
     if (date.isValid()) {
-        emit dateSelected(date);
+        emit dateSelected(date, calId);
         accept();
     }
 }

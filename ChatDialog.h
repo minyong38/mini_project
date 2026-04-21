@@ -16,7 +16,6 @@
 
 class ChatDialog : public QDialog
 {
-private:
     Q_OBJECT //QT 시그널/슬롯 사용을 위한 필수 매크로
 public:
     //생성자 : ID와 위젯을 인자로 받음
