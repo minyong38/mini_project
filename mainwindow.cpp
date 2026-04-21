@@ -14,6 +14,7 @@
 #include <QStyle>
 #include <QTabWidget>
 #include <QPixmap>
+#include <QBuffer>
 
 MainWindow::MainWindow(const QString& ip, const QString& myId,
                        const QString& password, QWidget *parent)
@@ -259,6 +260,21 @@ void MainWindow::processMessage(const QString& data) {
         requestMonthSchedules(ui->calendarWidget->yearShown(),
                               ui->calendarWidget->monthShown());
         requestSharedCals();
+    }
+
+    else if (data.startsWith(Protocol::PROFILE_RES + Protocol::SEP)) {
+        QStringList p = data.split(Protocol::SEP);
+        if (p.size() >= 3) {
+            QString userId = p[1];
+            QString base64 = p.mid(2).join(Protocol::SEP);
+            QByteArray bytes = QByteArray::fromBase64(base64.toLatin1());
+            QPixmap pix;
+            pix.loadFromData(bytes, "JPEG");
+            if (!pix.isNull()) {
+                m_profileCache[userId] = circularPixmap(pix, 36);
+                updateFriendsList();
+            }
+        }
     }
     else if (data == Protocol::LOGIN_FAIL) {
         QMessageBox::critical(this, "로그인 실패",
@@ -899,33 +915,76 @@ void MainWindow::updateFriendsList() {
     int friendOnlineCount = onlineFriends.size();
     ui->onlineLabel->setText(QString("👥  %1명 접속 중  |").arg(friendOnlineCount));
 
-    // 친구 버튼 생성 람다
+    // 프로필 없는 유저는 요청
+    QStringList allFriends = onlineFriends + offlineFriends;
+    for (const QString& u : allFriends)
+        if (!m_profileCache.contains(u))
+            requestProfile(u);
+
+    // 친구 위젯 생성 람다 (아바타 + 이름)
     auto addBtn = [this](const QString& userId, bool online) {
-        auto* btn = new QPushButton((online ? "🟢 " : "⚫ ") + userId);
-        btn->setFixedHeight(22);
-        btn->setCursor(Qt::PointingHandCursor);
-        btn->setFlat(true);
-        if (m_darkMode) {
-            btn->setStyleSheet(online
-                ? "QPushButton{background:#1A3A2A;color:#4CAF7D;border:1px solid #2D6A4F;"
-                  "border-radius:11px;padding:0 10px;font-size:12px;}"
-                  "QPushButton:hover{background:#22503A;}"
-                : "QPushButton{background:#3A3A3C;color:#8E8E93;border:1px solid #48484A;"
-                  "border-radius:11px;padding:0 10px;font-size:12px;}"
-                  "QPushButton:hover{background:#48484A;}");
+        auto* container = new QWidget();
+        container->setCursor(Qt::PointingHandCursor);
+        auto* hbox = new QHBoxLayout(container);
+        hbox->setContentsMargins(6, 2, 10, 2);
+        hbox->setSpacing(6);
+
+        // 동그란 프로필 사진
+        auto* avatar = new QLabel();
+        avatar->setFixedSize(28, 28);
+        if (m_profileCache.contains(userId)) {
+            avatar->setPixmap(circularPixmap(m_profileCache[userId], 28));
         } else {
-            btn->setStyleSheet(online
-                ? "QPushButton{background:#E8F5E9;color:#2D6A4F;border:1px solid #C3E6CB;"
-                  "border-radius:11px;padding:0 10px;font-size:12px;}"
-                  "QPushButton:hover{background:#C8E6C9;}"
-                : "QPushButton{background:#F5F5F5;color:#8E8E93;border:1px solid #E0E0E0;"
-                  "border-radius:11px;padding:0 10px;font-size:12px;}"
-                  "QPushButton:hover{background:#EEEEEE;}");
+            // 기본 아바타: 이니셜
+            QPixmap def(28, 28);
+            def.fill(Qt::transparent);
+            QPainter p(&def);
+            p.setRenderHint(QPainter::Antialiasing);
+            p.setBrush(online ? QColor("#1A237E") : QColor("#9E9E9E"));
+            p.setPen(Qt::NoPen);
+            p.drawEllipse(0, 0, 28, 28);
+            p.setPen(Qt::white);
+            p.setFont(QFont("Arial", 11, QFont::Bold));
+            p.drawText(def.rect(), Qt::AlignCenter, userId.left(1).toUpper());
+            avatar->setPixmap(def);
         }
-        connect(btn, &QPushButton::clicked, this, [this, userId]() {
+
+        // 온라인 상태 점
+        QString dot = online ? "🟢" : "⚫";
+        auto* nameLabel = new QLabel(dot + " " + userId);
+        nameLabel->setStyleSheet(online
+            ? "font-size:12px; color:#2D6A4F; font-weight:600;"
+            : "font-size:12px; color:#8E8E93;");
+
+        hbox->addWidget(avatar);
+        hbox->addWidget(nameLabel);
+
+        QString borderColor = online ? "#C3E6CB" : "#E0E0E0";
+        QString bgColor     = online ? "#E8F5E9" : "#F5F5F5";
+        QString hoverColor  = online ? "#C8E6C9" : "#EEEEEE";
+        container->setStyleSheet(QString(
+            "QWidget { background:%1; border:1px solid %2; border-radius:14px; }"
+            "QWidget:hover { background:%3; }").arg(bgColor, borderColor, hoverColor));
+
+        container->installEventFilter(this);
+        container->setProperty("userId", userId);
+
+        // 클릭 이벤트를 위해 마우스 press를 감지
+        connect(new QObject(container), &QObject::destroyed, this, []{});
+        auto* clickFilter = new QObject(container);
+        container->installEventFilter(clickFilter);
+
+        // QPushButton을 투명하게 위에 덮어서 클릭 처리
+        auto* clickBtn = new QPushButton(container);
+        clickBtn->setFlat(true);
+        clickBtn->setStyleSheet("QPushButton{background:transparent;border:none;}");
+        clickBtn->setGeometry(0, 0, 300, 40);
+        clickBtn->raise();
+        connect(clickBtn, &QPushButton::clicked, this, [this, userId]() {
             openFriendTab(userId);
         });
-        m_friendsLayout->addWidget(btn);
+
+        m_friendsLayout->addWidget(container);
     };
 
     for (const QString& u : onlineFriends)  addBtn(u, true);
@@ -1348,4 +1407,22 @@ void MainWindow::startReconnectTimer() {
 void MainWindow::stopReconnectTimer() {
     if (m_reconnectTimer) m_reconnectTimer->stop();
     m_reconnectSecs = 5;
+}
+
+void MainWindow::requestProfile(const QString& userId) {
+    if (m_socket->state() != QAbstractSocket::ConnectedState) return;
+    m_socket->write((Protocol::PROFILE_REQ + Protocol::SEP + userId + "\n").toUtf8());
+}
+
+QPixmap MainWindow::circularPixmap(const QPixmap& src, int size) {
+    QPixmap scaled = src.scaled(size, size, Qt::KeepAspectRatioByExpanding, Qt::SmoothTransformation);
+    QPixmap result(size, size);
+    result.fill(Qt::transparent);
+    QPainter p(&result);
+    p.setRenderHint(QPainter::Antialiasing);
+    QPainterPath path;
+    path.addEllipse(0, 0, size, size);
+    p.setClipPath(path);
+    p.drawPixmap(0, 0, scaled);
+    return result;
 }

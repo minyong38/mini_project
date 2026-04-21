@@ -9,7 +9,7 @@ set(CMAKE_AUTOMOC ON)
 set(CMAKE_AUTORCC ON)
 set(CMAKE_AUTOUIC ON)
 
-find_package(Qt6 REQUIRED COMPONENTS Core Gui Widgets Network Sql)
+find_package(Qt6 REQUIRED COMPONENTS Core Gui Widgets Network Sql Multimedia MultimediaWidgets)
 
 # 공통 헤더 포함 경로
 include_directories(${CMAKE_CURRENT_SOURCE_DIR})
@@ -48,4 +48,4 @@ add_executable(Client
     Common.h
     resources.qrc
 )
-target_link_libraries(Client PRIVATE Qt6::Widgets Qt6::Network)
+target_link_libraries(Client PRIVATE Qt6::Widgets Qt6::Network Qt6::Multimedia Qt6::MultimediaWidgets)

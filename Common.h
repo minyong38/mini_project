@@ -26,6 +26,16 @@ namespace Protocol {
     inline const QString LOGIN_FAIL   = "LOGIN_FAIL";   // 비밀번호 불일치
     inline const QString ONLINE       = "ONLINE";
 
+    // 프로필 사진
+    // PROFILE_UPLOAD : PROFILE_UPLOAD:userId:base64data
+    // PROFILE_OK     : PROFILE_OK
+    // PROFILE_REQ    : PROFILE_REQ:userId
+    // PROFILE_RES    : PROFILE_RES:userId:base64data
+    inline const QString PROFILE_UPLOAD = "PROFILE_UPLOAD";
+    inline const QString PROFILE_OK     = "PROFILE_OK";
+    inline const QString PROFILE_REQ    = "PROFILE_REQ";
+    inline const QString PROFILE_RES    = "PROFILE_RES";
+
     // 회원가입
     // SIGNUP      : SIGNUP:userId:password
     // SIGNUP_OK   : SIGNUP_OK

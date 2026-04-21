@@ -15,6 +15,7 @@
 #include "SharedCalDialog.h"
 #include "CustomCalendarWidget.h"
 #include <QTabWidget>
+#include <QPixmap>
 
 QT_BEGIN_NAMESPACE
 namespace Ui { class MainWindow; }
@@ -137,6 +138,11 @@ private:
 
     // 클릭 가능한 친구 목록 레이아웃
     QHBoxLayout* m_friendsLayout = nullptr;
+
+    // 프로필 사진 캐시
+    QMap<QString, QPixmap> m_profileCache;
+    void requestProfile(const QString& userId);
+    QPixmap circularPixmap(const QPixmap& src, int size);
 };
 
 #endif

@@ -17,6 +17,8 @@ void ScheduleServer::initDatabase() {
     QSqlQuery q;
     q.exec("CREATE TABLE IF NOT EXISTS users "
            "(USER_ID TEXT PRIMARY KEY, PASSWORD TEXT)");
+    q.exec("CREATE TABLE IF NOT EXISTS profiles "
+           "(USER_ID TEXT PRIMARY KEY, PHOTO TEXT)");
     q.exec("CREATE TABLE IF NOT EXISTS schedules (USER_ID TEXT, DATE TEXT, CONTENT TEXT)");
     q.exec("CREATE TABLE IF NOT EXISTS chats (USER_ID TEXT, MESSAGE TEXT, SEND_TIME TEXT)");
     q.exec("ALTER TABLE chats ADD COLUMN SEND_TIME TEXT DEFAULT ''"); // 기존 테이블 마이그레이션
@@ -67,8 +69,35 @@ void ScheduleServer::handleRequest(QTcpSocket* socket, const QString& data) {
     if (parts.isEmpty()) return;
     const QString cmd = parts[0];
 
+    // ── 프로필 업로드 ────────────────────────────────────────────
+    if (cmd == Protocol::PROFILE_UPLOAD && parts.size() >= 3) {
+        QString userId = parts[1];
+        QString base64 = parts.mid(2).join(Protocol::SEP);
+        QSqlQuery q;
+        q.prepare("INSERT OR REPLACE INTO profiles (USER_ID, PHOTO) VALUES(?,?)");
+        q.addBindValue(userId); q.addBindValue(base64);
+        socket->write(q.exec()
+            ? (Protocol::PROFILE_OK + "\n").toUtf8()
+            : QString("PROFILE_ERR\n").toUtf8());
+        return;
+    }
+
+    // ── 프로필 조회 ──────────────────────────────────────────────
+    else if (cmd == Protocol::PROFILE_REQ && parts.size() >= 2) {
+        QString userId = parts[1];
+        QSqlQuery q;
+        q.prepare("SELECT PHOTO FROM profiles WHERE USER_ID=?");
+        q.addBindValue(userId);
+        q.exec();
+        if (q.next()) {
+            socket->write((Protocol::PROFILE_RES + Protocol::SEP
+                           + userId + Protocol::SEP + q.value(0).toString() + "\n").toUtf8());
+        }
+        return;
+    }
+
     // ── 회원가입 ─────────────────────────────────────────────────
-    if (cmd == Protocol::SIGNUP && parts.size() >= 3) {
+    else if (cmd == Protocol::SIGNUP && parts.size() >= 3) {
         QString userId   = parts[1];
         QString password = parts[2];
         QSqlQuery q;
