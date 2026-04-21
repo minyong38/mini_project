@@ -15,9 +15,10 @@
 #include <QTabWidget>
 #include <QPixmap>
 
-MainWindow::MainWindow(const QString& ip, const QString& myId, QWidget *parent)
+MainWindow::MainWindow(const QString& ip, const QString& myId,
+                       const QString& password, QWidget *parent)
     : QMainWindow(parent), ui(new Ui::MainWindow),
-    m_myId(myId), m_selectedId(myId), m_serverIp(ip)
+    m_myId(myId), m_password(password), m_selectedId(myId), m_serverIp(ip)
 {
     ui->setupUi(this);
     setWindowTitle("캘린더 — " + m_myId);
@@ -218,7 +219,8 @@ MainWindow::~MainWindow() { delete ui; }
 void MainWindow::onConnectSuccess() {
     stopReconnectTimer();
     setWindowTitle("캘린더 — " + m_myId);
-    m_socket->write((Protocol::LOGIN + Protocol::SEP + m_myId + "\n").toUtf8());
+    m_socket->write((Protocol::LOGIN + Protocol::SEP + m_myId
+                     + Protocol::SEP + m_password + "\n").toUtf8());
 }
 
 void MainWindow::requestUsers() {
@@ -261,6 +263,12 @@ void MainWindow::processMessage(const QString& data) {
         requestMonthSchedules(ui->calendarWidget->yearShown(),
                               ui->calendarWidget->monthShown());
         requestSharedCals();
+    }
+    else if (data == Protocol::LOGIN_FAIL) {
+        QMessageBox::critical(this, "로그인 실패",
+            "ID 또는 비밀번호가 올바르지 않습니다.\n"
+            "회원가입 후 이용해주세요.");
+        close();
     }
     else if (data == Protocol::LOGIN_REJECT) {
         QMessageBox::critical(this, "로그인 실패",

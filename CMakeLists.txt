@@ -37,6 +37,8 @@ add_executable(Client
     GoogleAuthManager.h
     LoginDialog.cpp
     LoginDialog.h
+    RegisterDialog.cpp
+    RegisterDialog.h
     ScheduleDialog.cpp
     ScheduleDialog.h
     scheduledialog.ui

@@ -12,18 +12,23 @@ class LoginDialog : public QDialog {
 public:
     explicit LoginDialog(QWidget* parent = nullptr);
 
-    QString getIp()   const;
-    QString getId()   const;  // Google 로그인 시 표시 이름, 수동 입력 시 ID
-    QString getEmail()const;
+    QString getIp()       const;
+    QString getId()       const;
+    QString getPassword() const;
+    QString getEmail()    const;
+    bool    isGoogleLogin() const;
 
-private:
+private slots:
     void onGoogleLogin();
     void onLoginSuccess(const GoogleUserInfo& user);
     void onLoginFailed(const QString& error);
     void setGoogleButtonState(bool loading);
+    void onSignupClicked();
 
+private:
     QLineEdit*    m_ipEdit;
-    QLineEdit*    m_idEdit;       // 수동 ID (fallback)
+    QLineEdit*    m_idEdit;
+    QLineEdit*    m_pwEdit;
     QPushButton*  m_googleBtn;
     QPushButton*  m_okBtn;
     QLabel*       m_statusLabel;

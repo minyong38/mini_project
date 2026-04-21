@@ -15,6 +15,8 @@ void ScheduleServer::initDatabase() {
     if (!m_db.open()) { qCritical() << "DB Error:" << m_db.lastError().text(); return; }
 
     QSqlQuery q;
+    q.exec("CREATE TABLE IF NOT EXISTS users "
+           "(USER_ID TEXT PRIMARY KEY, PASSWORD TEXT)");
     q.exec("CREATE TABLE IF NOT EXISTS schedules (USER_ID TEXT, DATE TEXT, CONTENT TEXT)");
     q.exec("CREATE TABLE IF NOT EXISTS chats (USER_ID TEXT, MESSAGE TEXT, SEND_TIME TEXT)");
     q.exec("ALTER TABLE chats ADD COLUMN SEND_TIME TEXT DEFAULT ''"); // 기존 테이블 마이그레이션
@@ -65,13 +67,54 @@ void ScheduleServer::handleRequest(QTcpSocket* socket, const QString& data) {
     if (parts.isEmpty()) return;
     const QString cmd = parts[0];
 
+    // ── 회원가입 ─────────────────────────────────────────────────
+    if (cmd == Protocol::SIGNUP && parts.size() >= 3) {
+        QString userId   = parts[1];
+        QString password = parts[2];
+        QSqlQuery q;
+        q.prepare("SELECT USER_ID FROM users WHERE USER_ID=?");
+        q.addBindValue(userId);
+        q.exec();
+        if (q.next()) {
+            socket->write((Protocol::SIGNUP_FAIL + ":이미 존재하는 ID입니다\n").toUtf8());
+        } else {
+            q.prepare("INSERT INTO users (USER_ID, PASSWORD) VALUES(?,?)");
+            q.addBindValue(userId); q.addBindValue(password);
+            socket->write(q.exec()
+                ? (Protocol::SIGNUP_OK + "\n").toUtf8()
+                : (Protocol::SIGNUP_FAIL + ":서버 오류\n").toUtf8());
+        }
+        return;
+    }
+
     // ── 로그인 ──────────────────────────────────────────────────
-    if (cmd == Protocol::LOGIN && parts.size() >= 2) {
-        QString userId = parts[1];
+    else if (cmd == Protocol::LOGIN && parts.size() >= 2) {
+        QString userId   = parts[1];
+        QString password = (parts.size() >= 3) ? parts[2] : "";
+
         if (m_clientIds.values().contains(userId)) {
             socket->write((Protocol::LOGIN_REJECT + "\n").toUtf8());
             return;
         }
+
+        if (password.isEmpty()) {
+            // Google 로그인: users 테이블에 없으면 자동 등록
+            QSqlQuery q;
+            q.prepare("INSERT OR IGNORE INTO users (USER_ID, PASSWORD) VALUES(?,?)");
+            q.addBindValue(userId); q.addBindValue("");
+            q.exec();
+        } else {
+            // 일반 로그인: 비밀번호 확인
+            QSqlQuery q;
+            q.prepare("SELECT USER_ID FROM users WHERE USER_ID=? AND PASSWORD=?");
+            q.addBindValue(userId); q.addBindValue(password);
+            q.exec();
+            if (!q.next()) {
+                socket->write((Protocol::LOGIN_FAIL + "\n").toUtf8());
+                return;
+            }
+        }
+
         m_clientIds[socket] = userId;
         socket->write((Protocol::LOGIN_OK + "\n").toUtf8());
         broadcastOnlineList();

@@ -30,7 +30,8 @@ struct SharedCalInfo {
 class MainWindow : public QMainWindow {
     Q_OBJECT
 public:
-    MainWindow(const QString& ip, const QString& myId, QWidget *parent = nullptr);
+    MainWindow(const QString& ip, const QString& myId,
+               const QString& password = "", QWidget *parent = nullptr);
     ~MainWindow();
 
 private slots:
@@ -61,6 +62,7 @@ private:
     QTcpSocket*      m_socket;
 
     QString          m_myId;
+    QString          m_password;
     QString          m_selectedId;
     QString          m_serverIp;
 

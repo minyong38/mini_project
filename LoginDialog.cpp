@@ -1,4 +1,5 @@
 #include "LoginDialog.h"
+#include "RegisterDialog.h"
 #include <QVBoxLayout>
 #include <QHBoxLayout>
 #include <QFrame>
@@ -125,7 +126,25 @@ LoginDialog::LoginDialog(QWidget* parent) : QDialog(parent)
         "QLineEdit:focus { border-color:#1A237E; background:#FFFFFF; }"
     );
     root->addWidget(m_idEdit);
-    root->addSpacing(22);
+    root->addSpacing(14);
+
+    // ── 비밀번호 ──────────────────────────────────────────
+    auto* pwLabel = new QLabel("비밀번호", this);
+    pwLabel->setStyleSheet("font-size:11px; font-weight:700; color:#757575; letter-spacing:0.8px;");
+    root->addWidget(pwLabel);
+    root->addSpacing(5);
+
+    m_pwEdit = new QLineEdit(this);
+    m_pwEdit->setPlaceholderText("비밀번호를 입력하세요");
+    m_pwEdit->setEchoMode(QLineEdit::Password);
+    m_pwEdit->setFixedHeight(40);
+    m_pwEdit->setStyleSheet(
+        "QLineEdit { padding:0 12px; border:1.5px solid #E0E0E0; border-radius:8px;"
+        " font-size:13px; color:#212121; background:#FAFAFA; }"
+        "QLineEdit:focus { border-color:#1A237E; background:#FFFFFF; }"
+    );
+    root->addWidget(m_pwEdit);
+    root->addSpacing(18);
 
     // ── 버튼 행 ───────────────────────────────────────────
     auto* btnRow = new QHBoxLayout();
@@ -152,11 +171,31 @@ LoginDialog::LoginDialog(QWidget* parent) : QDialog(parent)
     btnRow->addWidget(cancelBtn, 1);
     btnRow->addWidget(m_okBtn,   2);
     root->addLayout(btnRow);
+    root->addSpacing(10);
+
+    // ── 회원가입 링크 ──────────────────────────────────────
+    auto* signupRow = new QHBoxLayout();
+    signupRow->setAlignment(Qt::AlignHCenter);
+    auto* signupHint = new QLabel("계정이 없으신가요?", this);
+    signupHint->setStyleSheet("font-size:12px; color:#9E9E9E;");
+    auto* signupBtn = new QPushButton("회원가입", this);
+    signupBtn->setFlat(true);
+    signupBtn->setCursor(Qt::PointingHandCursor);
+    signupBtn->setStyleSheet(
+        "QPushButton { font-size:12px; color:#1A237E; font-weight:700;"
+        " background:transparent; border:none; padding:0; }"
+        "QPushButton:hover { color:#283593; }"
+    );
+    signupRow->addWidget(signupHint);
+    signupRow->addWidget(signupBtn);
+    root->addLayout(signupRow);
 
     connect(m_googleBtn, &QPushButton::clicked, this, &LoginDialog::onGoogleLogin);
     connect(m_okBtn,     &QPushButton::clicked, this, &LoginDialog::accept);
     connect(cancelBtn,   &QPushButton::clicked, this, &LoginDialog::reject);
-    connect(m_idEdit,    &QLineEdit::returnPressed, this, &LoginDialog::accept);
+    connect(signupBtn,   &QPushButton::clicked, this, &LoginDialog::onSignupClicked);
+    connect(m_idEdit,    &QLineEdit::returnPressed, m_pwEdit, QOverload<>::of(&QLineEdit::setFocus));
+    connect(m_pwEdit,    &QLineEdit::returnPressed, this, &LoginDialog::accept);
 }
 
 void LoginDialog::onGoogleLogin()
@@ -190,6 +229,14 @@ void LoginDialog::onLoginSuccess(const GoogleUserInfo& user)
 
     m_idEdit->clear();
     m_idEdit->setPlaceholderText(user.name + " (Google 로그인됨)");
+    m_pwEdit->setEnabled(false);
+    m_pwEdit->setPlaceholderText("Google 계정 사용 중");
+}
+
+void LoginDialog::onSignupClicked()
+{
+    RegisterDialog dlg(m_ipEdit->text().trimmed(), this);
+    dlg.exec();
 }
 
 void LoginDialog::onLoginFailed(const QString& error)
@@ -211,6 +258,13 @@ void LoginDialog::setGoogleButtonState(bool loading)
 
 QString LoginDialog::getIp()    const { return m_ipEdit->text().trimmed(); }
 QString LoginDialog::getEmail() const { return m_userInfo.email; }
+bool    LoginDialog::isGoogleLogin() const { return m_googleLoggedIn; }
+
+QString LoginDialog::getPassword() const
+{
+    if (m_googleLoggedIn) return "";
+    return m_pwEdit->text();
+}
 
 QString LoginDialog::getId() const
 {

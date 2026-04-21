@@ -12,7 +12,7 @@ int main(int argc, char *argv[]) {
             return 0;
         }
 
-        MainWindow w(login.getIp(), login.getId());
+        MainWindow w(login.getIp(), login.getId(), login.getPassword());
         w.show();
         return a.exec();
     }

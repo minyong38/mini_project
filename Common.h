@@ -23,7 +23,16 @@ namespace Protocol {
     inline const QString LOGIN        = "LOGIN";
     inline const QString LOGIN_OK     = "LOGIN_OK";
     inline const QString LOGIN_REJECT = "LOGIN_REJECT";
+    inline const QString LOGIN_FAIL   = "LOGIN_FAIL";   // 비밀번호 불일치
     inline const QString ONLINE       = "ONLINE";
+
+    // 회원가입
+    // SIGNUP      : SIGNUP:userId:password
+    // SIGNUP_OK   : SIGNUP_OK
+    // SIGNUP_FAIL : SIGNUP_FAIL:reason
+    inline const QString SIGNUP      = "SIGNUP";
+    inline const QString SIGNUP_OK   = "SIGNUP_OK";
+    inline const QString SIGNUP_FAIL = "SIGNUP_FAIL";
 
     // 단체 채팅
     // CHAT    : CHAT:USER_ID:MESSAGE
