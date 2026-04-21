@@ -45,6 +45,7 @@ add_executable(Client
     scheduledialog.ui
     ChatDialog.cpp
     ChatDialog.h
+    SharedCalDialog.cpp
     SharedCalDialog.h
     MyPageDialog.cpp
     MyPageDialog.h
