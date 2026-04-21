@@ -114,7 +114,7 @@ MyPageDialog::MyPageDialog(const QString& userId,
     footRow->addWidget(saveBtn);
     pLayout->addLayout(footRow);
 
-    m_stack->addWidget(profilePage);  // index 0
+    m_stack->addWidget(profilePage);
 
     // ── 페이지 1: 카메라 촬영 ──────────────────────────────────
     auto* cameraPage = new QWidget;
@@ -150,7 +150,7 @@ MyPageDialog::MyPageDialog(const QString& userId,
     camBtnRow->addWidget(m_captureBtn);
     cLayout->addLayout(camBtnRow);
 
-    m_stack->addWidget(cameraPage);   // index 1
+    m_stack->addWidget(cameraPage);
 
     // ── 시그널 연결 ────────────────────────────────────────────
     connect(retakeBtn,    &QPushButton::clicked, this, &MyPageDialog::onRetake);
@@ -228,6 +228,11 @@ void MyPageDialog::onRetake() {
             "연결된 카메라가 없습니다.\n이미지 업로드를 이용해주세요.");
         return;
     }
+
+    // 이전 카메라 세션이 남아있으면 먼저 정리
+    if (m_camera) { m_camera->stop(); delete m_camera; m_camera = nullptr; }
+    delete m_imgCapture; m_imgCapture = nullptr;
+    delete m_session;    m_session    = nullptr;
 
     m_session    = new QMediaCaptureSession(this);
     m_camera     = new QCamera(cameras.first(), this);

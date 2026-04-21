@@ -108,7 +108,6 @@ private:
     QPushButton*     m_themeBtn   = nullptr;
     bool             m_darkMode        = false;
     QTimer*          m_reconnectTimer  = nullptr;
-    int              m_reconnectSecs   = 5;
 
     WeatherManager*  m_weather    = nullptr;
 

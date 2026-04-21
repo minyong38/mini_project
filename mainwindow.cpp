@@ -12,7 +12,6 @@
 #include <QAction>
 #include <QPainter>
 #include <QPainterPath>
-#include <QStyle>
 #include <QTabWidget>
 #include <QPixmap>
 #include <QBuffer>
@@ -602,7 +601,7 @@ void MainWindow::processMessage(const QString& data) {
         QStringList p = payload.split(Protocol::SEP);
         if (p.size() < 5) return;
         int     calId  = p[0].toInt();
-        // p[1] = rowid (unused on client)
+        // p[1]은 rowid (클라이언트 미사용)
         QString sender = p[2];
         QString rawT   = p[3];
         QString msg    = p.mid(4).join(Protocol::SEP);
@@ -1480,7 +1479,6 @@ void MainWindow::startReconnectTimer() {
 
 void MainWindow::stopReconnectTimer() {
     if (m_reconnectTimer) m_reconnectTimer->stop();
-    m_reconnectSecs = 5;
 }
 
 void MainWindow::requestProfile(const QString& userId) {
