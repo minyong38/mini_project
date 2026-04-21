@@ -10,14 +10,21 @@
 class SearchDialog : public QDialog {
     Q_OBJECT
 public:
+    struct SearchResult {
+        int     calId;    // 0 = 내 캘린더, >0 = 공유 캘린더 ID
+        QString calName;
+        QString date;
+        QString content;
+    };
+
     explicit SearchDialog(QWidget* parent = nullptr);
 
-    void setResults(const QList<QPair<QString, QString>>& results); // date, content
+    void setResults(const QList<SearchResult>& results);
     void setDarkMode(bool dark);
 
 signals:
     void searchRequested(const QString& keyword);
-    void dateSelected(const QDate& date);
+    void dateSelected(const QDate& date, int calId);
 
 private slots:
     void onSearch();

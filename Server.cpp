@@ -1,7 +1,7 @@
 #include "Server.h"
 #include "Common.h"
 #include <QSqlError>
-#include <QTime>
+#include <QDateTime>
 #include <QDebug>
 #include <QCoreApplication>
 
@@ -23,7 +23,6 @@ void ScheduleServer::initDatabase() {
            "(USER_ID TEXT PRIMARY KEY, NICKNAME TEXT)");
     q.exec("CREATE TABLE IF NOT EXISTS schedules (USER_ID TEXT, DATE TEXT, CONTENT TEXT)");
     q.exec("CREATE TABLE IF NOT EXISTS chats (USER_ID TEXT, MESSAGE TEXT, SEND_TIME TEXT)");
-    q.exec("ALTER TABLE chats ADD COLUMN SEND_TIME TEXT DEFAULT ''"); // 기존 테이블 마이그레이션
     q.exec("CREATE TABLE IF NOT EXISTS dm_chats "
            "(SENDER TEXT, RECEIVER TEXT, MESSAGE TEXT, SEND_TIME TEXT)");
     q.exec("CREATE TABLE IF NOT EXISTS shared_calendars "
@@ -166,15 +165,32 @@ void ScheduleServer::handleRequest(QTcpSocket* socket, const QString& data) {
     else if (cmd == Protocol::SEARCH_REQ && parts.size() >= 3) {
         QString userId  = parts[1];
         QString keyword = parts.mid(2).join(Protocol::SEP);
+        QStringList entries;
+
+        // 개인 일정 검색
         QSqlQuery q;
         q.prepare("SELECT DATE, CONTENT FROM schedules "
                   "WHERE USER_ID=? AND CONTENT LIKE ? ORDER BY DATE ASC");
         q.addBindValue(userId);
         q.addBindValue("%" + keyword + "%");
         q.exec();
-        QStringList entries;
         while (q.next())
-            entries << q.value(0).toString() + "~" + q.value(1).toString();
+            entries << "0\t내 캘린더\t" + q.value(0).toString() + "\t" + q.value(1).toString();
+
+        // 멤버로 속한 공유 캘린더 일정 검색
+        QSqlQuery q2;
+        q2.prepare("SELECT ss.DATE, ss.CONTENT, sc.ID, sc.NAME "
+                   "FROM shared_schedules ss "
+                   "JOIN shared_calendars sc ON ss.CAL_ID = sc.ID "
+                   "WHERE ss.CAL_ID IN (SELECT CAL_ID FROM shared_members WHERE USER_ID=?) "
+                   "AND ss.CONTENT LIKE ? ORDER BY ss.DATE ASC");
+        q2.addBindValue(userId);
+        q2.addBindValue("%" + keyword + "%");
+        q2.exec();
+        while (q2.next())
+            entries << q2.value(2).toString() + "\t" + q2.value(3).toString()
+                       + "\t" + q2.value(0).toString() + "\t" + q2.value(1).toString();
+
         socket->write((Protocol::SEARCH_RES + Protocol::SEP
                        + entries.join("|") + "\n").toUtf8());
         return;
@@ -307,12 +323,12 @@ void ScheduleServer::handleRequest(QTcpSocket* socket, const QString& data) {
     else if (cmd == Protocol::CHAT && parts.size() >= 3) {
         QString userId  = parts[1];
         QString message = parts.mid(2).join(Protocol::SEP);
-        QString timeStr = QTime::currentTime().toString("HHmm");
+        QString timeStr = QDateTime::currentDateTime().toString("MM/dd HH.mm");
 
         QSqlQuery q;
         q.prepare("INSERT INTO chats (USER_ID,MESSAGE,SEND_TIME) VALUES(?,?,?)");
         q.addBindValue(userId); q.addBindValue(message); q.addBindValue(timeStr);
-        if (!q.exec()) return;
+        if (!q.exec()) { qWarning() << "채팅 저장 실패:" << q.lastError().text(); return; }
 
         qint64 rowid = q.lastInsertId().toLongLong();
 
@@ -329,13 +345,13 @@ void ScheduleServer::handleRequest(QTcpSocket* socket, const QString& data) {
         QString sender   = parts[1];
         QString receiver = parts[2];
         QString message  = parts.mid(3).join(Protocol::SEP);
-        QString timeStr  = QTime::currentTime().toString("HHmm");
+        QString timeStr  = QDateTime::currentDateTime().toString("MM/dd HH.mm");
 
         QSqlQuery q;
         q.prepare("INSERT INTO dm_chats (SENDER,RECEIVER,MESSAGE,SEND_TIME) VALUES(?,?,?,?)");
         q.addBindValue(sender); q.addBindValue(receiver);
         q.addBindValue(message); q.addBindValue(timeStr);
-        if (!q.exec()) return;
+        if (!q.exec()) { qWarning() << "DM 저장 실패:" << q.lastError().text(); return; }
 
         // sender 와 receiver 에게만 전달
         QString msg = Protocol::DMRES + Protocol::SEP
@@ -356,7 +372,7 @@ void ScheduleServer::handleRequest(QTcpSocket* socket, const QString& data) {
         QSqlQuery q;
         q.prepare(
             "SELECT SENDER,SEND_TIME,MESSAGE FROM "
-            "  (SELECT SENDER,SEND_TIME,MESSAGE FROM dm_chats "
+            "  (SELECT rowid,SENDER,SEND_TIME,MESSAGE FROM dm_chats "
             "   WHERE (SENDER=? AND RECEIVER=?) OR (SENDER=? AND RECEIVER=?) "
             "   ORDER BY rowid DESC LIMIT 50) "
             "ORDER BY rowid ASC"
@@ -621,13 +637,13 @@ void ScheduleServer::handleRequest(QTcpSocket* socket, const QString& data) {
         int     calId   = parts[1].toInt();
         QString sender  = parts[2];
         QString message = parts.mid(3).join(Protocol::SEP);
-        QString timeStr = QTime::currentTime().toString("HHmm");
+        QString timeStr = QDateTime::currentDateTime().toString("MM/dd HH.mm");
 
         QSqlQuery q;
         q.prepare("INSERT INTO shared_chats (CAL_ID,SENDER,MESSAGE,SEND_TIME) VALUES(?,?,?,?)");
         q.addBindValue(calId); q.addBindValue(sender);
         q.addBindValue(message); q.addBindValue(timeStr);
-        if (!q.exec()) return;
+        if (!q.exec()) { qWarning() << "공유 채팅 저장 실패:" << q.lastError().text(); return; }
 
         qint64 rowid = q.lastInsertId().toLongLong();
 

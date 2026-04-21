@@ -308,12 +308,18 @@ void MainWindow::processMessage(const QString& data) {
     else if (data.startsWith(Protocol::SEARCH_RES + Protocol::SEP)) {
         if (!m_searchDialog) return;
         QString payload = data.mid(Protocol::SEARCH_RES.length() + 1);
-        QList<QPair<QString, QString>> results;
+        QList<SearchDialog::SearchResult> results;
         if (!payload.isEmpty()) {
             for (const QString& entry : payload.split("|")) {
-                int sep = entry.indexOf('~');
-                if (sep > 0)
-                    results.append({ entry.left(sep), entry.mid(sep + 1) });
+                QStringList f = entry.split("\t");
+                if (f.size() >= 4) {
+                    SearchDialog::SearchResult r;
+                    r.calId   = f[0].toInt();
+                    r.calName = f[1];
+                    r.date    = f[2];
+                    r.content = f[3];
+                    results.append(r);
+                }
             }
         }
         m_searchDialog->setResults(results);
@@ -423,7 +429,7 @@ void MainWindow::processMessage(const QString& data) {
                 QString sender = p[0];
                 QString rawT   = p[1];
                 QString msg    = p.mid(2).join(Protocol::SEP);
-                QString time   = rawT.length() == 4 ? rawT.left(2) + ":" + rawT.right(2) : "";
+                QString time   = rawT.length() == 4 ? rawT.left(2) + ":" + rawT.right(2) : QString(rawT).replace('.', ':');
                 dlg->appendMessage(0, 0, sender, msg, time);
             }
         }
@@ -438,7 +444,7 @@ void MainWindow::processMessage(const QString& data) {
         QString receiver = p[2];
         QString rawT     = p[3];
         QString msg      = p.mid(4).join(Protocol::SEP);
-        QString time     = rawT.length() == 4 ? rawT.left(2) + ":" + rawT.right(2) : "";
+        QString time     = rawT.length() == 4 ? rawT.left(2) + ":" + rawT.right(2) : QString(rawT).replace('.', ':');
 
         QString peer = (sender == m_myId) ? receiver : sender;
 
@@ -603,7 +609,7 @@ void MainWindow::processMessage(const QString& data) {
                 QString sender = p[0];
                 QString rawT   = p[1];
                 QString msg    = p.mid(2).join(Protocol::SEP);
-                QString time   = rawT.length() == 4 ? rawT.left(2) + ":" + rawT.right(2) : "";
+                QString time   = rawT.length() == 4 ? rawT.left(2) + ":" + rawT.right(2) : QString(rawT).replace('.', ':');
                 dlg->appendMessage(0, 0, sender, msg, time);
             }
         }
@@ -619,7 +625,7 @@ void MainWindow::processMessage(const QString& data) {
         QString sender = p[2];
         QString rawT   = p[3];
         QString msg    = p.mid(4).join(Protocol::SEP);
-        QString time   = rawT.length() == 4 ? rawT.left(2) + ":" + rawT.right(2) : "";
+        QString time   = rawT.length() == 4 ? rawT.left(2) + ":" + rawT.right(2) : QString(rawT).replace('.', ':');
 
         if (!m_sharedChatDialogs.contains(calId)) {
             QString calName;
@@ -684,11 +690,25 @@ void MainWindow::onSearchBtnClicked() {
         m_socket->write((Protocol::SEARCH_REQ + Protocol::SEP
                          + m_myId + Protocol::SEP + keyword + "\n").toUtf8());
     });
-    connect(m_searchDialog, &SearchDialog::dateSelected, this, [this](const QDate& date) {
-        // 내 캘린더 탭으로 이동 후 해당 날짜 선택
-        m_calTabWidget->setCurrentIndex(0);
-        ui->calendarWidget->setSelectedDate(date);
-        ui->calendarWidget->showSelectedDate();
+    connect(m_searchDialog, &SearchDialog::dateSelected, this, [this](const QDate& date, int calId) {
+        if (calId == 0) {
+            // 내 캘린더 탭으로 이동
+            m_calTabWidget->setCurrentIndex(0);
+            ui->calendarWidget->setSelectedDate(date);
+            ui->calendarWidget->showSelectedDate();
+        } else {
+            // 해당 공유 캘린더 탭으로 이동
+            for (int i = 0; i < m_calTabWidget->count(); i++) {
+                if (m_calTabWidget->tabBar()->tabData(i).toString() == QString("S:%1").arg(calId)) {
+                    m_calTabWidget->setCurrentIndex(i);
+                    if (m_sharedCalWidgets.contains(calId)) {
+                        m_sharedCalWidgets[calId]->setSelectedDate(date);
+                        m_sharedCalWidgets[calId]->showSelectedDate();
+                    }
+                    break;
+                }
+            }
+        }
     });
     connect(m_searchDialog, &QDialog::finished, this, [this]() {
         m_searchDialog = nullptr;
