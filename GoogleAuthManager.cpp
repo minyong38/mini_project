@@ -82,10 +82,10 @@ void GoogleAuthManager::startLogin()
 void GoogleAuthManager::sendBrowserResponse(QTcpSocket* socket, bool success)
 {
     QString body = success
-        ? "<html><body style='font-family:sans-serif;text-align:center;padding:60px'>"
-          "<h2>✅ 로그인 성공!</h2><p>이 창을 닫고 앱으로 돌아가세요.</p></body></html>"
-        : "<html><body style='font-family:sans-serif;text-align:center;padding:60px'>"
-          "<h2>❌ 로그인 실패</h2><p>다시 시도해주세요.</p></body></html>";
+                       ? "<html><body style='font-family:sans-serif;text-align:center;padding:60px'>"
+                         "<h2>✅ 로그인 성공!</h2><p>이 창을 닫고 앱으로 돌아가세요.</p></body></html>"
+                       : "<html><body style='font-family:sans-serif;text-align:center;padding:60px'>"
+                         "<h2>❌ 로그인 실패</h2><p>다시 시도해주세요.</p></body></html>";
 
     QString response = "HTTP/1.1 200 OK\r\n"
                        "Content-Type: text/html; charset=utf-8\r\n"

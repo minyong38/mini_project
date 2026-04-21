@@ -28,8 +28,8 @@ static QColor colorFromTag(const QString& tag) {
 // ─────────────────────────────────────────────────────────────────────
 
 static QString encodeContent(const QString& title, const QString& start,
-                              const QString& end, const QString& desc,
-                              const QString& color = "")
+                             const QString& end, const QString& desc,
+                             const QString& color = "")
 {
     return title + "\t" + start + "\t" + end + "\t" + desc + "\t" + color;
 }
@@ -78,7 +78,7 @@ AddScheduleDialog::AddScheduleDialog(QWidget* parent) : QDialog(parent)
         "QFrame { background: #FFFFFF;"
         " border-top-left-radius: 16px; border-top-right-radius: 16px;"
         " border-bottom: 1px solid #F2F2F7; }"
-    );
+        );
     auto* headerLayout = new QHBoxLayout(header);
     headerLayout->setContentsMargins(20, 0, 12, 0);
 
@@ -86,7 +86,7 @@ AddScheduleDialog::AddScheduleDialog(QWidget* parent) : QDialog(parent)
     m_headerLabel->setStyleSheet(
         "QLabel { font-size: 18px; font-weight: bold; color: #000;"
         " background: transparent; border: none; }"
-    );
+        );
     headerLayout->addWidget(m_headerLabel);
     headerLayout->addStretch();
     cardLayout->addWidget(header);
@@ -103,7 +103,7 @@ AddScheduleDialog::AddScheduleDialog(QWidget* parent) : QDialog(parent)
     titleLabel->setStyleSheet(
         "QLabel { font-size: 13px; font-weight: 600; color: #3C3C43;"
         " background: transparent; border: none; }"
-    );
+        );
     m_titleEdit = new QLineEdit;
     m_titleEdit->setPlaceholderText("제목을 입력하세요 (필수)");
     m_titleEdit->setFixedHeight(40);
@@ -111,7 +111,7 @@ AddScheduleDialog::AddScheduleDialog(QWidget* parent) : QDialog(parent)
         "QLineEdit { background: #F2F2F7; border: none; border-radius: 10px;"
         " padding: 0 12px; font-size: 15px; color: #000; }"
         "QLineEdit:focus { background: #E5F0FF; }"
-    );
+        );
     bodyLayout->addWidget(titleLabel);
     bodyLayout->addWidget(m_titleEdit);
 
@@ -120,7 +120,7 @@ AddScheduleDialog::AddScheduleDialog(QWidget* parent) : QDialog(parent)
     colorLabel->setStyleSheet(
         "QLabel { font-size: 13px; font-weight: 600; color: #3C3C43;"
         " background: transparent; border: none; }"
-    );
+        );
     bodyLayout->addWidget(colorLabel);
 
     auto* colorRow = new QWidget;
@@ -143,7 +143,7 @@ AddScheduleDialog::AddScheduleDialog(QWidget* parent) : QDialog(parent)
                     "QPushButton:checked {"
                     "  border: 3px solid #1C1C1E;"
                     "}").arg(COLOR_CODES[i])
-        );
+            );
         m_colorBtns->addButton(btn, i);
         colorRowLayout->addWidget(btn);
     }
@@ -159,7 +159,7 @@ AddScheduleDialog::AddScheduleDialog(QWidget* parent) : QDialog(parent)
         "QCheckBox::indicator { width: 18px; height: 18px;"
         " border-radius: 4px; border: 1.5px solid #C7C7CC; background: white; }"
         "QCheckBox::indicator:checked { background: #007AFF; border-color: #007AFF; }"
-    );
+        );
     bodyLayout->addWidget(m_timeCheck);
 
     // 시간 입력 행
@@ -185,7 +185,7 @@ AddScheduleDialog::AddScheduleDialog(QWidget* parent) : QDialog(parent)
     auto* sepLabel = new QLabel("~");
     sepLabel->setStyleSheet(
         "QLabel { color: #8E8E93; font-size: 16px; background: transparent; border: none; }"
-    );
+        );
     sepLabel->setAlignment(Qt::AlignCenter);
 
     m_endEdit = new QTimeEdit;
@@ -211,7 +211,7 @@ AddScheduleDialog::AddScheduleDialog(QWidget* parent) : QDialog(parent)
     descLabel->setStyleSheet(
         "QLabel { font-size: 13px; font-weight: 600; color: #3C3C43;"
         " background: transparent; border: none; }"
-    );
+        );
     m_descEdit = new QPlainTextEdit;
     m_descEdit->setPlaceholderText("상세 내용을 입력하세요 (선택사항)");
     m_descEdit->setFixedHeight(72);
@@ -219,7 +219,7 @@ AddScheduleDialog::AddScheduleDialog(QWidget* parent) : QDialog(parent)
         "QPlainTextEdit { background: #F2F2F7; border: none; border-radius: 10px;"
         " padding: 8px 12px; font-size: 14px; color: #000; }"
         "QPlainTextEdit:focus { background: #E5F0FF; }"
-    );
+        );
     bodyLayout->addWidget(descLabel);
     bodyLayout->addWidget(m_descEdit);
     cardLayout->addWidget(body, 1);
@@ -231,7 +231,7 @@ AddScheduleDialog::AddScheduleDialog(QWidget* parent) : QDialog(parent)
         "QFrame { background: #FFFFFF;"
         " border-top: 1px solid #F2F2F7;"
         " border-bottom-left-radius: 16px; border-bottom-right-radius: 16px; }"
-    );
+        );
     auto* footerLayout = new QHBoxLayout(footer);
     footerLayout->setContentsMargins(16, 0, 16, 0);
     footerLayout->setSpacing(8);
@@ -243,7 +243,7 @@ AddScheduleDialog::AddScheduleDialog(QWidget* parent) : QDialog(parent)
         " border: 1.5px solid #C7C7CC; border-radius: 19px;"
         " font-size: 14px; font-weight: 500; }"
         "QPushButton:hover { background: #F2F2F7; }"
-    );
+        );
 
     auto* saveBtn = new QPushButton("저장");
     saveBtn->setFixedSize(80, 38);
@@ -252,7 +252,7 @@ AddScheduleDialog::AddScheduleDialog(QWidget* parent) : QDialog(parent)
         " border-radius: 19px; font-size: 14px; font-weight: 600; }"
         "QPushButton:hover { background: #0066D6; }"
         "QPushButton:pressed { background: #0055B3; }"
-    );
+        );
 
     footerLayout->addWidget(cancelBtn);
     footerLayout->addStretch();
@@ -265,7 +265,7 @@ AddScheduleDialog::AddScheduleDialog(QWidget* parent) : QDialog(parent)
             m_titleEdit->setStyleSheet(
                 "QLineEdit { background: #FFF0EF; border: 1.5px solid #FF3B30;"
                 " border-radius: 10px; padding: 0 12px; font-size: 15px; color: #000; }"
-            );
+                );
             m_titleEdit->setPlaceholderText("⚠ 제목을 입력해주세요");
             return;
         }
@@ -274,8 +274,8 @@ AddScheduleDialog::AddScheduleDialog(QWidget* parent) : QDialog(parent)
 }
 
 void AddScheduleDialog::setValues(const QString& title, const QString& startTime,
-                                   const QString& endTime, const QString& description,
-                                   const QString& colorTag)
+                                  const QString& endTime, const QString& description,
+                                  const QString& colorTag)
 {
     m_headerLabel->setText("일정 수정");
     m_titleEdit->setText(title);

@@ -225,7 +225,7 @@ void MyPageDialog::onRetake() {
     const auto cameras = QMediaDevices::videoInputs();
     if (cameras.isEmpty()) {
         QMessageBox::information(this, "카메라 없음",
-            "연결된 카메라가 없습니다.\n이미지 업로드를 이용해주세요.");
+                                 "연결된 카메라가 없습니다.\n이미지 업로드를 이용해주세요.");
         return;
     }
 

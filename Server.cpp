@@ -162,6 +162,24 @@ void ScheduleServer::handleRequest(QTcpSocket* socket, const QString& data) {
         return;
     }
 
+    // ── 일정 검색 ────────────────────────────────────────────────
+    else if (cmd == Protocol::SEARCH_REQ && parts.size() >= 3) {
+        QString userId  = parts[1];
+        QString keyword = parts.mid(2).join(Protocol::SEP);
+        QSqlQuery q;
+        q.prepare("SELECT DATE, CONTENT FROM schedules "
+                  "WHERE USER_ID=? AND CONTENT LIKE ? ORDER BY DATE ASC");
+        q.addBindValue(userId);
+        q.addBindValue("%" + keyword + "%");
+        q.exec();
+        QStringList entries;
+        while (q.next())
+            entries << q.value(0).toString() + "~" + q.value(1).toString();
+        socket->write((Protocol::SEARCH_RES + Protocol::SEP
+                       + entries.join("|") + "\n").toUtf8());
+        return;
+    }
+
     // ── 회원가입 ─────────────────────────────────────────────────
     else if (cmd == Protocol::SIGNUP && parts.size() >= 3) {
         QString userId   = parts[1];
@@ -176,8 +194,8 @@ void ScheduleServer::handleRequest(QTcpSocket* socket, const QString& data) {
             q.prepare("INSERT INTO users (USER_ID, PASSWORD) VALUES(?,?)");
             q.addBindValue(userId); q.addBindValue(password);
             socket->write(q.exec()
-                ? (Protocol::SIGNUP_OK + "\n").toUtf8()
-                : (Protocol::SIGNUP_FAIL + ":서버 오류\n").toUtf8());
+                              ? (Protocol::SIGNUP_OK + "\n").toUtf8()
+                              : (Protocol::SIGNUP_FAIL + ":서버 오류\n").toUtf8());
         }
         return;
     }
@@ -234,8 +252,8 @@ void ScheduleServer::handleRequest(QTcpSocket* socket, const QString& data) {
         q.addBindValue(parts[1]); q.addBindValue(parts[2]);
         q.addBindValue(parts.mid(3).join(Protocol::SEP));
         socket->write(q.exec()
-            ? (Protocol::ACK + ":OK\n").toUtf8()
-            : (Protocol::ACK + ":ERR\n").toUtf8());
+                          ? (Protocol::ACK + ":OK\n").toUtf8()
+                          : (Protocol::ACK + ":ERR\n").toUtf8());
     }
 
     // ── 일정 삭제 ────────────────────────────────────────────────
@@ -244,8 +262,8 @@ void ScheduleServer::handleRequest(QTcpSocket* socket, const QString& data) {
         q.prepare("DELETE FROM schedules WHERE rowid=?");
         q.addBindValue(parts[1].toLongLong());
         socket->write(q.exec()
-            ? (Protocol::ACK + ":OK\n").toUtf8()
-            : (Protocol::ACK + ":ERR\n").toUtf8());
+                          ? (Protocol::ACK + ":OK\n").toUtf8()
+                          : (Protocol::ACK + ":ERR\n").toUtf8());
     }
 
     // ── 일정 수정 ────────────────────────────────────────────────
@@ -255,8 +273,8 @@ void ScheduleServer::handleRequest(QTcpSocket* socket, const QString& data) {
         q.addBindValue(parts.mid(2).join(Protocol::SEP));
         q.addBindValue(parts[1].toLongLong());
         socket->write(q.exec()
-            ? (Protocol::ACK + ":OK\n").toUtf8()
-            : (Protocol::ACK + ":ERR\n").toUtf8());
+                          ? (Protocol::ACK + ":OK\n").toUtf8()
+                          : (Protocol::ACK + ":ERR\n").toUtf8());
     }
 
     // ── 월별 조회 ────────────────────────────────────────────────
@@ -321,10 +339,10 @@ void ScheduleServer::handleRequest(QTcpSocket* socket, const QString& data) {
 
         // sender 와 receiver 에게만 전달
         QString msg = Protocol::DMRES + Protocol::SEP
-                    + sender   + Protocol::SEP
-                    + receiver + Protocol::SEP
-                    + timeStr  + Protocol::SEP
-                    + message  + "\n";
+                      + sender   + Protocol::SEP
+                      + receiver + Protocol::SEP
+                      + timeStr  + Protocol::SEP
+                      + message  + "\n";
         for (QTcpSocket* s : m_clients) {
             QString uid = m_clientIds.value(s);
             if (uid == sender || uid == receiver)
@@ -342,7 +360,7 @@ void ScheduleServer::handleRequest(QTcpSocket* socket, const QString& data) {
             "   WHERE (SENDER=? AND RECEIVER=?) OR (SENDER=? AND RECEIVER=?) "
             "   ORDER BY rowid DESC LIMIT 50) "
             "ORDER BY rowid ASC"
-        );
+            );
         q.addBindValue(u1); q.addBindValue(u2);
         q.addBindValue(u2); q.addBindValue(u1);
 
@@ -350,10 +368,10 @@ void ScheduleServer::handleRequest(QTcpSocket* socket, const QString& data) {
         if (q.exec()) {
             while (q.next()) {
                 entries << q.value(0).toString()   // SENDER
-                         + Protocol::SEP
-                         + q.value(1).toString()   // SEND_TIME
-                         + Protocol::SEP
-                         + q.value(2).toString();  // MESSAGE
+                               + Protocol::SEP
+                               + q.value(1).toString()   // SEND_TIME
+                               + Protocol::SEP
+                               + q.value(2).toString();  // MESSAGE
             }
         }
         socket->write((Protocol::RESDM + Protocol::SEP + entries.join("|") + "\n").toUtf8());
@@ -386,8 +404,8 @@ void ScheduleServer::handleRequest(QTcpSocket* socket, const QString& data) {
             QString time  = q.value(3).toString();
             int     unread = m_unreadCount.value(rid, 0);
             entries << QString::number(rid) + Protocol::SEP
-                     + QString::number(unread) + Protocol::SEP
-                     + uid + Protocol::SEP + time + Protocol::SEP + msg;
+                           + QString::number(unread) + Protocol::SEP
+                           + uid + Protocol::SEP + time + Protocol::SEP + msg;
             maxRowid = qMax(maxRowid, rid);
         }
         socket->write((Protocol::RESCHAT + Protocol::SEP + entries.join("|") + "\n").toUtf8());
@@ -402,8 +420,8 @@ void ScheduleServer::handleRequest(QTcpSocket* socket, const QString& data) {
         QString owner   = parts[1];
         QString calName = parts[2];
         QStringList invited = (parts.size() >= 4 && !parts[3].isEmpty())
-                              ? parts[3].split("~", Qt::SkipEmptyParts)
-                              : QStringList();
+                                  ? parts[3].split("~", Qt::SkipEmptyParts)
+                                  : QStringList();
 
         QSqlQuery q;
         q.prepare("INSERT INTO shared_calendars (OWNER, NAME) VALUES(?,?)");
@@ -450,7 +468,7 @@ void ScheduleServer::handleRequest(QTcpSocket* socket, const QString& data) {
                 if (mq.exec()) while (mq.next()) members << mq.value(0).toString();
 
                 entries << QString::number(calId) + "~" + name + "~" + owner
-                             + "~" + members.join(",");
+                               + "~" + members.join(",");
             }
         }
         socket->write((Protocol::RESCALS + Protocol::SEP + entries.join("|") + "\n").toUtf8());
@@ -469,8 +487,8 @@ void ScheduleServer::handleRequest(QTcpSocket* socket, const QString& data) {
         if (q.exec()) {
             while (q.next())
                 res << q.value(1).toString() + "@"
-                     + q.value(0).toString() + "@"
-                     + q.value(2).toString();
+                           + q.value(0).toString() + "@"
+                           + q.value(2).toString();
         }
         socket->write((Protocol::RESSHMONTH + Protocol::SEP
                        + QString::number(calId) + Protocol::SEP
@@ -569,8 +587,8 @@ void ScheduleServer::handleRequest(QTcpSocket* socket, const QString& data) {
         if (q.exec()) {
             while (q.next())
                 entries << q.value(0).toString() + Protocol::SEP
-                         + q.value(1).toString() + Protocol::SEP
-                         + q.value(2).toString();
+                               + q.value(1).toString() + Protocol::SEP
+                               + q.value(2).toString();
         }
         socket->write((Protocol::RESSHCHAT + Protocol::SEP
                        + QString::number(calId) + Protocol::SEP
@@ -614,24 +632,24 @@ void ScheduleServer::handleRequest(QTcpSocket* socket, const QString& data) {
         qint64 rowid = q.lastInsertId().toLongLong();
 
         QString msg = Protocol::SHCHATRES + Protocol::SEP
-                    + QString::number(calId) + Protocol::SEP
-                    + QString::number(rowid) + Protocol::SEP
-                    + sender  + Protocol::SEP
-                    + timeStr + Protocol::SEP
-                    + message + "\n";
+                      + QString::number(calId) + Protocol::SEP
+                      + QString::number(rowid) + Protocol::SEP
+                      + sender  + Protocol::SEP
+                      + timeStr + Protocol::SEP
+                      + message + "\n";
         sendToCalMembers(calId, msg);
     }
 }
 
 void ScheduleServer::broadcastChat(qint64 rowid, int unread, const QString& userId,
-                                    const QString& timeStr, const QString& message)
+                                   const QString& timeStr, const QString& message)
 {
     QString msg = Protocol::CHATRES + Protocol::SEP
-                + QString::number(rowid) + Protocol::SEP
-                + QString::number(unread) + Protocol::SEP
-                + userId + Protocol::SEP
-                + timeStr + Protocol::SEP
-                + message + "\n";
+                  + QString::number(rowid) + Protocol::SEP
+                  + QString::number(unread) + Protocol::SEP
+                  + userId + Protocol::SEP
+                  + timeStr + Protocol::SEP
+                  + message + "\n";
     for (QTcpSocket* s : m_clients)
         if (s && s->state() == QAbstractSocket::ConnectedState)
             s->write(msg.toUtf8());
@@ -639,8 +657,8 @@ void ScheduleServer::broadcastChat(qint64 rowid, int unread, const QString& user
 
 void ScheduleServer::broadcastReadRes(qint64 rowid, int count, QTcpSocket* exclude) {
     QString msg = Protocol::READRES + Protocol::SEP
-                + QString::number(rowid) + Protocol::SEP
-                + QString::number(count) + "\n";
+                  + QString::number(rowid) + Protocol::SEP
+                  + QString::number(count) + "\n";
     for (QTcpSocket* s : m_clients)
         if (s != exclude && s && s->state() == QAbstractSocket::ConnectedState)
             s->write(msg.toUtf8());

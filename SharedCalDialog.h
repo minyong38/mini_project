@@ -37,7 +37,7 @@ public:
             "QLineEdit { padding:8px 12px; border:1.5px solid #E5E5EA; border-radius:10px;"
             " font-size:14px; color:#1C1C1E; }"
             "QLineEdit:focus { border-color:#007AFF; }"
-        );
+            );
         root->addWidget(m_nameEdit);
 
         if (!friends.isEmpty()) {
@@ -51,7 +51,7 @@ public:
                 "QListWidget { border:1.5px solid #E5E5EA; border-radius:10px; outline:none; }"
                 "QListWidget::item { padding:6px 12px; font-size:13px; }"
                 "QListWidget::item:selected { background:#E5F0FF; color:#007AFF; border-radius:6px; }"
-            );
+                );
             for (const QString& f : friends) {
                 auto* item = new QListWidgetItem("👤 " + f, m_friendList);
                 item->setData(Qt::UserRole, f);
@@ -70,7 +70,7 @@ public:
             "QPushButton { background:#F2F2F7; border:none; border-radius:10px;"
             " font-size:14px; color:#1C1C1E; }"
             "QPushButton:hover { background:#E5E5EA; }"
-        );
+            );
         auto* createBtn = new QPushButton("만들기", this);
         createBtn->setFixedHeight(40);
         createBtn->setDefault(true);
@@ -78,7 +78,7 @@ public:
             "QPushButton { background:#007AFF; border:none; border-radius:10px;"
             " font-size:14px; color:#FFFFFF; font-weight:600; }"
             "QPushButton:hover { background:#0071E3; }"
-        );
+            );
         btnRow->addWidget(cancelBtn);
         btnRow->addWidget(createBtn);
         root->addLayout(btnRow);

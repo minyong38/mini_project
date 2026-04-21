@@ -59,7 +59,7 @@ LoginDialog::LoginDialog(QWidget* parent) : QDialog(parent)
         "QLineEdit { padding:0 12px; border:1.5px solid #E0E0E0; border-radius:8px;"
         " font-size:13px; color:#212121; background:#FAFAFA; }"
         "QLineEdit:focus { border-color:#1A237E; background:#FFFFFF; }"
-    );
+        );
     root->addWidget(m_ipEdit);
     root->addSpacing(18);
 
@@ -124,7 +124,7 @@ LoginDialog::LoginDialog(QWidget* parent) : QDialog(parent)
         "QLineEdit { padding:0 12px; border:1.5px solid #E0E0E0; border-radius:8px;"
         " font-size:13px; color:#212121; background:#FAFAFA; }"
         "QLineEdit:focus { border-color:#1A237E; background:#FFFFFF; }"
-    );
+        );
     root->addWidget(m_idEdit);
     root->addSpacing(14);
 
@@ -142,7 +142,7 @@ LoginDialog::LoginDialog(QWidget* parent) : QDialog(parent)
         "QLineEdit { padding:0 12px; border:1.5px solid #E0E0E0; border-radius:8px;"
         " font-size:13px; color:#212121; background:#FAFAFA; }"
         "QLineEdit:focus { border-color:#1A237E; background:#FFFFFF; }"
-    );
+        );
     root->addWidget(m_pwEdit);
     root->addSpacing(18);
 
@@ -156,7 +156,7 @@ LoginDialog::LoginDialog(QWidget* parent) : QDialog(parent)
         "QPushButton { background:#F5F5F5; border:none; border-radius:8px;"
         " font-size:13px; color:#616161; font-weight:600; }"
         "QPushButton:hover { background:#EEEEEE; }"
-    );
+        );
 
     m_okBtn = new QPushButton("로그인", this);
     m_okBtn->setFixedHeight(42);
@@ -166,7 +166,7 @@ LoginDialog::LoginDialog(QWidget* parent) : QDialog(parent)
         " font-size:13px; color:#FFFFFF; font-weight:700; }"
         "QPushButton:hover   { background:#283593; }"
         "QPushButton:pressed { background:#0D47A1; }"
-    );
+        );
 
     btnRow->addWidget(cancelBtn, 1);
     btnRow->addWidget(m_okBtn,   2);
@@ -185,7 +185,7 @@ LoginDialog::LoginDialog(QWidget* parent) : QDialog(parent)
         "QPushButton { font-size:12px; color:#1A237E; font-weight:700;"
         " background:transparent; border:none; padding:0; }"
         "QPushButton:hover { color:#283593; }"
-    );
+        );
     signupRow->addWidget(signupHint);
     signupRow->addWidget(signupBtn);
     root->addLayout(signupRow);
@@ -222,7 +222,7 @@ void LoginDialog::onLoginSuccess(const GoogleUserInfo& user)
     m_googleBtn->setStyleSheet(
         "QPushButton { background:#E8F5E9; border:1.5px solid #43A047; border-radius:8px;"
         " font-size:13px; font-weight:600; color:#2E7D32; padding-left:8px; }"
-    );
+        );
     m_statusLabel->setStyleSheet("font-size:11px; color:#43A047; font-weight:600;");
     m_statusLabel->setText("✓  " + user.email);
     m_statusLabel->show();
