@@ -17,6 +17,7 @@
 #include <QTabWidget>
 #include <QPixmap>
 #include "MyPageDialog.h"
+#include "SearchDialog.h"
 
 QT_BEGIN_NAMESPACE
 namespace Ui { class MainWindow; }
@@ -51,6 +52,7 @@ private slots:
 
     void onChatBtnClicked();
     void onMyPageBtnClicked();
+    void onSearchBtnClicked();
 
 private:
     void requestSchedules(const QDate& date);
@@ -144,6 +146,7 @@ private:
     // 프로필 사진 캐시
     QMap<QString, QPixmap>  m_profileCache;
     QMap<QString, QString>  m_nicknameCache;
+    SearchDialog*           m_searchDialog = nullptr;
     void requestProfile(const QString& userId);
     QPixmap circularPixmap(const QPixmap& src, int size);
 };

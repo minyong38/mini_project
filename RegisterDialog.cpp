@@ -79,7 +79,7 @@ RegisterDialog::RegisterDialog(const QString& serverIp, QWidget* parent)
         "QPushButton { background:#1A237E; border:none; border-radius:8px;"
         " font-size:13px; color:#FFFFFF; font-weight:700; }"
         "QPushButton:hover { background:#283593; }"
-    );
+        );
 
     m_retakeBtn = new QPushButton("다시 찍기", m_cameraPage);
     m_retakeBtn->setFixedHeight(42);
@@ -88,7 +88,7 @@ RegisterDialog::RegisterDialog(const QString& serverIp, QWidget* parent)
         "QPushButton { background:#F5F5F5; border:none; border-radius:8px;"
         " font-size:13px; color:#616161; font-weight:600; }"
         "QPushButton:hover { background:#EEEEEE; }"
-    );
+        );
 
     m_nextBtn = new QPushButton("다음 →", m_cameraPage);
     m_nextBtn->setFixedHeight(42);
@@ -98,7 +98,7 @@ RegisterDialog::RegisterDialog(const QString& serverIp, QWidget* parent)
         " font-size:13px; color:#FFFFFF; font-weight:700; }"
         "QPushButton:hover   { background:#388E3C; }"
         "QPushButton:disabled{ background:#BDBDBD; }"
-    );
+        );
 
     camBtnRow->addWidget(m_retakeBtn, 1);
     camBtnRow->addWidget(m_captureBtn, 2);
@@ -167,7 +167,7 @@ RegisterDialog::RegisterDialog(const QString& serverIp, QWidget* parent)
         "QPushButton { background:#F5F5F5; border:none; border-radius:8px;"
         " font-size:13px; color:#616161; font-weight:600; }"
         "QPushButton:hover { background:#EEEEEE; }"
-    );
+        );
 
     m_registerBtn = new QPushButton("가입하기", m_formPage);
     m_registerBtn->setFixedHeight(42);
@@ -177,7 +177,7 @@ RegisterDialog::RegisterDialog(const QString& serverIp, QWidget* parent)
         " font-size:13px; color:#FFFFFF; font-weight:700; }"
         "QPushButton:hover   { background:#283593; }"
         "QPushButton:disabled{ background:#BDBDBD; }"
-    );
+        );
 
     formBtnRow->addWidget(backBtn, 1);
     formBtnRow->addWidget(m_registerBtn, 2);
@@ -330,7 +330,7 @@ void RegisterDialog::onReadyRead()
     if (resp == Protocol::PROFILE_OK) {
         m_socket->disconnectFromHost();
         QMessageBox::information(this, "회원가입 완료",
-            "회원가입이 완료되었습니다!\n로그인 화면으로 돌아갑니다.");
+                                 "회원가입이 완료되었습니다!\n로그인 화면으로 돌아갑니다.");
         accept();
         return;
     }

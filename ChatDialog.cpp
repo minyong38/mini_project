@@ -35,7 +35,7 @@ ChatDialog::ChatDialog(const QString& myId, QWidget* parent)
         "QScrollBar:vertical { width: 4px; background: transparent; }"
         "QScrollBar::handle:vertical { background: #90A4AE; border-radius: 2px; }"
         "QScrollBar::add-line:vertical, QScrollBar::sub-line:vertical { height: 0px; }"
-    );
+        );
 
     m_messageContainer = new QWidget();
     m_messageContainer->setStyleSheet("background: #B2C7D9;");
@@ -63,7 +63,7 @@ ChatDialog::ChatDialog(const QString& myId, QWidget* parent)
         "QPushButton { background:#EEEEEE; border:none; border-radius:18px; font-size:16px; }"
         "QPushButton:hover  { background:#DDDDDD; }"
         "QPushButton:pressed{ background:#CCCCCC; }"
-    );
+        );
 
     m_inputEdit = new QLineEdit();
     m_inputEdit->setPlaceholderText("메시지 입력");
@@ -71,7 +71,7 @@ ChatDialog::ChatDialog(const QString& myId, QWidget* parent)
         "QLineEdit { background:#FFFFFF; border:1px solid #DDDDDD; border-radius:20px;"
         " padding:6px 16px; font-size:14px; color:#000; }"
         "QLineEdit:focus { border-color:#AAAAAA; }"
-    );
+        );
 
     m_sendBtn = new QPushButton("전송");
     m_sendBtn->setFixedSize(60, 36);
@@ -81,7 +81,7 @@ ChatDialog::ChatDialog(const QString& myId, QWidget* parent)
         " font-size:13px; font-weight:bold; }"
         "QPushButton:hover  { background:#FFBA00; }"
         "QPushButton:pressed{ background:#F0A800; }"
-    );
+        );
 
     inputLayout->addWidget(m_imageBtn);
     inputLayout->addWidget(m_inputEdit);
@@ -95,8 +95,8 @@ ChatDialog::ChatDialog(const QString& myId, QWidget* parent)
     // 스크롤바 범위가 실제로 늘어난 순간 바닥으로 이동
     connect(m_scrollArea->verticalScrollBar(), &QScrollBar::rangeChanged,
             this, [this](int, int max) {
-        m_scrollArea->verticalScrollBar()->setValue(max);
-    });
+                m_scrollArea->verticalScrollBar()->setValue(max);
+            });
 }
 
 void ChatDialog::onSendClicked() {
@@ -110,7 +110,7 @@ void ChatDialog::onImageClicked() {
     QString path = QFileDialog::getOpenFileName(
         this, "이미지 선택", "",
         "이미지 파일 (*.png *.jpg *.jpeg *.bmp *.gif *.webp)"
-    );
+        );
     if (path.isEmpty()) return;
 
     QImageReader reader(path);
@@ -136,8 +136,8 @@ void ChatDialog::onImageClicked() {
 }
 
 void ChatDialog::appendMessage(qint64 rowid, int unread,
-                                const QString& userId, const QString& message,
-                                const QString& time)
+                               const QString& userId, const QString& message,
+                               const QString& time)
 {
     bool isMe = (userId == m_myId);
 
@@ -158,7 +158,7 @@ void ChatDialog::appendMessage(qint64 rowid, int unread,
         auto* nameLabel = new QLabel(userId);
         nameLabel->setStyleSheet(
             "color:#333; font-size:12px; font-weight:bold; background:transparent;"
-        );
+            );
         bubbleLayout->addWidget(nameLabel);
     }
 
@@ -185,9 +185,9 @@ void ChatDialog::appendMessage(qint64 rowid, int unread,
     }
 
     bubble->setStyleSheet(isMe
-        ? "background:#FFCD00; border-radius:12px; border-top-right-radius:2px;"
-        : "background:#FFFFFF; border-radius:12px; border-top-left-radius:2px;"
-    );
+                              ? "background:#FFCD00; border-radius:12px; border-top-right-radius:2px;"
+                              : "background:#FFFFFF; border-radius:12px; border-top-left-radius:2px;"
+                          );
 
     // ── 시간 라벨 ─────────────────────────────────────
     auto* timeLabel = new QLabel(time);
@@ -198,7 +198,7 @@ void ChatDialog::appendMessage(qint64 rowid, int unread,
     auto* unreadLabel = new QLabel(unread > 0 ? QString::number(unread) : "");
     unreadLabel->setStyleSheet(
         "color:#34C759; font-size:10px; font-weight:bold; background:transparent;"
-    );
+        );
     unreadLabel->setAlignment(Qt::AlignBottom);
     unreadLabel->setVisible(unread > 0);
     m_unreadLabels[rowid] = unreadLabel;
