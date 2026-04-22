@@ -15,7 +15,22 @@
       "Bash(sed -i -e '/^\\\\/\\\\/ 공휴일$/d' /c/Users/5-20/mini_project/CustomCalendarWidget.cpp)",
       "Bash(grep -n \"    //\" /c/Users/5-20/mini_project/mainwindow.cpp)",
       "Bash(cmake --build . --target Client --target Server)",
-      "Bash(/c/Qt/Tools/CMake_64/bin/cmake --build .)"
+      "Bash(/c/Qt/Tools/CMake_64/bin/cmake --build .)",
+      "Bash(python3 -c \"import pdfplumber; pdf=pdfplumber.open\\('C:/Qt_workspace/v2.0_Qt_6_Programming_[Korean]_2024.06.13.pdf'\\); print\\(len\\(pdf.pages\\)\\); print\\(pdf.pages[0].extract_text\\(\\)[:2000]\\)\")",
+      "Bash(python3 -c \"from pypdf import PdfReader; r=PdfReader\\('C:/Qt_workspace/v2.0_Qt_6_Programming_[Korean]_2024.06.13.pdf'\\); print\\(len\\(r.pages\\)\\); print\\(r.pages[0].extract_text\\(\\)[:2000]\\)\")",
+      "Bash(python -c \"from PyPDF2 import PdfReader; r=PdfReader\\('C:/Qt_workspace/v2.0_Qt_6_Programming_[Korean]_2024.06.13.pdf'\\); print\\(len\\(r.pages\\)\\); print\\(r.pages[0].extract_text\\(\\)[:2000]\\)\")",
+      "Bash(pip install *)",
+      "Bash(pip3 install *)",
+      "Bash(python3 -m pip install pypdf)",
+      "Bash(py --version)",
+      "Bash(where python *)",
+      "Bash(where py *)",
+      "PowerShell(Get-Item *)",
+      "PowerShell(Get-ChildItem *)",
+      "Bash(git rm *)",
+      "Bash(git checkout *)",
+      "Bash(git add *)",
+      "Bash(cmake --build . --target Server)"
     ]
   }
 }

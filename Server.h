@@ -33,12 +33,6 @@ private:
     void initDatabase();
     void handleRequest(QTcpSocket* socket, const QString& data);
 
-    //단체 채팅 메세지를 접속한 모두에게 전송
-    void broadcastChat(qint64 rowid, int unread, const QString& userId,
-                       const QString& timeStr, const QString& message);
-
-    //메세지 읽음 상태가 변동되었음을 알림
-    void broadcastReadRes(qint64 rowid, int count, QTcpSocket* exclude);
     void broadcastOnlineList();
     QStringList getCalMembers(int calId);
     void sendToCalMembers(int calId, const QString& msg, QTcpSocket* exclude = nullptr);
@@ -49,9 +43,7 @@ private:
     QList<QTcpSocket*>         m_clients;
     QMap<QTcpSocket*, QString> m_clientIds;
 
-    // 읽음 추적(메모리, 서버 재시작 시 초기화)
-    QMap<qint64, int>     m_unreadCount;    // rowid → 아직 안 읽은 사람 수
-    QMap<QString, qint64> m_lastReadRowid;  // userId → 마지막으로 읽은 rowid
+
 };
 
 #endif

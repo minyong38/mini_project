@@ -70,18 +70,6 @@ inline const QString SIGNUP      = "SIGNUP";
 inline const QString SIGNUP_OK   = "SIGNUP_OK";
 inline const QString SIGNUP_FAIL = "SIGNUP_FAIL";
 
-// 단체 채팅
-// CHAT    : CHAT:USER_ID:MESSAGE
-// CHATRES : CHATRES:ROWID:UNREAD:USER_ID:HHmm:MESSAGE
-// REQCHAT : REQCHAT:USER_ID
-// RESCHAT : RESCHAT:ROWID:UNREAD:USER_ID:HHmm:MSG|...
-// READRES : READRES:ROWID:NEW_COUNT
-inline const QString CHAT    = "CHAT";
-inline const QString CHATRES = "CHATRES";
-inline const QString REQCHAT = "REQCHAT";
-inline const QString RESCHAT = "RESCHAT";
-inline const QString READRES = "READRES";
-
 // 1대1 DM
 // DM     : DM:sender:receiver:message
 // DMRES  : DMRES:sender:receiver:HHmm:message  (sender, receiver 모두에게 전송)

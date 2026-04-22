@@ -22,7 +22,6 @@ void ScheduleServer::initDatabase() {
     q.exec("CREATE TABLE IF NOT EXISTS nicknames "
            "(USER_ID TEXT PRIMARY KEY, NICKNAME TEXT)");
     q.exec("CREATE TABLE IF NOT EXISTS schedules (USER_ID TEXT, DATE TEXT, CONTENT TEXT)");
-    q.exec("CREATE TABLE IF NOT EXISTS chats (USER_ID TEXT, MESSAGE TEXT, SEND_TIME TEXT)");
     q.exec("CREATE TABLE IF NOT EXISTS dm_chats "
            "(SENDER TEXT, RECEIVER TEXT, MESSAGE TEXT, SEND_TIME TEXT)");
     q.exec("CREATE TABLE IF NOT EXISTS shared_calendars "
@@ -303,24 +302,6 @@ void ScheduleServer::handleRequest(QTcpSocket* socket, const QString& data) {
         socket->write((Protocol::RESUSERS + Protocol::SEP + users.join("|") + "\n").toUtf8());
     }
 
-    else if (cmd == Protocol::CHAT && parts.size() >= 3) {
-        QString userId  = parts[1];
-        QString message = parts.mid(2).join(Protocol::SEP);
-        QString timeStr = QDateTime::currentDateTime().toString("MM/dd HH.mm");
-
-        QSqlQuery q;
-        q.prepare("INSERT INTO chats (USER_ID,MESSAGE,SEND_TIME) VALUES(?,?,?)");
-        q.addBindValue(userId); q.addBindValue(message); q.addBindValue(timeStr);
-        if (!q.exec()) { qWarning() << "채팅 저장 실패:" << q.lastError().text(); return; }
-
-        qint64 rowid = q.lastInsertId().toLongLong();
-
-        int unread = qMax(0, m_clientIds.size() - 1);
-        m_unreadCount[rowid]      = unread;
-
-        broadcastChat(rowid, unread, userId, timeStr, message);
-    }
-
     else if (cmd == Protocol::DM && parts.size() >= 4) {
         QString sender   = parts[1];
         QString receiver = parts[2];
@@ -371,43 +352,6 @@ void ScheduleServer::handleRequest(QTcpSocket* socket, const QString& data) {
             }
         }
         socket->write((Protocol::RESDM + Protocol::SEP + entries.join("|") + "\n").toUtf8());
-    }
-
-    else if (cmd == Protocol::REQCHAT && parts.size() >= 2) {
-        QString userId = parts[1];
-
-        // 1) 먼저 이 유저의 미읽음 카운트 차감 (차감 후 RESCHAT을 보내야 최신 카운트가 반영됨)
-        qint64 lastRead = m_lastReadRowid.value(userId, -1);
-        for (auto it = m_unreadCount.begin(); it != m_unreadCount.end(); ++it) {
-            if (it.key() > lastRead && it.value() > 0) {
-                it.value() = qMax(0, it.value() - 1);
-                broadcastReadRes(it.key(), it.value(), socket); // 다른 클라이언트에게 알림
-            }
-        }
-
-        // 2) 최근 50개 채팅 기록 (차감된 카운트 기준)
-        QSqlQuery q;
-        q.exec("SELECT rowid,USER_ID,MESSAGE,SEND_TIME "
-               "FROM (SELECT rowid,USER_ID,MESSAGE,SEND_TIME FROM chats ORDER BY rowid DESC LIMIT 50) "
-               "ORDER BY rowid ASC");
-        QStringList entries;
-        qint64 maxRowid = -1;
-        while (q.next()) {
-            qint64  rid   = q.value(0).toLongLong();
-            QString uid   = q.value(1).toString();
-            QString msg   = q.value(2).toString();
-            QString time  = q.value(3).toString();
-            int     unread = m_unreadCount.value(rid, 0);
-            entries << QString::number(rid) + Protocol::SEP
-                           + QString::number(unread) + Protocol::SEP
-                           + uid + Protocol::SEP + time + Protocol::SEP + msg;
-            maxRowid = qMax(maxRowid, rid);
-        }
-        socket->write((Protocol::RESCHAT + Protocol::SEP + entries.join("|") + "\n").toUtf8());
-
-        // 3) lastRead 갱신
-        if (maxRowid > lastRead)
-            m_lastReadRowid[userId] = maxRowid;
     }
 
     else if (cmd == Protocol::CREATECAL && parts.size() >= 3) {
@@ -624,29 +568,6 @@ void ScheduleServer::handleRequest(QTcpSocket* socket, const QString& data) {
                       + message + "\n";
         sendToCalMembers(calId, msg);
     }
-}
-
-void ScheduleServer::broadcastChat(qint64 rowid, int unread, const QString& userId,
-                                   const QString& timeStr, const QString& message)
-{
-    QString msg = Protocol::CHATRES + Protocol::SEP
-                  + QString::number(rowid) + Protocol::SEP
-                  + QString::number(unread) + Protocol::SEP
-                  + userId + Protocol::SEP
-                  + timeStr + Protocol::SEP
-                  + message + "\n";
-    for (QTcpSocket* s : m_clients)
-        if (s && s->state() == QAbstractSocket::ConnectedState)
-            s->write(msg.toUtf8());
-}
-
-void ScheduleServer::broadcastReadRes(qint64 rowid, int count, QTcpSocket* exclude) {
-    QString msg = Protocol::READRES + Protocol::SEP
-                  + QString::number(rowid) + Protocol::SEP
-                  + QString::number(count) + "\n";
-    for (QTcpSocket* s : m_clients)
-        if (s != exclude && s && s->state() == QAbstractSocket::ConnectedState)
-            s->write(msg.toUtf8());
 }
 
 void ScheduleServer::broadcastOnlineList() {
