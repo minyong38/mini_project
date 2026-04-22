@@ -125,43 +125,38 @@ inline const QString DELSH      = "DELSH";
 //일정 수정
 inline const QString MODSH      = "MODSH";
 
+//변경사항이 있을시 친구들에게 알림
 inline const QString SHUPDATE   = "SHUPDATE";
 
-
+//채팅 내역 요청
 inline const QString REQSHCHAT  = "REQSHCHAT";
 
-
+//채팅 응답
 inline const QString RESSHCHAT  = "RESSHCHAT";
 
-
+//채팅 전송
 inline const QString SHCHAT     = "SHCHAT";
 
-
+//채팅 중계
 inline const QString SHCHATRES  = "SHCHATRES";
 
-
+//캘린더 삭제
 inline const QString DELCAL     = "DELCAL";      // DELCAL:calId
 
-
+//삭제 알림
 inline const QString CALREMOVED = "CALREMOVED";  // CALREMOVED:calId (서버→전체)
 
 
 // 닉네임
-// NICK_UPDATE : NICK_UPDATE:userId:nickname
-// NICK_OK     : NICK_OK:nickname
-// NICK_REQ    : NICK_REQ:userId
-// NICK_RES    : NICK_RES:userId:nickname
-inline const QString NICK_UPDATE = "NICK_UPDATE";
-inline const QString NICK_OK     = "NICK_OK";
-inline const QString NICK_REQ    = "NICK_REQ";
-inline const QString NICK_RES    = "NICK_RES";
+inline const QString NICK_UPDATE = "NICK_UPDATE"; //변경 요청
+inline const QString NICK_OK     = "NICK_OK";   //변경 성공
+inline const QString NICK_REQ    = "NICK_REQ";  //닉네임 정보 요청
+inline const QString NICK_RES    = "NICK_RES";  //정보 응답
 
 // 프로필 사진 삭제
-inline const QString PROFILE_DELETE = "PROFILE_DELETE";  // PROFILE_DELETE:userId
+inline const QString PROFILE_DELETE = "PROFILE_DELETE";  //프로필 삭제
 
 // 일정 검색
-// SEARCH_REQ : SEARCH_REQ:userId:keyword
-// SEARCH_RES : SEARCH_RES:calId\tcalName\tdate\tcontent|...
 inline const QString SEARCH_REQ = "SEARCH_REQ";
 inline const QString SEARCH_RES = "SEARCH_RES";
 }
